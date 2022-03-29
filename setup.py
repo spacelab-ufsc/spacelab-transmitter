@@ -37,7 +37,7 @@ with open("README.md", "r") as fh:
 setuptools.setup(
     name                            = "spacelab_transmitter",
     version                         = __version__,
-    author                          = "Vitória Beatriz Bianchin",
+    author                          = "Vitória Beatriz Bianchin", 
     author_email                    = "vitoriabbianchin@gmail.com",
     maintainer                      = "Gabriel Mariano Marcelino",
     maintainer_email                = "gabriel.mm8@gmail.com",
@@ -61,20 +61,18 @@ setuptools.setup(
         ],
     download_url                    = "https://github.com/spacelab-ufsc/spacelab-transmitter/releases",
     packages                        = setuptools.find_packages(),
-    entry_points                    = { #not ready
+    entry_points                    = { 
         'gui_scripts': [
-            'spacelab-decoder = spacelab_decoder.__main__:main'
+            'spacelab-transmitter = spacelab_transmitter.__main__:main'
             ]
         },
-    data_files                      = [ #not ready
-        ('share/icons/', ['spacelab_decoder/data/img/spacelab_decoder_256x256.png']),
-        ('share/applications/', ['spacelab_decoder.desktop']),
+    data_files                      = [ 
+        ('share/icons/', ['spacelab_transmitter/data/img/spacelab_transmitter_256x256.png']),
+        ('share/applications/', ['spacelab_transmitter.desktop']),
         ('share/spacelab_transmitter/', ['spacelab_transmitter/data/ui/spacelab_transmitter.glade']),
         ('share/spacelab_transmitter/', ['spacelab_transmitter/data/img/spacelab-logo-full-400x200.png']),
         ('share/spacelab_transmitter/', ['spacelab_transmitter/data/satellites/floripasat-1.json']),
         ('share/spacelab_transmitter/', ['spacelab_transmitter/data/satellites/floripasat-2.json']),
-        ('lib/', ['spacelab_transmitter/libngham.so']),
-        ('lib/', ['spacelab_transmitter/libngham_fsat.so']), #not ready
         ],
     cmdclass                        = {'build_sphinx': BuildDoc},
 )
