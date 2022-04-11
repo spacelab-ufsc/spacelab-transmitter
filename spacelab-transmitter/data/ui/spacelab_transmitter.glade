@@ -3,31 +3,31 @@
 
 Copyright (C) 2020, Universidade Federal de Santa Catarina
 
-This file is part of SpaceLab-Decoder.
+This file is part of SpaceLab-Transmitter.
 
-SpaceLab-Decoder is free software: you can redistribute it and/or modify
+SpaceLab-Transmitter is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
 
-SpaceLab-Decoder is distributed in the hope that it will be useful,
+SpaceLab-Transmitter is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with SpaceLab-Decoder.  If not, see <http://www.gnu.org/licenses/>.
+along with SpaceLab-Transmitter.  If not, see <http://www.gnu.org/licenses/>.
 
-Author: Gabriel Mariano Marcelino <gabriel.mm8@gmail.com>
+Author: Vitória Beatriz Bianchin <vitoriabbianchin@gmail.com>
 
 -->
 <interface>
   <requires lib="gtk+" version="3.20"/>
   <!-- interface-license-type gplv3 -->
-  <!-- interface-name SpaceLab-Decoder -->
-  <!-- interface-description SpaceLab satellites packet decoder -->
+  <!-- interface-name SpaceLab-Transmitter -->
+  <!-- interface-description SpaceLab satellites packet Transmitter -->
   <!-- interface-copyright 2020, Universidade Federal de Santa Catarina -->
-  <!-- interface-authors Gabriel Mariano Marcelino <gabriel.mm8@gmail.com> -->
+  <!-- interface-authors Vitória Beatriz Bianchin <vitoriabbianchin@gmail.com> -->
   <object class="GtkTextBuffer"/>
   <object class="GtkAdjustment" id="adjustment_wav_gen_amplitude">
     <property name="upper">1</property>
@@ -64,7 +64,7 @@ Author: Gabriel Mariano Marcelino <gabriel.mm8@gmail.com>
   </object>
   <object class="GtkWindow" id="window_main">
     <property name="can_focus">False</property>
-    <property name="title" translatable="yes">SpaceLab Decoder</property>
+    <property name="title" translatable="yes">SpaceLab Transmitter</property>
     <property name="window_position">center</property>
     <child type="titlebar">
       <placeholder/>
@@ -111,7 +111,7 @@ Author: Gabriel Mariano Marcelino <gabriel.mm8@gmail.com>
               <object class="GtkToolButton" id="button_transmit">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="tooltip_text" translatable="yes">Run decoder</property>
+                <property name="tooltip_text" translatable="yes">Run transmitter</property>
                 <property name="label" translatable="yes">Run transmitter</property>
                 <property name="use_underline">True</property>
                 <property name="stock_id">gtk-media-play</property>
@@ -543,11 +543,11 @@ Author: Gabriel Mariano Marcelino <gabriel.mm8@gmail.com>
   </object>
   <object class="GtkAboutDialog" id="aboutdialog_spacelab_transmitter">
     <property name="can_focus">False</property>
-    <property name="title" translatable="yes">About SpaceLab Decoder</property>
+    <property name="title" translatable="yes">About SpaceLab Transmitter</property>
     <property name="resizable">False</property>
     <property name="window_position">center</property>
     <property name="destroy_with_parent">True</property>
-    <property name="icon_name">../icon/spacelab_decoder_400x400.png</property>
+    <property name="icon_name">../icon/spacelab_transmitter_400x400.png</property>
     <property name="type_hint">dialog</property>
     <property name="transient_for">window_main</property>
     <property name="program_name">SpaceLab Transmitter</property>
