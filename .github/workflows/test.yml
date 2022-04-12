@@ -45,7 +45,7 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Install dependencies
-        run: sudo apt install -y sphinx-common sphinx-rtd-theme-common python3-pytest
+        run: sudo apt install -y python3 python3-gi sphinx-common sphinx-rtd-theme-common python3-pytest
 
       - name: Execute the tests
         run: pytest-3 tests/
