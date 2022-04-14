@@ -55,4 +55,4 @@ jobs:
         run: |
          Xvfb :1 &
          export DISPLAY=:1
-         pytest-3 test_ui.py
+         pytest-3 tests/
