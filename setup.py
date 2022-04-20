@@ -3,7 +3,7 @@
 #
 #  setup.py
 #  
-#  Copyright (C) 2021, Universidade Federal de Santa Catarina
+#  Copyright The SpaceLab-Transmitter Contributors.
 #  
 #  This file is part of SpaceLab-Transmitter.
 #
@@ -25,9 +25,6 @@
 
 import setuptools
 import os
-
-from sphinx.setup_command import BuildDoc
-
 
 exec(open('spacelab_transmitter/version.py').read())
 
@@ -74,5 +71,4 @@ setuptools.setup(
         ('share/spacelab_transmitter/', ['spacelab_transmitter/data/satellites/floripasat-1.json']),
         ('share/spacelab_transmitter/', ['spacelab_transmitter/data/satellites/floripasat-2.json']),
         ],
-    cmdclass                        = {'build_sphinx': BuildDoc},
 )
