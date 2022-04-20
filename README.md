@@ -40,7 +40,7 @@ This program will support the satellites below:
 
 ## Dependencies
 
-* python (>= 3)
+* [PyGObject](https://pypi.org/project/PyGObject/)
 
 ### Installation on Ubuntu
 
