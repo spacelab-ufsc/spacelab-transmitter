@@ -27,7 +27,7 @@ from gi.repository import Gtk
 
 def test_ui():
     builder = Gtk.Builder()
-    builder.add_from_file("spacelab-transmitter/data/ui/spacelab_transmitter.glade")
+    builder.add_from_file("spacelab_transmitter/data/ui/spacelab_transmitter.glade")
 
     # Main window
     window                  = builder.get_object("window_main")
@@ -49,6 +49,7 @@ def test_ui():
     activate_module         = builder.get_object("activate_module")
     deactivate_payload      = builder.get_object("deactivate_payload")
     get_payload_data        = builder.get_object("get_payload_data")
+    treeview_events         = builder.get_object("treeview_events")
 
     assert window                   != None
     assert button_preferences       != None
@@ -69,6 +70,7 @@ def test_ui():
     assert activate_module          != None
     assert deactivate_payload       != None
     assert get_payload_data         != None
+    assert treeview_events          != None
 
     # About dialog
     aboutdialog_spacelab_transmitter = builder.get_object("aboutdialog_spacelab_transmitter")
