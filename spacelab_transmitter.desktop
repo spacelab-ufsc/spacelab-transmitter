@@ -1,9 +1,0 @@
-[Desktop Entry]
-Type=Application
-Encoding=UTF-8
-Name=SpaceLab Transmitter
-Comment=SpaceLab packet transmitter
-Icon=/usr/share/icons/spacelab_transmitter_256x256.png
-Exec=/usr/bin/spacelab-transmitter
-Terminal=false
-Categories=HamRadio
