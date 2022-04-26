@@ -25,11 +25,15 @@
     <a href="#license">License</a>
 </p>
 
-## Overview
+# Overview
 
 SpaceLab Packet Transmitter is a software to transmit audio records to the satellites of SpaceLab.
 
 It is still under construction and the following information is what is expected by the final product.
+
+Software front page screenshot:
+
+<img src="docs/img/tela_inicial.png" width=""/>
 
 ## Satellites
 
@@ -38,26 +42,32 @@ This program will support the satellites below:
 * FloripaSat-1 (launched in December 2019)
 * GOLDS-UFSC (to be launched on 2022)
 
-## Dependencies
+# Dependencies
 
 * [PyGObject](https://pypi.org/project/PyGObject/)
 
-### Installation on Ubuntu
+## Installation on Ubuntu
+```sudo apt install python3 python3-gi```
 
 
-### Installation on Fedora
+## Installation on Fedora
+```sudo dnf install python3 python3-gobject```
 
 
-## Building and Installing
+## Installing
+```python setup.py install```
 
+# Documentation
 
-## Documentation
+## Dependencies
+* Sphinx
+* sphinx-redactor-theme
 
-### Dependencies
+## Building the Documentation
 
-### Building the Documentation
+```make html```
 
-## License
+# License
 
 This project is licensed under GPLv3 license.
 
