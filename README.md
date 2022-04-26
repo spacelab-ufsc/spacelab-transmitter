@@ -33,7 +33,7 @@ It is still under construction and the following information is what is expected
 
 Software front page screenshot:
 
-<img src="docs/img/tela_inicial.png" width=""/>
+<img src="docs/img/front_page.png" width=""/>
 
 ## Satellites
 
