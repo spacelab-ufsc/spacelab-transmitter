@@ -4,7 +4,8 @@ SW_NAME=spacelab_transmitter
 PKT_VERSION=0.1.0
 DIST=ubuntu
 DIST_VERSION=20.04
-PYTHON_VERSION=3.9
+PYTHON_VERSION=3.8
+BIN_NAME=spacelab-transmitter
 PKT_NAME=${SW_NAME}_${PKT_VERSION}_${DIST}${DIST_VERSION}-1
 
 SW_ICON=../${SW_NAME}/data/img/spacelab_transmitter_256x256.png
@@ -17,8 +18,6 @@ mkdir /tmp/${PKT_NAME}/usr/lib
 mkdir /tmp/${PKT_NAME}/usr/lib/python${PYTHON_VERSION}
 mkdir /tmp/${PKT_NAME}/usr/lib/python${PYTHON_VERSION}/site-packages
 mkdir /tmp/${PKT_NAME}/usr/lib/python${PYTHON_VERSION}/site-packages/${SW_NAME}
-mkdir /tmp/${PKT_NAME}/usr/local
-mkdir /tmp/${PKT_NAME}/usr/local/bin
 mkdir /tmp/${PKT_NAME}/usr/share
 mkdir /tmp/${PKT_NAME}/usr/share/applications
 mkdir /tmp/${PKT_NAME}/usr/share/icons
@@ -38,7 +37,7 @@ EOF
 tar -xf ../dist/${SW_NAME}-${PKT_VERSION}.tar.gz -C /tmp/
 
 # bin
-cat > /tmp/${PKT_NAME}/usr/bin/${SW_NAME} << 'EOF'
+cat > /tmp/${PKT_NAME}/usr/bin/${BIN_NAME} << 'EOF'
 #!/usr/bin/python3
 # EASY-INSTALL-ENTRY-SCRIPT: 'spacelab-transmitter==0.1.0','gui_scripts','spacelab-transmitter'
 import re
@@ -73,6 +72,8 @@ if __name__ == '__main__':
     sys.argv[0] = re.sub(r'(-script\.pyw?|\.exe)?$', '', sys.argv[0])
     sys.exit(load_entry_point('spacelab-transmitter==0.1.0', 'gui_scripts', 'spacelab-transmitter')())
 EOF
+
+chmod +x /tmp/${PKT_NAME}/usr/bin/${SW_NAME}
 
 # lib
 cp -r /tmp/${SW_NAME}-${PKT_VERSION}/${SW_NAME}.egg-info /tmp/${PKT_NAME}/usr/lib/python${PYTHON_VERSION}/site-packages/
