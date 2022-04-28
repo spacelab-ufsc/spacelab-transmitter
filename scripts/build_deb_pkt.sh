@@ -16,8 +16,8 @@ mkdir /tmp/${PKT_NAME}/usr
 mkdir /tmp/${PKT_NAME}/usr/bin
 mkdir /tmp/${PKT_NAME}/usr/lib
 mkdir /tmp/${PKT_NAME}/usr/lib/python${PYTHON_VERSION}
-mkdir /tmp/${PKT_NAME}/usr/lib/python${PYTHON_VERSION}/site-packages
-mkdir /tmp/${PKT_NAME}/usr/lib/python${PYTHON_VERSION}/site-packages/${SW_NAME}
+mkdir /tmp/${PKT_NAME}/usr/lib/python${PYTHON_VERSION}/dist-packages
+mkdir /tmp/${PKT_NAME}/usr/lib/python${PYTHON_VERSION}/dist-packages/${SW_NAME}
 mkdir /tmp/${PKT_NAME}/usr/share
 mkdir /tmp/${PKT_NAME}/usr/share/applications
 mkdir /tmp/${PKT_NAME}/usr/share/icons
@@ -73,11 +73,11 @@ if __name__ == '__main__':
     sys.exit(load_entry_point('spacelab-transmitter==0.1.0', 'gui_scripts', 'spacelab-transmitter')())
 EOF
 
-chmod +x /tmp/${PKT_NAME}/usr/bin/${SW_NAME}
+chmod +x /tmp/${PKT_NAME}/usr/bin/${BIN_NAME}
 
 # lib
-cp -r /tmp/${SW_NAME}-${PKT_VERSION}/${SW_NAME}.egg-info /tmp/${PKT_NAME}/usr/lib/python${PYTHON_VERSION}/site-packages/
-cp ../spacelab_transmitter/*.py /tmp/${PKT_NAME}/usr/lib/python${PYTHON_VERSION}/site-packages/${SW_NAME}/
+cp -r /tmp/${SW_NAME}-${PKT_VERSION}/${SW_NAME}.egg-info /tmp/${PKT_NAME}/usr/lib/python${PYTHON_VERSION}/dist-packages/
+cp ../spacelab_transmitter/*.py /tmp/${PKT_NAME}/usr/lib/python${PYTHON_VERSION}/dist-packages/${SW_NAME}/
 
 # share
 cp ../${SW_NAME}.desktop /tmp/${PKT_NAME}/usr/share/applications/
