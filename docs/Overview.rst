@@ -12,6 +12,7 @@ A list of known satellites that are planned to use this software are presented b
 
 * **FloripaSat-1** [1]_
 * **GOLDS-UFSC (a.k.a. FloripaSat-2)** [2]_
+* **Catarina-A1**
 
 
 The two satellites of the list above are developed (or in development) by the same research group: the *Space Technology Research Laboratory* (SpaceLab) [3]_, from *Universidade Federal de Santa Catarina* (Brazil).
