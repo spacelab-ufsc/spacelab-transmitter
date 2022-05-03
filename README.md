@@ -41,6 +41,7 @@ This program will support the satellites below:
 
 * FloripaSat-1 (launched in December 2019)
 * GOLDS-UFSC (to be launched on 2022)
+* Catarina-A1 
 
 # Dependencies
 
