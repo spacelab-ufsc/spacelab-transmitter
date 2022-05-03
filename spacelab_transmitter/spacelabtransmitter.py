@@ -40,9 +40,7 @@ from gi.repository import GdkPixbuf
 import matplotlib.pyplot as plt
 from scipy.io import wavfile
 import zmq
-
-#import pyngham
-
+from pyngham import PyNGHam
 import spacelab_transmitter.version
 
 #here's for importing the other files of spacelab-transmitter that are missing or not ready
@@ -65,6 +63,10 @@ _SAT_JSON_FLORIPASAT_1_SYSTEM   = '/usr/share/spacelab_transmitter/floripasat-1.
 _SAT_JSON_FLORIPASAT_2_LOCAL    = os.path.abspath(os.path.dirname(__file__)) + '/data/satellites/floripasat-2.json'
 _SAT_JSON_FLORIPASAT_2_SYSTEM   = '/usr/share/spacelab_transmitter/floripasat-2.json'
 
+_DEFAULT_CALLSIGN               = 'PP5UF'
+_DEFAULT_LOCATION               = 'Florianópolis'
+_DEFAULT_COUNTRY                = 'Brazil'
+
 #signal constants (?) such as location, country, etc. (?)
 
 class SpaceLabTransmitter:
@@ -80,8 +82,8 @@ class SpaceLabTransmitter:
         self.builder.connect_signals(self)
 
         self._build_widgets()
+        self._load_preferences()
 
-        #self._load_preferences()
         #self.ngham = pyngham.PyNGHam()
         #self.decoded_packets_index = list()
 
@@ -95,6 +97,48 @@ class SpaceLabTransmitter:
         self.window.set_wmclass(self.window.get_title(), self.window.get_title())
         self.window.connect("destroy", Gtk.main_quit)
 
+        #Ping (carregamento essencial para manipualr um elemento do glade)
+        self.ping_request = self.builder.get_object("ping_request")
+        self.ping_request.connect("clicked", self.on_ping_request_command_clicked)
+
+        #Entry_preferences_general_callsign builder
+        self.entry_preferences_general_callsign = self.builder.get_object("entry_preferences_general_callsign")
+
+        # Events treeview
+        self.treeview_events = self.builder.get_object("treeview_events")
+        self.listmodel_events = Gtk.ListStore(str, str)
+        self.treeview_events.set_model(self.listmodel_events)
+        cell = Gtk.CellRendererText()
+        column = Gtk.TreeViewColumn("Datetime", cell, text=0)
+        column.set_fixed_width(250)
+        self.treeview_events.append_column(column)
+        column = Gtk.TreeViewColumn("Event", cell, text=1)
+        self.treeview_events.append_column(column)
+
+        #About dialog
+        self.aboutdialog = self.builder.get_object("aboutdialog_spacelab_transmitter")
+        self.aboutdialog.set_version(spacelab_transmitter.version.__version__)
+
+        # Preferences button
+        self.button_preferences = self.builder.get_object("button_preferences")
+        self.button_preferences.connect("clicked", self.on_button_preferences_clicked)
+
+        #Preferences dialog
+        self.button_preferences = self.builder.get_object("button_preferences")
+        self.button_preferences.connect("clicked", self.on_button_preferences_clicked)
+
+        self.dialog_preferences = self.builder.get_object("dialog_preferences")
+        self.button_preferences_ok = self.builder.get_object("button_preferences_ok")
+        self.button_preferences_ok.connect("clicked", self.on_button_preferences_ok_clicked)
+        self.button_preferences_default = self.builder.get_object("button_preferences_default")
+        self.button_preferences_default.connect("clicked", self.on_button_preferences_default_clicked)
+        self.button_preferences_cancel = self.builder.get_object("button_preferences_cancel")
+        self.button_preferences_cancel.connect("clicked", self.on_button_preferences_cancel_clicked)
+
+        self.entry_preferences_general_callsign = self.builder.get_object("entry_preferences_general_callsign")
+        self.entry_preferences_general_location = self.builder.get_object("entry_preferences_general_location")
+        self.entry_preferences_general_country = self.builder.get_object("entry_preferences_general_country")
+
     def run(self):
 
         self.window.show_all()
@@ -102,3 +146,56 @@ class SpaceLabTransmitter:
 
     def destroy(window, self):
         Gtk.main_quit()
+
+
+    def on_ping_request_command_clicked(self, button):
+        pngh = PyNGHam()
+        callsign = self.entry_preferences_general_callsign.get_text()
+        #fazer a condição 
+
+        x = [ord(i) for i in callsign]
+
+        pl = [0x40] + x
+        self.pkt = pngh.encode(pl)
+        print("Encoded packet:", self.pkt)
+
+        #log eventos = eventos q acontecem dentro do software inciialização, cliques etc em horarios
+        self.listmodel_events.append([str(datetime.now()), "Ping Resquest initial string"])
+        
+    def on_button_preferences_clicked(self, button):
+        response = self.dialog_preferences.run()
+
+        if response == Gtk.ResponseType.DELETE_EVENT:
+            self._load_preferences()
+            self.dialog_preferences.hide()
+
+    def on_button_preferences_ok_clicked(self, button):
+        self._save_preferences()
+        self.dialog_preferences.hide()
+
+    def on_button_preferences_default_clicked(self, button):
+        self._load_default_preferences()
+
+    def on_button_preferences_cancel_clicked(self, button):
+        self._load_preferences()
+        self.dialog_preferences.hide()
+
+    def _load_preferences(self):
+        home = os.path.expanduser('~')
+        location = os.path.join(home, _DIR_CONFIG_LINUX)
+
+    def _load_default_preferences(self):
+        self.entry_preferences_general_callsign.set_text(_DEFAULT_CALLSIGN)
+        self.entry_preferences_general_location.set_text(_DEFAULT_LOCATION)
+        self.entry_preferences_general_country.set_text(_DEFAULT_COUNTRY)
+
+    def _save_preferences(self):
+        home = os.path.expanduser('~')
+        location = os.path.join(home, _DIR_CONFIG_LINUX)
+
+        if not os.path.exists(location):
+            os.mkdir(location)
+
+
+
+
