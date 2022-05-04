@@ -153,9 +153,13 @@ class SpaceLabTransmitter:
     def on_ping_request_command_clicked(self, button):
         pngh = PyNGHam()
         callsign = self.entry_preferences_general_callsign.get_text()
-        #fazer a condição 
 
-        x = [ord(i) for i in callsign]
+        string_callsign = callsign.count(callsign) 
+        n = 7 - string_callsign 
+        if n != 7: 
+            final_callsign = n*' ' + callsign
+        print(final_callsign)
+        x = [ord(i) for i in final_callsign] 
 
         pl = [0x40] + x
         self.pkt = pngh.encode(pl)
