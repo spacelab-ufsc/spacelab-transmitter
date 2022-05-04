@@ -154,8 +154,10 @@ class SpaceLabTransmitter:
         pngh = PyNGHam()
         callsign = self.entry_preferences_general_callsign.get_text()
 
-        string_callsign = callsign.count(callsign) 
+        string_callsign = len(callsign) 
+        print(string_callsign)
         n = 7 - string_callsign 
+        print(n)
         if n != 7: 
             final_callsign = n*" " + callsign
         print(final_callsign)
