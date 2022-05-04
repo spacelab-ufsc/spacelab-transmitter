@@ -67,8 +67,6 @@ _DEFAULT_CALLSIGN               = 'PP5UF'
 _DEFAULT_LOCATION               = 'Florianópolis'
 _DEFAULT_COUNTRY                = 'Brazil'
 
-#signal constants (?) such as location, country, etc. (?)
-
 class SpaceLabTransmitter:
 
     def __init__(self):
@@ -97,7 +95,7 @@ class SpaceLabTransmitter:
         self.window.set_wmclass(self.window.get_title(), self.window.get_title())
         self.window.connect("destroy", Gtk.main_quit)
 
-        #Ping (carregamento essencial para manipualr um elemento do glade)
+        #Ping 
         self.ping_request = self.builder.get_object("ping_request")
         self.ping_request.connect("clicked", self.on_ping_request_command_clicked)
 
@@ -118,10 +116,6 @@ class SpaceLabTransmitter:
         #About dialog
         self.aboutdialog = self.builder.get_object("aboutdialog_spacelab_transmitter")
         self.aboutdialog.set_version(spacelab_transmitter.version.__version__)
-
-        # Preferences button
-        self.button_preferences = self.builder.get_object("button_preferences")
-        self.button_preferences.connect("clicked", self.on_button_preferences_clicked)
 
         #Preferences dialog
         self.button_preferences = self.builder.get_object("button_preferences")
@@ -159,7 +153,6 @@ class SpaceLabTransmitter:
         self.pkt = pngh.encode(pl)
         print("Encoded packet:", self.pkt)
 
-        #log eventos = eventos q acontecem dentro do software inciialização, cliques etc em horarios
         self.listmodel_events.append([str(datetime.now()), "Ping Resquest initial string"])
         
     def on_button_preferences_clicked(self, button):
@@ -195,6 +188,7 @@ class SpaceLabTransmitter:
 
         if not os.path.exists(location):
             os.mkdir(location)
+        
 
 
 
