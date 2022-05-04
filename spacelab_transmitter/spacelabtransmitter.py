@@ -157,7 +157,7 @@ class SpaceLabTransmitter:
         string_callsign = callsign.count(callsign) 
         n = 7 - string_callsign 
         if n != 7: 
-            final_callsign = n*' ' + callsign
+            final_callsign = n*" " + callsign
         print(final_callsign)
         x = [ord(i) for i in final_callsign] 
 
