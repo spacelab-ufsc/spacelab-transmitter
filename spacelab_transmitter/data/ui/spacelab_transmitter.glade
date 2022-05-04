@@ -589,7 +589,8 @@ Author: Vitória Beatriz Bianchin <vitoriabbianchin@gmail.com>
     <property name="copyright" translatable="yes">Universidade Federal de Santa Catarina</property>
     <property name="website">https://github.com/spacelab-ufsc/spacelab-transmitter</property>
     <property name="website_label" translatable="yes">https://github.com/spacelab-ufsc/spacelab-transmitter</property>
-    <property name="authors">Gabriel Mariano Marcelino - PU5GMA &lt;gabriel.mm8@gmail.com&gt;</property>
+    <property name="authors">Vitória Beatriz Bianchin &lt;vitoriabbianchin@gmail.com&gt;
+Gabriel Mariano Marcelino - PU5GMA &lt;gabriel.mm8@gmail.com&gt;</property>
     <property name="logo_icon_name">image-missing</property>
     <property name="license_type">gpl-3-0</property>
     <child type="titlebar">

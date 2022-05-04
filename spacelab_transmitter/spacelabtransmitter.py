@@ -116,6 +116,14 @@ class SpaceLabTransmitter:
         #About dialog
         self.aboutdialog = self.builder.get_object("aboutdialog_spacelab_transmitter")
         self.aboutdialog.set_version(spacelab_transmitter.version.__version__)
+        if os.path.isfile(_LOGO_FILE_LOCAL):
+            self.aboutdialog.set_logo(GdkPixbuf.Pixbuf.new_from_file(_LOGO_FILE_LOCAL))
+        else:
+            self.aboutdialog.set_logo(GdkPixbuf.Pixbuf.new_from_file(_LOGO_FILE_LINUX_SYSTEM))
+
+        # About toolbutton
+        self.toolbutton_about = self.builder.get_object("toolbutton_about")
+        self.toolbutton_about.connect("clicked", self.on_toolbutton_about_clicked)
 
         #Preferences dialog
         self.button_preferences = self.builder.get_object("button_preferences")
@@ -188,6 +196,12 @@ class SpaceLabTransmitter:
 
         if not os.path.exists(location):
             os.mkdir(location)
+
+    def on_toolbutton_about_clicked(self, toolbutton):
+        response = self.aboutdialog.run()
+
+        if response == Gtk.ResponseType.DELETE_EVENT:
+            self.aboutdialog.hide()
         
 
 
