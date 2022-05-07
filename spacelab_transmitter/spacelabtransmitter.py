@@ -26,21 +26,15 @@
 #MODULES 
 import os
 import threading
-import sys
-import signal
 from datetime import datetime
-import pathlib
-import json
 
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 from gi.repository import GdkPixbuf
 
-import matplotlib.pyplot as plt
-from scipy.io import wavfile
-import zmq
 from pyngham import PyNGHam
+
 import spacelab_transmitter.version
 
 #here's for importing the other files of spacelab-transmitter that are missing or not ready
@@ -208,8 +202,3 @@ class SpaceLabTransmitter:
 
         if response == Gtk.ResponseType.DELETE_EVENT:
             self.aboutdialog.hide()
-        
-
-
-
-
