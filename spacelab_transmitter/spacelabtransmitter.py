@@ -211,7 +211,7 @@ class SpaceLabTransmitter:
 
         self.listmodel_events.append([str(timestamp), msg])
 
-        with open('logfile.csv', 'w') as logfile:
+        with open('logfile.csv', 'a') as logfile:
             writer = csv.writer(logfile, delimiter='\t')
             writer.writerows(self.listmodel_events)
 
