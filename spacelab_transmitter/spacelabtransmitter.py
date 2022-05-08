@@ -27,12 +27,9 @@
 import os
 import threading
 from datetime import datetime
-<<<<<<< HEAD
 import pathlib
 import json
 import csv
-=======
->>>>>>> a762824509ebea89d36c7f073ce6b5c9219b393b
 
 import gi
 gi.require_version('Gtk', '3.0')
