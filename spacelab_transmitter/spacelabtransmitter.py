@@ -26,22 +26,21 @@
 #MODULES 
 import os
 import threading
-import sys
-import signal
 from datetime import datetime
+<<<<<<< HEAD
 import pathlib
 import json
 import csv
+=======
+>>>>>>> a762824509ebea89d36c7f073ce6b5c9219b393b
 
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 from gi.repository import GdkPixbuf
 
-import matplotlib.pyplot as plt
-from scipy.io import wavfile
-import zmq
 from pyngham import PyNGHam
+
 import spacelab_transmitter.version
 
 #here's for importing the other files of spacelab-transmitter that are missing or not ready

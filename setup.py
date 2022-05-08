@@ -58,6 +58,7 @@ setuptools.setup(
         ],
     download_url                    = "https://github.com/spacelab-ufsc/spacelab-transmitter/releases",
     packages                        = setuptools.find_packages(),
+    install_requires                = ['PyGObject','pyngham'],
     entry_points                    = { 
         'gui_scripts': [
             'spacelab-transmitter = spacelab_transmitter.__main__:main'

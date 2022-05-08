@@ -46,21 +46,28 @@ This program will support the satellites below:
 # Dependencies
 
 * [PyGObject](https://pypi.org/project/PyGObject/)
+* [PyNGHam](https://pypi.org/project/pyngham/)
 
 ## Installation on Ubuntu
+
 ```sudo apt install python3 python3-gi```
 
+```pip install pyngham```
 
 ## Installation on Fedora
+
 ```sudo dnf install python3 python3-gobject```
 
+```pip install pyngham```
 
 ## Installing
+
 ```python setup.py install```
 
 # Documentation
 
 ## Dependencies
+
 * Sphinx
 * sphinx-redactor-theme
 
@@ -71,5 +78,3 @@ This program will support the satellites below:
 # License
 
 This project is licensed under GPLv3 license.
-
-
