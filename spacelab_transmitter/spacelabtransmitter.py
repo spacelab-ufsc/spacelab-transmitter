@@ -31,6 +31,7 @@ import signal
 from datetime import datetime
 import pathlib
 import json
+import csv
 
 import gi
 gi.require_version('Gtk', '3.0')
@@ -143,7 +144,7 @@ class SpaceLabTransmitter:
 
     def run(self):
 
-        self.window.show_all()
+        self.window.show_all()          
         Gtk.main()
 
     def destroy(window, self):
@@ -167,7 +168,7 @@ class SpaceLabTransmitter:
         self.pkt = pngh.encode(pl)
         print("Encoded packet:", self.pkt)
 
-        self.listmodel_events.append([str(datetime.now()), "Ping Resquest initial string"])
+        self.write_log("Ping request transmitted!")
         
     def on_button_preferences_clicked(self, button):
         response = self.dialog_preferences.run()
@@ -208,8 +209,15 @@ class SpaceLabTransmitter:
 
         if response == Gtk.ResponseType.DELETE_EVENT:
             self.aboutdialog.hide()
-        
 
+    def write_log(self, msg):
+        timestamp = datetime.now()
+
+        self.listmodel_events.append([str(timestamp), msg])
+
+        with open('logfile.csv', 'w') as logfile:
+            writer = csv.writer(logfile, delimiter='\t')
+            writer.writerows(self.listmodel_events)
 
 
 
