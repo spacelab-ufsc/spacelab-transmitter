@@ -64,6 +64,11 @@ _DEFAULT_CALLSIGN               = 'PP5UF'
 _DEFAULT_LOCATION               = 'Florianópolis'
 _DEFAULT_COUNTRY                = 'Brazil'
 
+#Defining logfile deafult local
+_DIR_CONFIG_LOGFILE_LINUX       = 'spacelab_transmitter'
+_DEFAULT_LOGFILE_PATH = os.path.join(os.path.expanduser('~'), _DIR_CONFIG_LOGFILE_LINUX)
+_DEFAULT_LOGFILE = 'logfile.csv'
+
 class SpaceLabTransmitter:
 
     def __init__(self):
@@ -211,9 +216,10 @@ class SpaceLabTransmitter:
 
         self.listmodel_events.append([str(timestamp), msg])
 
-        with open('logfile.csv', 'a') as logfile:
+        if not os.path.exists(_DEFAULT_LOGFILE_PATH):
+            os.mkdir(_DEFAULT_LOGFILE_PATH)
+
+        with open(_DEFAULT_LOGFILE_PATH + '/' + _DEFAULT_LOGFILE, 'a') as logfile:
             writer = csv.writer(logfile, delimiter='\t')
             writer.writerows(self.listmodel_events)
-
-
-
+        
