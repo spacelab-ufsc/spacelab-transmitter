@@ -12,3 +12,4 @@ Spacelab Transmitter's documentation!
    Overview
    Installation
    packaging
+   logfile
