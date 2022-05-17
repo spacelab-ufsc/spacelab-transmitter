@@ -66,8 +66,8 @@ _DEFAULT_COUNTRY                = 'Brazil'
 
 #Defining logfile deafult local
 _DIR_CONFIG_LOGFILE_LINUX       = 'spacelab_transmitter'
-_DEFAULT_LOGFILE_PATH = os.path.join(os.path.expanduser('~'), _DIR_CONFIG_LOGFILE_LINUX)
-_DEFAULT_LOGFILE = 'logfile.csv'
+_DEFAULT_LOGFILE_PATH           = os.path.join(os.path.expanduser('~'), _DIR_CONFIG_LOGFILE_LINUX)
+_DEFAULT_LOGFILE                = 'logfile.csv'
 
 class SpaceLabTransmitter:
 
@@ -212,14 +212,13 @@ class SpaceLabTransmitter:
             self.aboutdialog.hide()
 
     def write_log(self, msg):
-        timestamp = datetime.now()
+        event = [str(datetime.now()), msg]
 
-        self.listmodel_events.append([str(timestamp), msg])
+        self.listmodel_events.append(event)
 
         if not os.path.exists(_DEFAULT_LOGFILE_PATH):
             os.mkdir(_DEFAULT_LOGFILE_PATH)
 
         with open(_DEFAULT_LOGFILE_PATH + '/' + _DEFAULT_LOGFILE, 'a') as logfile:
             writer = csv.writer(logfile, delimiter='\t')
-            writer.writerows(self.listmodel_events)
-        
+            writer.writerow(event)
