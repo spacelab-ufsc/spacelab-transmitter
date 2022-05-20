@@ -30,18 +30,18 @@ class GMSK:
         self._bt = bt
         self._baudrate = baud
 
-    def modulate(self, data, fc):
+    def modulate(self, data):
         """
         Function to modulate a binary stream using GMSK modulation
         Parameters:
         data : input integer list to modulate (bytes as integers)
-        enable_plot: True = plot transmitter waveforms (default False)
         Returns:
         (s_t,s_complex) : tuple containing the following variables
         s_t : GMSK modulated signal with carrier s(t)
         s_complex : baseband GMSK signal (I+jQ)
         """
         L = 40
+        fc = self._baudrate                         # Carrier frequency = Data transfer rate in bps
         fs = L*fc
         Ts = 1/fs
         Tb = L*Ts                                   # Derived waveform timing parameters
