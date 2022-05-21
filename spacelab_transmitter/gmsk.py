@@ -24,6 +24,8 @@
 import numpy as np
 from scipy.signal import upfirdn, lfilter
 
+_GMSK_DEFAULT_OVERSAMPLING_FACTOR = 100
+
 class GMSK:
     """
     GMSK modulator.
@@ -38,39 +40,85 @@ class GMSK:
         self._bt = bt
         self._baudrate = baud
 
-    def modulate(self, data):
+    def modulate(self, data, L=_GMSK_DEFAULT_OVERSAMPLING_FACTOR):
         """
         Function to modulate an integer stream using GMSK modulation.
 
         :param data: input integer list to modulate (bytes as integers)
+        :param L: oversampling factor
 
-        :return: s_t: GMSK modulated signal with carrier s(t)
         :return: s_complex: baseband GMSK signal (I+jQ)
+        :return: samp: Sample rate S/s
+        :return: dur: Signal duration in seconds
         """
-        L = 40
+        I, Q, samp, dur = self.get_iq(data, L)
+        s_complex = I - 1j*Q                        # Complex baseband representation
+
+        return s_complex, samp, dur
+
+    def get_iq(self, data, L=_GMSK_DEFAULT_OVERSAMPLING_FACTOR):
+        """
+        Computes the IQ data of the GMSK modulated signal.
+
+        :param data: input integer list to modulate (bytes as integers)
+        :param L: oversampling factor
+
+        :return: I: I data of the modulated signal
+        :return: Q: Q data of the modulated signal
+        :return: samp: Sample rate S/s
+        :return: dur: Signal duration in seconds
+        """
+        # Convert to array of bits
+        data = self._int_list_to_bit_list(data)
+        data = np.array(data)
+
+        # Timing parameters
         fc = self._baudrate                         # Carrier frequency = Data transfer rate in bps
         fs = L*fc
         Ts = 1/fs
         Tb = L*Ts                                   # Bit period in seconds
-        data = self._int_list_to_bit_list(data)
-        data = np.array(data)
+
         c_t = upfirdn(h=[1]*L, x=2*data-1, up = L)  # NRZ pulse train c(t)
         k = 1                                       # Truncation length for Gaussian LPF
         h_t = self._gaussian_lpf(Tb, L, k)          # Gaussian LPF with BT=0.25
         b_t = np.convolve(h_t, c_t, 'full')         # Convolve c(t) with Gaussian LPF to get b(t)
         bnorm_t = b_t/max(abs(b_t))                 # Normalize the output of Gaussian LPF to +/-1
-        h = 0.5                                     # Modulation index (GMSK = 0.5)
+
         # Integrate to get phase information
+        h = 0.5                                     # Modulation index (GMSK = 0.5)
         phi_t = lfilter(b = [1], a=[1,-1], x=bnorm_t*Ts) * h*np.pi/Tb
         I = np.cos(phi_t)
         Q = np.sin(phi_t)                           # Cross-correlated baseband I/Q signals
-        s_complex = I - 1j*Q                        # Complex baseband representation
+
+        # Sampling values
+        samp = L*self._baudrate                     # Sample rate in samples per second
+        dur = len(data)/self._baudrate              # Transmission duration in seconds
+
+        return I, Q, samp, dur
+
+    def modulate_time_domain(self, data, L=_GMSK_DEFAULT_OVERSAMPLING_FACTOR):
+        """
+        Generates the GMSK modulated signal in time domain.
+
+        :param data: input integer list to modulate (bytes as integers)
+        :param L: oversampling factor
+
+        :return: s_t: GMSK modulated signal with carrier s(t) (time domain)
+        :return: samp: Sample rate S/s
+        :return: dur: Signal duration in seconds
+        """
+        I, Q, samp, dur = self.get_iq(data, L)
+
+        fc = self._baudrate                         # Carrier frequency = Data transfer rate in bps
+        fs = L*fc
+        Ts = 1/fs
+
         t = Ts*np.arange(start=0, stop=len(I))      # Time base for RF carrier
         sI_t = I*np.cos(2*np.pi*fc*t)
         sQ_t = Q*np.sin(2*np.pi*fc*t)
         s_t = sI_t - sQ_t                           # s(t) - GMSK with RF carrier
 
-        return s_t, s_complex
+        return s_t, samp, dur
 
     def _gaussian_lpf(self, Tb, L, k):
         """
