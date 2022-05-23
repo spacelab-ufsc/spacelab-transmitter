@@ -55,6 +55,6 @@ jobs:
 
       - name: Execute the tests
         run: |
-         Xvfb :1 &
-         export DISPLAY=:1
-         pytest-3 -k 'not log' tests/
+          Xvfb :1 &
+          export DISPLAY=:1
+          pytest-3 --ignore=tests/test_log.py tests/
