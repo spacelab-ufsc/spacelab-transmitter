@@ -128,7 +128,6 @@ class SpaceLabTransmitter:
         self.toolbutton_about.connect("clicked", self.on_toolbutton_about_clicked)
 
         self.logfile_chooser_button = self.builder.get_object("logfile_chooser_button")
-        self.filechooser_audio_file = self.builder.get_object("filechooser_audio_file")
 
         #Preferences dialog
         self.button_preferences = self.builder.get_object("button_preferences")
