@@ -47,16 +47,18 @@ This program will support the satellites below:
 
 * [PyGObject](https://pypi.org/project/PyGObject/)
 * [PyNGHam](https://pypi.org/project/pyngham/)
+* [NumPy](https://pypi.org/project/numpy/)
+* [SciPy](https://pypi.org/project/scipy/)
 
 ## Installation on Ubuntu
 
-```sudo apt install python3 python3-gi```
+```sudo apt install python3 python3-gi python3-numpy python3-scipy```
 
 ```pip install pyngham```
 
 ## Installation on Fedora
 
-```sudo dnf install python3 python3-gobject```
+```sudo dnf install python3 python3-gobject python3-numpy python3-scipy```
 
 ```pip install pyngham```
 
