@@ -127,6 +127,9 @@ class SpaceLabTransmitter:
         self.toolbutton_about = self.builder.get_object("toolbutton_about")
         self.toolbutton_about.connect("clicked", self.on_toolbutton_about_clicked)
 
+        self.logfile_chooser_button = self.builder.get_object("logfile_chooser_button")
+        self.filechooser_audio_file = self.builder.get_object("filechooser_audio_file")
+
         #Preferences dialog
         self.button_preferences = self.builder.get_object("button_preferences")
         self.button_preferences.connect("clicked", self.on_button_preferences_clicked)
@@ -219,6 +222,12 @@ class SpaceLabTransmitter:
         if not os.path.exists(_DEFAULT_LOGFILE_PATH):
             os.mkdir(_DEFAULT_LOGFILE_PATH)
 
-        with open(_DEFAULT_LOGFILE_PATH + '/' + _DEFAULT_LOGFILE, 'a') as logfile:
+        logpath = _DEFAULT_LOGFILE_PATH
+        self.chosen_logpath = self.logfile_chooser_button.get_filename()
+        if self.chosen_logpath != _DEFAULT_LOGFILE_PATH:
+            logpath = self.chosen_logpath
+        
+
+        with open(logpath + '/' + _DEFAULT_LOGFILE, 'a') as logfile:
             writer = csv.writer(logfile, delimiter='\t')
             writer.writerow(event)
