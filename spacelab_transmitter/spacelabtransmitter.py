@@ -82,6 +82,7 @@ class SpaceLabTransmitter:
         self.builder.connect_signals(self)
 
         self._build_widgets()
+        self.write_log("SpaceLab Transmitter initialized!")
         self._load_preferences()
 
         #self.ngham = pyngham.PyNGHam()
