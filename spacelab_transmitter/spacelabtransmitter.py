@@ -127,7 +127,10 @@ class SpaceLabTransmitter:
         self.toolbutton_about = self.builder.get_object("toolbutton_about")
         self.toolbutton_about.connect("clicked", self.on_toolbutton_about_clicked)
 
+
+        # Logfile chooser button
         self.logfile_chooser_button = self.builder.get_object("logfile_chooser_button")
+        self.logfile_chooser_button.set_filename(_DEFAULT_LOGFILE_PATH)
 
         #Preferences dialog
         self.button_preferences = self.builder.get_object("button_preferences")
@@ -199,7 +202,7 @@ class SpaceLabTransmitter:
         self.entry_preferences_general_callsign.set_text(_DEFAULT_CALLSIGN)
         self.entry_preferences_general_location.set_text(_DEFAULT_LOCATION)
         self.entry_preferences_general_country.set_text(_DEFAULT_COUNTRY)
-
+        
     def _save_preferences(self):
         home = os.path.expanduser('~')
         location = os.path.join(home, _DIR_CONFIG_LINUX)
@@ -221,12 +224,6 @@ class SpaceLabTransmitter:
         if not os.path.exists(_DEFAULT_LOGFILE_PATH):
             os.mkdir(_DEFAULT_LOGFILE_PATH)
 
-        logpath = _DEFAULT_LOGFILE_PATH
-        self.chosen_logpath = self.logfile_chooser_button.get_filename()
-        if self.chosen_logpath != _DEFAULT_LOGFILE_PATH:
-            logpath = self.chosen_logpath
-        
-
-        with open(logpath + '/' + _DEFAULT_LOGFILE, 'a') as logfile:
+        with open(self.logfile_chooser_button.get_filename() + '/' + _DEFAULT_LOGFILE, 'a') as logfile:
             writer = csv.writer(logfile, delimiter='\t')
             writer.writerow(event)
