@@ -1,0 +1,31 @@
+{
+    "Default Preferences": [
+        {
+            "name": "General",
+            "options": [
+                {
+                    "name": "callsign",
+                    "value": "PP5UF"
+                },
+                {
+                    "name": "location",
+                    "value": "Florianópolis"
+                },
+                {
+                    "name": "country",
+                    "value": "Brazil"
+                }
+            ]
+        },
+        {
+            "name": "Logfile",
+            "options": [
+                {
+                    "name": "logfile_location",
+                    "value": "os.path.join(os.path.expanduser('~'), 'spacelab_transmitter')"
+                }
+
+            ]
+        }
+    ]
+}
