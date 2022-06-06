@@ -42,6 +42,11 @@ Author: Vitória Beatriz Bianchin <vitoriabbianchin@gmail.com>
       <pattern>*.wav</pattern>
     </patterns>
   </object>
+  <object class="GtkAdjustment" id="gain_adjustment">
+    <property name="upper">100</property>
+    <property name="step_increment">1</property>
+    <property name="page_increment">10</property>
+  </object>
   <object class="GtkListStore" id="liststore_packet_type">
     <columns>
       <!-- column-name gchararray1 -->
@@ -289,7 +294,7 @@ Author: Vitória Beatriz Bianchin <vitoriabbianchin@gmail.com>
                             <property name="row_spacing">5</property>
                             <property name="column_spacing">5</property>
                             <child>
-                              <object class="GtkLabel" id="carrier_frequency">
+                              <object class="GtkLabel" id="freq">
                                 <property name="width_request">-1</property>
                                 <property name="height_request">-1</property>
                                 <property name="visible">True</property>
@@ -303,7 +308,7 @@ Author: Vitória Beatriz Bianchin <vitoriabbianchin@gmail.com>
                               </packing>
                             </child>
                             <child>
-                              <object class="GtkLabel" id="sample_rate">
+                              <object class="GtkLabel" id="samps">
                                 <property name="width_request">-1</property>
                                 <property name="height_request">-1</property>
                                 <property name="visible">True</property>
@@ -316,11 +321,12 @@ Author: Vitória Beatriz Bianchin <vitoriabbianchin@gmail.com>
                               </packing>
                             </child>
                             <child>
-                              <object class="GtkLabel" id="tx_gain">
+                              <object class="GtkLabel" id="gain">
                                 <property name="width_request">-1</property>
                                 <property name="height_request">-1</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
+                                <property name="tooltip_markup" translatable="yes">Gain must be between 0 and 100</property>
                                 <property name="halign">start</property>
                                 <property name="label" translatable="yes">Gain [dB]</property>
                               </object>
@@ -330,11 +336,14 @@ Author: Vitória Beatriz Bianchin <vitoriabbianchin@gmail.com>
                               </packing>
                             </child>
                             <child>
-                              <object class="GtkSpinButton">
+                              <object class="GtkSpinButton" id="tx_gain">
                                 <property name="name">tx_gain</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
+                                <property name="max_length">100</property>
                                 <property name="input_purpose">number</property>
+                                <property name="adjustment">gain_adjustment</property>
+                                <property name="value">40</property>
                               </object>
                               <packing>
                                 <property name="left_attach">1</property>
@@ -342,10 +351,24 @@ Author: Vitória Beatriz Bianchin <vitoriabbianchin@gmail.com>
                               </packing>
                             </child>
                             <child>
-                              <placeholder/>
+                              <object class="GtkEntry" id="sample_rate">
+                                <property name="visible">True</property>
+                                <property name="can_focus">True</property>
+                              </object>
+                              <packing>
+                                <property name="left_attach">1</property>
+                                <property name="top_attach">1</property>
+                              </packing>
                             </child>
                             <child>
-                              <placeholder/>
+                              <object class="GtkEntry" id="carrier_frequency">
+                                <property name="visible">True</property>
+                                <property name="can_focus">True</property>
+                              </object>
+                              <packing>
+                                <property name="left_attach">1</property>
+                                <property name="top_attach">0</property>
+                              </packing>
                             </child>
                           </object>
                         </child>
