@@ -51,10 +51,10 @@ class GMSK:
         :return: samp: Sample rate S/s
         :return: dur: Signal duration in seconds
         """
-        I, Q, samp, dur = self.get_iq(data, L)
-        s_complex = I - 1j*Q                        # Complex baseband representation
+        I, Q, fs, dur = self.get_iq(data, L)
+        s_complex = np.complex64(I) - np.complex64(1j)*np.complex64(Q)  # Complex baseband representation
 
-        return s_complex, samp, dur
+        return s_complex, fs, dur
 
     def get_iq(self, data, L=_GMSK_DEFAULT_OVERSAMPLING_FACTOR):
         """
@@ -74,8 +74,8 @@ class GMSK:
 
         # Timing parameters
         fc = self._baudrate                         # Carrier frequency = Data transfer rate in bps
-        fs = L*fc
-        Ts = 1/fs
+        fs = L*fc                                   # Sample frequency in Hz
+        Ts = 1/fs                                   # Sample period in seconds
         Tb = L*Ts                                   # Bit period in seconds
 
         c_t = upfirdn(h=[1]*L, x=2*data-1, up = L)  # NRZ pulse train c(t)
@@ -91,10 +91,9 @@ class GMSK:
         Q = np.sin(phi_t)                           # Cross-correlated baseband I/Q signals
 
         # Sampling values
-        samp = L*self._baudrate                     # Sample rate in samples per second
-        dur = len(data)/self._baudrate              # Transmission duration in seconds
+        dur = len(data)*Tb                          # Transmission duration in seconds
 
-        return I, Q, samp, dur
+        return I, Q, fs, dur
 
     def modulate_time_domain(self, data, L=_GMSK_DEFAULT_OVERSAMPLING_FACTOR):
         """
@@ -118,7 +117,7 @@ class GMSK:
         sQ_t = Q*np.sin(2*np.pi*fc*t)
         s_t = sI_t - sQ_t                           # s(t) - GMSK with RF carrier
 
-        return s_t, samp, dur
+        return s_t, t, samp, dur
 
     def _gaussian_lpf(self, Tb, L, k):
         """
