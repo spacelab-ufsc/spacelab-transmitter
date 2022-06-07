@@ -133,6 +133,20 @@ class SpaceLabTransmitter:
         self.logfile_chooser_button = self.builder.get_object("logfile_chooser_button")
         self.logfile_chooser_button.set_filename(_DEFAULT_LOGFILE_PATH)
 
+        # SDR Parameters
+        self.carrier_frequency = self.builder.get_object("carrier_frequency")
+        self.sample_rate = self.builder.get_object("sample_rate")
+        self.tx_gain = self.builder.get_object("tx_gain")
+
+        # Satellite combobox
+        self.liststore_satellite = self.builder.get_object("liststore_satellite")
+        self.liststore_satellite.append(["FloripaSat-1"])
+        self.liststore_satellite.append(["GOLDS-UFSC"])
+        self.combobox_satellite = self.builder.get_object("combobox_satellite")
+        cell = Gtk.CellRendererText()
+        self.combobox_satellite.pack_start(cell, True)
+        self.combobox_satellite.add_attribute(cell, "text", 0)
+
         #Preferences dialog
         self.button_preferences = self.builder.get_object("button_preferences")
         self.button_preferences.connect("clicked", self.on_button_preferences_clicked)
@@ -175,7 +189,15 @@ class SpaceLabTransmitter:
         self.pkt = pngh.encode(pl)
         print("Encoded packet:", self.pkt)
 
-        self.write_log("Ping request transmitted!")
+        #sattelite =  self.combobox_satellite.get_text() #?
+        '''index = self.combobox_satellite.get_active()
+        model = self.combobox_satellite.get_model()
+        sattelite = model[index]'''
+        carrier_frequency = self.carrier_frequency.get_text()
+        tx_gain = self.tx_gain.get_text()
+        sattelite = self.combobox_satellite.get_active_text()
+
+        self.write_log("Ping request transmitted to " + sattelite + " from" + final_callsign + " in " + carrier_frequency + " with a gain of " + tx_gain)
         
     def on_button_preferences_clicked(self, button):
         response = self.dialog_preferences.run()
@@ -203,6 +225,7 @@ class SpaceLabTransmitter:
         self.entry_preferences_general_callsign.set_text(_DEFAULT_CALLSIGN)
         self.entry_preferences_general_location.set_text(_DEFAULT_LOCATION)
         self.entry_preferences_general_country.set_text(_DEFAULT_COUNTRY)
+        
         
     def _save_preferences(self):
         home = os.path.expanduser('~')
