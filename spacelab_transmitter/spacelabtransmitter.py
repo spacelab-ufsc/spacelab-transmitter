@@ -57,8 +57,8 @@ _DIR_CONFIG_WINDOWS             = 'spacelab_transmitter'
 
 _SAT_JSON_FLORIPASAT_1_LOCAL    = os.path.abspath(os.path.dirname(__file__)) + '/data/satellites/floripasat-1.json'
 _SAT_JSON_FLORIPASAT_1_SYSTEM   = '/usr/share/spacelab_transmitter/floripasat-1.json'
-_SAT_JSON_FLORIPASAT_2_LOCAL    = os.path.abspath(os.path.dirname(__file__)) + '/data/satellites/floripasat-2.json'
-_SAT_JSON_FLORIPASAT_2_SYSTEM   = '/usr/share/spacelab_transmitter/floripasat-2.json'
+_SAT_JSON_GOLDS_UFSC_LOCAL    = os.path.abspath(os.path.dirname(__file__)) + '/data/satellites/GOLDS_UFSC.json'
+_SAT_JSON_GOLDS_UFSC_SYSTEM   = '/usr/share/spacelab_transmitter/GOLDS_UFSC.json'
 
 _DEFAULT_CALLSIGN               = 'PP5UF'
 _DEFAULT_LOCATION               = 'Florianópolis'
@@ -193,11 +193,16 @@ class SpaceLabTransmitter:
         '''index = self.combobox_satellite.get_active()
         model = self.combobox_satellite.get_model()
         sattelite = model[index]'''
+
+        if self.combobox_satellite.get_active() == 0:
+            sat_json = 'FloripaSat-1'
+        elif self.combobox_satellite.get_active() == 1:
+            sat_json = 'GOLDS-UFSC'
+
         carrier_frequency = self.carrier_frequency.get_text()
         tx_gain = self.tx_gain.get_text()
-        sattelite = self.combobox_satellite.get_active_text()
 
-        self.write_log("Ping request transmitted to " + sattelite + " from" + final_callsign + " in " + carrier_frequency + " with a gain of " + tx_gain)
+        self.write_log("Ping request transmitted to " + sat_json + " from" + final_callsign + " in " + carrier_frequency + " with a gain of " + tx_gain)
         
     def on_button_preferences_clicked(self, button):
         response = self.dialog_preferences.run()
