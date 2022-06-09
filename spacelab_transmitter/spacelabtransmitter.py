@@ -64,7 +64,9 @@ _DEFAULT_CALLSIGN               = 'PP5UF'
 _DEFAULT_LOCATION               = 'Florianópolis'
 _DEFAULT_COUNTRY                = 'Brazil'
 
-#Defining logfile deafult local
+_DIR_CONFIG_DEFAULTJSON_LINUX   = 'spacelab_transmitter'
+
+#Defining logfile default local
 _DIR_CONFIG_LOGFILE_LINUX       = 'spacelab_transmitter'
 _DEFAULT_LOGFILE_PATH           = os.path.join(os.path.expanduser('~'), _DIR_CONFIG_LOGFILE_LINUX)
 _DEFAULT_LOGFILE                = 'logfile.csv'
@@ -189,11 +191,6 @@ class SpaceLabTransmitter:
         self.pkt = pngh.encode(pl)
         print("Encoded packet:", self.pkt)
 
-        #sattelite =  self.combobox_satellite.get_text() #?
-        '''index = self.combobox_satellite.get_active()
-        model = self.combobox_satellite.get_model()
-        sattelite = model[index]'''
-
         if self.combobox_satellite.get_active() == 0:
             sat_json = 'FloripaSat-1'
         elif self.combobox_satellite.get_active() == 1:
@@ -226,11 +223,24 @@ class SpaceLabTransmitter:
         home = os.path.expanduser('~')
         location = os.path.join(home, _DIR_CONFIG_LINUX)
 
+        if not os.path.isfile(location + "/" + _DIR_CONFIG_DEFAULTJSON_LINUX):
+            self._load_default_preferences()
+            self._save_preferences() 
+
+        f = open(location + "/" + _DIR_CONFIG_DEFAULTJSON_LINUX, "r")
+        config = json.loads(f.read())
+        f.close()
+
+        self.entry_preferences_general_callsign.set_text(config[_DEFAULT_CALLSIGN])
+        self.entry_preferences_general_location.set_text(config[_DEFAULT_LOCATION])
+        self.entry_preferences_general_country.set_text(config[_DEFAULT_COUNTRY])
+        self.logfile_chooser_button.set_filename(config[_DEFAULT_LOGFILE_PATH])
+
     def _load_default_preferences(self):
         self.entry_preferences_general_callsign.set_text(_DEFAULT_CALLSIGN)
         self.entry_preferences_general_location.set_text(_DEFAULT_LOCATION)
         self.entry_preferences_general_country.set_text(_DEFAULT_COUNTRY)
-        
+        self.logfile_chooser_button.set_filename(_DEFAULT_LOGFILE_PATH)
         
     def _save_preferences(self):
         home = os.path.expanduser('~')
@@ -238,6 +248,12 @@ class SpaceLabTransmitter:
 
         if not os.path.exists(location):
             os.mkdir(location)
+
+        with open(location + '/' + _DIR_CONFIG_DEFAULTJSON_LINUX, 'w', encoding='utf-8') as f:
+            json.dump({_DEFAULT_CALLSIGN: self.entry_preferences_general_callsign.get_text(),
+                    _DEFAULT_LOCATION: self.entry_preferences_general_location.get_text(),
+                    _DEFAULT_COUNTRY: self.entry_preferences_general_country.get_text(),
+                    _DEFAULT_LOGFILE_PATH: self.logfile_chooser_button.get_filename()}, f, ensure_ascii=False, indent=4)
 
     def on_toolbutton_about_clicked(self, toolbutton):
         response = self.aboutdialog.run()
