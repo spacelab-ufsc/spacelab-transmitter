@@ -21,6 +21,9 @@
 #
 
 
+import uhd
+from scipy import signal
+
 class USRP:
     """
     Ettus USRP SDR handler.
@@ -32,16 +35,25 @@ class USRP:
         :param sample_rate: Sample rate in S/s
         :param gain: gain in dB
         """
-        pass
+        self._sample_rate = sample_rate
+        self._gain = gain
 
-    def transmit(self, samples, baud, freq):
+        self._usrp = uhd.usrp.MultiUSRP()
+
+    def transmit(self, samples, dur, rate, freq):
         """
         Function to transmit IQ samples through the SDR device.
 
-        :param: samples:
-        :param: baud:
-        :param: freq:
+        :param: samples: A NumPy array with the IQ data (complex).
+        :param: dur: is the time duration of the transmission (in seconds).
+        :param: rate: is the samples rate of the input samples.
+        :param: freq: is the frequency in Hz.
 
-        :return: .
+        :return: True/False if successful or not.
         """
-        pass
+        samples = signal.resample_poly(samples, self._sample_rate, rate)
+
+        if self._usrp.send_waveform(samples, dur, freq, self._sample_rate, [0], self._gain) >= len(samples):
+            return True
+        else:
+            return False
