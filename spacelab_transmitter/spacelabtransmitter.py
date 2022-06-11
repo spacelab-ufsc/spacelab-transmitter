@@ -39,6 +39,8 @@ from gi.repository import GdkPixbuf
 from pyngham import PyNGHam
 
 import spacelab_transmitter.version
+from spacelab_transmitter.gmsk import GMSK
+from spacelab_transmitter.usrp import USRP
 
 #here's for importing the other files of spacelab-transmitter that are missing or not ready
 
@@ -166,31 +168,25 @@ class SpaceLabTransmitter:
         self.entry_preferences_general_country = self.builder.get_object("entry_preferences_general_country")
 
     def run(self):
-
         self.window.show_all()          
         Gtk.main()
 
     def destroy(window, self):
         Gtk.main_quit()
 
-
     def on_ping_request_command_clicked(self, button):
         pngh = PyNGHam()
         callsign = self.entry_preferences_general_callsign.get_text()
 
-        string_callsign = len(callsign) 
-        print(string_callsign)
-        n = 7 - string_callsign 
-        print(n)
-        if n != 7: 
+        n = 7 - len(callsign)
+        if n != 7:
             final_callsign = n*" " + callsign
-        print(final_callsign)
-        x = [ord(i) for i in final_callsign] 
+        x = [ord(i) for i in final_callsign]
 
         pl = [0x40] + x
-        self.pkt = pngh.encode(pl)
-        print("Encoded packet:", self.pkt)
+        pkt = pngh.encode(pl)
 
+        sat_json = str()
         if self.combobox_satellite.get_active() == 0:
             sat_json = 'FloripaSat-1'
         elif self.combobox_satellite.get_active() == 1:
@@ -199,8 +195,17 @@ class SpaceLabTransmitter:
         carrier_frequency = self.carrier_frequency.get_text()
         tx_gain = self.tx_gain.get_text()
 
-        self.write_log("Ping request transmitted to " + sat_json + " from" + final_callsign + " in " + carrier_frequency + " with a gain of " + tx_gain)
-        
+        mod = GMSK(0.5, 1200)   # BT = 0.5, 1200 bps
+
+        samples, sample_rate, duration_s = mod.modulate(pkt, 1000)
+
+        sdr = USRP(int(self.sample_rate.get_text()), int(tx_gain))
+
+        if sdr.transmit(samples, duration_s, sample_rate, int(carrier_frequency)):
+            self.write_log("Ping request transmitted to " + sat_json + " from" + final_callsign + " in " + carrier_frequency + " Hz with a gain of " + tx_gain + " dB")
+        else:
+            self.write_log("Error transmitting a ping telecommand!")
+
     def on_button_preferences_clicked(self, button):
         response = self.dialog_preferences.run()
 
