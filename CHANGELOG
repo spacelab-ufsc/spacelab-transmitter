@@ -1,5 +1,18 @@
 ===========================================
 
+v0.2 - 2022/06/14
+
+- UI updated
+- Logfile system
+- Ping command 
+- GMSK modulation
+- USRP interface
+- Load and save preferences 
+- Minor fix and updates
+
+===========================================
+===========================================
+
 v0.1 - 2022/04/26
 
 - Initial project structure
