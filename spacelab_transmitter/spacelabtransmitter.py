@@ -66,7 +66,7 @@ _DEFAULT_CALLSIGN               = 'PP5UF'
 _DEFAULT_LOCATION               = 'Florianópolis'
 _DEFAULT_COUNTRY                = 'Brazil'
 
-_DIR_CONFIG_DEFAULTJSON_LINUX   = 'spacelab_transmitter'
+_DIR_CONFIG_DEFAULTJSON   = 'spacelab_transmitter.json'
 
 #Defining logfile default local
 _DIR_CONFIG_LOGFILE_LINUX       = 'spacelab_transmitter'
@@ -138,9 +138,9 @@ class SpaceLabTransmitter:
         self.logfile_chooser_button.set_filename(_DEFAULT_LOGFILE_PATH)
 
         # SDR Parameters
-        self.carrier_frequency = self.builder.get_object("carrier_frequency")
-        self.sample_rate = self.builder.get_object("sample_rate")
-        self.tx_gain = self.builder.get_object("tx_gain")
+        self.entry_carrier_frequency = self.builder.get_object("entry_carrier_frequency")
+        self.entry_sample_rate = self.builder.get_object("entry_sample_rate")
+        self.spinbutton_tx_gain = self.builder.get_object("spinbutton_tx_gain")
 
         # Satellite combobox
         self.liststore_satellite = self.builder.get_object("liststore_satellite")
@@ -192,14 +192,14 @@ class SpaceLabTransmitter:
         elif self.combobox_satellite.get_active() == 1:
             sat_json = 'GOLDS-UFSC'
 
-        carrier_frequency = self.carrier_frequency.get_text()
-        tx_gain = self.tx_gain.get_text()
+        carrier_frequency = self.entry_carrier_frequency.get_text()
+        tx_gain = self.spinbutton_tx_gain.get_text()
 
         mod = GMSK(0.5, 1200)   # BT = 0.5, 1200 bps
 
         samples, sample_rate, duration_s = mod.modulate(pkt, 1000)
 
-        sdr = USRP(int(self.sample_rate.get_text()), int(tx_gain))
+        sdr = USRP(int(self.entry_sample_rate.get_text()), int(tx_gain))
 
         if sdr.transmit(samples, duration_s, sample_rate, int(carrier_frequency)):
             self.write_log("Ping request transmitted to " + sat_json + " from" + final_callsign + " in " + carrier_frequency + " Hz with a gain of " + tx_gain + " dB")
@@ -228,11 +228,11 @@ class SpaceLabTransmitter:
         home = os.path.expanduser('~')
         location = os.path.join(home, _DIR_CONFIG_LINUX)
 
-        if not os.path.isfile(location + "/" + _DIR_CONFIG_DEFAULTJSON_LINUX):
+        if not os.path.isfile(location + "/" + _DIR_CONFIG_DEFAULTJSON):
             self._load_default_preferences()
             self._save_preferences() 
 
-        f = open(location + "/" + _DIR_CONFIG_DEFAULTJSON_LINUX, "r")
+        f = open(location + "/" + _DIR_CONFIG_DEFAULTJSON, "r")
         config = json.loads(f.read())
         f.close()
 
@@ -254,7 +254,7 @@ class SpaceLabTransmitter:
         if not os.path.exists(location):
             os.mkdir(location)
 
-        with open(location + '/' + _DIR_CONFIG_DEFAULTJSON_LINUX, 'w', encoding='utf-8') as f:
+        with open(location + '/' + _DIR_CONFIG_DEFAULTJSON, 'w', encoding='utf-8') as f:
             json.dump({_DEFAULT_CALLSIGN: self.entry_preferences_general_callsign.get_text(),
                     _DEFAULT_LOCATION: self.entry_preferences_general_location.get_text(),
                     _DEFAULT_COUNTRY: self.entry_preferences_general_country.get_text(),
