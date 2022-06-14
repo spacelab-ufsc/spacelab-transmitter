@@ -26,24 +26,21 @@
 #MODULES 
 import os
 import threading
-import sys
-import signal
 from datetime import datetime
 import pathlib
 import json
+import csv
 
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 from gi.repository import GdkPixbuf
 
-import matplotlib.pyplot as plt
-from scipy.io import wavfile
-import zmq
-
-#import pyngham
+from pyngham import PyNGHam
 
 import spacelab_transmitter.version
+from spacelab_transmitter.gmsk import GMSK
+from spacelab_transmitter.usrp import USRP
 
 #here's for importing the other files of spacelab-transmitter that are missing or not ready
 
@@ -62,10 +59,19 @@ _DIR_CONFIG_WINDOWS             = 'spacelab_transmitter'
 
 _SAT_JSON_FLORIPASAT_1_LOCAL    = os.path.abspath(os.path.dirname(__file__)) + '/data/satellites/floripasat-1.json'
 _SAT_JSON_FLORIPASAT_1_SYSTEM   = '/usr/share/spacelab_transmitter/floripasat-1.json'
-_SAT_JSON_FLORIPASAT_2_LOCAL    = os.path.abspath(os.path.dirname(__file__)) + '/data/satellites/floripasat-2.json'
-_SAT_JSON_FLORIPASAT_2_SYSTEM   = '/usr/share/spacelab_transmitter/floripasat-2.json'
+_SAT_JSON_GOLDS_UFSC_LOCAL    = os.path.abspath(os.path.dirname(__file__)) + '/data/satellites/GOLDS_UFSC.json'
+_SAT_JSON_GOLDS_UFSC_SYSTEM   = '/usr/share/spacelab_transmitter/GOLDS_UFSC.json'
 
-#signal constants (?) such as location, country, etc. (?)
+_DEFAULT_CALLSIGN               = 'PP5UF'
+_DEFAULT_LOCATION               = 'Florianópolis'
+_DEFAULT_COUNTRY                = 'Brazil'
+
+_DIR_CONFIG_DEFAULTJSON   = 'spacelab_transmitter.json'
+
+#Defining logfile default local
+_DIR_CONFIG_LOGFILE_LINUX       = 'spacelab_transmitter'
+_DEFAULT_LOGFILE_PATH           = os.path.join(os.path.expanduser('~'), _DIR_CONFIG_LOGFILE_LINUX)
+_DEFAULT_LOGFILE                = 'logfile.csv'
 
 class SpaceLabTransmitter:
 
@@ -80,8 +86,9 @@ class SpaceLabTransmitter:
         self.builder.connect_signals(self)
 
         self._build_widgets()
+        self.write_log("SpaceLab Transmitter initialized!")
+        self._load_preferences()
 
-        #self._load_preferences()
         #self.ngham = pyngham.PyNGHam()
         #self.decoded_packets_index = list()
 
@@ -95,10 +102,178 @@ class SpaceLabTransmitter:
         self.window.set_wmclass(self.window.get_title(), self.window.get_title())
         self.window.connect("destroy", Gtk.main_quit)
 
-    def run(self):
+        #Ping 
+        self.ping_request = self.builder.get_object("ping_request")
+        self.ping_request.connect("clicked", self.on_ping_request_command_clicked)
 
-        self.window.show_all()
+        #Entry_preferences_general_callsign builder
+        self.entry_preferences_general_callsign = self.builder.get_object("entry_preferences_general_callsign")
+
+        # Events treeview
+        self.treeview_events = self.builder.get_object("treeview_events")
+        self.listmodel_events = Gtk.ListStore(str, str)
+        self.treeview_events.set_model(self.listmodel_events)
+        cell = Gtk.CellRendererText()
+        column = Gtk.TreeViewColumn("Datetime", cell, text=0)
+        column.set_fixed_width(250)
+        self.treeview_events.append_column(column)
+        column = Gtk.TreeViewColumn("Event", cell, text=1)
+        self.treeview_events.append_column(column)
+
+        #About dialog
+        self.aboutdialog = self.builder.get_object("aboutdialog_spacelab_transmitter")
+        self.aboutdialog.set_version(spacelab_transmitter.version.__version__)
+        if os.path.isfile(_LOGO_FILE_LOCAL):
+            self.aboutdialog.set_logo(GdkPixbuf.Pixbuf.new_from_file(_LOGO_FILE_LOCAL))
+        else:
+            self.aboutdialog.set_logo(GdkPixbuf.Pixbuf.new_from_file(_LOGO_FILE_LINUX_SYSTEM))
+
+        # About toolbutton
+        self.toolbutton_about = self.builder.get_object("toolbutton_about")
+        self.toolbutton_about.connect("clicked", self.on_toolbutton_about_clicked)
+
+
+        # Logfile chooser button
+        self.logfile_chooser_button = self.builder.get_object("logfile_chooser_button")
+        self.logfile_chooser_button.set_filename(_DEFAULT_LOGFILE_PATH)
+
+        # SDR Parameters
+        self.entry_carrier_frequency = self.builder.get_object("entry_carrier_frequency")
+        self.entry_sample_rate = self.builder.get_object("entry_sample_rate")
+        self.spinbutton_tx_gain = self.builder.get_object("spinbutton_tx_gain")
+
+        # Satellite combobox
+        self.liststore_satellite = self.builder.get_object("liststore_satellite")
+        self.liststore_satellite.append(["FloripaSat-1"])
+        self.liststore_satellite.append(["GOLDS-UFSC"])
+        self.combobox_satellite = self.builder.get_object("combobox_satellite")
+        cell = Gtk.CellRendererText()
+        self.combobox_satellite.pack_start(cell, True)
+        self.combobox_satellite.add_attribute(cell, "text", 0)
+
+        #Preferences dialog
+        self.button_preferences = self.builder.get_object("button_preferences")
+        self.button_preferences.connect("clicked", self.on_button_preferences_clicked)
+
+        self.dialog_preferences = self.builder.get_object("dialog_preferences")
+        self.button_preferences_ok = self.builder.get_object("button_preferences_ok")
+        self.button_preferences_ok.connect("clicked", self.on_button_preferences_ok_clicked)
+        self.button_preferences_default = self.builder.get_object("button_preferences_default")
+        self.button_preferences_default.connect("clicked", self.on_button_preferences_default_clicked)
+        self.button_preferences_cancel = self.builder.get_object("button_preferences_cancel")
+        self.button_preferences_cancel.connect("clicked", self.on_button_preferences_cancel_clicked)
+
+        self.entry_preferences_general_callsign = self.builder.get_object("entry_preferences_general_callsign")
+        self.entry_preferences_general_location = self.builder.get_object("entry_preferences_general_location")
+        self.entry_preferences_general_country = self.builder.get_object("entry_preferences_general_country")
+
+    def run(self):
+        self.window.show_all()          
         Gtk.main()
 
     def destroy(window, self):
         Gtk.main_quit()
+
+    def on_ping_request_command_clicked(self, button):
+        pngh = PyNGHam()
+        callsign = self.entry_preferences_general_callsign.get_text()
+
+        n = 7 - len(callsign)
+        if n != 7:
+            final_callsign = n*" " + callsign
+        x = [ord(i) for i in final_callsign]
+
+        pl = [0x40] + x
+        pkt = pngh.encode(pl)
+
+        sat_json = str()
+        if self.combobox_satellite.get_active() == 0:
+            sat_json = 'FloripaSat-1'
+        elif self.combobox_satellite.get_active() == 1:
+            sat_json = 'GOLDS-UFSC'
+
+        carrier_frequency = self.entry_carrier_frequency.get_text()
+        tx_gain = self.spinbutton_tx_gain.get_text()
+
+        mod = GMSK(0.5, 1200)   # BT = 0.5, 1200 bps
+
+        samples, sample_rate, duration_s = mod.modulate(pkt, 1000)
+
+        sdr = USRP(int(self.entry_sample_rate.get_text()), int(tx_gain))
+
+        if sdr.transmit(samples, duration_s, sample_rate, int(carrier_frequency)):
+            self.write_log("Ping request transmitted to " + sat_json + " from" + final_callsign + " in " + carrier_frequency + " Hz with a gain of " + tx_gain + " dB")
+        else:
+            self.write_log("Error transmitting a ping telecommand!")
+
+    def on_button_preferences_clicked(self, button):
+        response = self.dialog_preferences.run()
+
+        if response == Gtk.ResponseType.DELETE_EVENT:
+            self._load_preferences()
+            self.dialog_preferences.hide()
+
+    def on_button_preferences_ok_clicked(self, button):
+        self._save_preferences()
+        self.dialog_preferences.hide()
+
+    def on_button_preferences_default_clicked(self, button):
+        self._load_default_preferences()
+
+    def on_button_preferences_cancel_clicked(self, button):
+        self._load_preferences()
+        self.dialog_preferences.hide()
+
+    def _load_preferences(self):
+        home = os.path.expanduser('~')
+        location = os.path.join(home, _DIR_CONFIG_LINUX)
+
+        if not os.path.isfile(location + "/" + _DIR_CONFIG_DEFAULTJSON):
+            self._load_default_preferences()
+            self._save_preferences() 
+
+        f = open(location + "/" + _DIR_CONFIG_DEFAULTJSON, "r")
+        config = json.loads(f.read())
+        f.close()
+
+        self.entry_preferences_general_callsign.set_text(config["callsign"])
+        self.entry_preferences_general_location.set_text(config["location"])
+        self.entry_preferences_general_country.set_text(config["country"])
+        self.logfile_chooser_button.set_filename(config["logfile_path"])
+
+    def _load_default_preferences(self):
+        self.entry_preferences_general_callsign.set_text(_DEFAULT_CALLSIGN)
+        self.entry_preferences_general_location.set_text(_DEFAULT_LOCATION)
+        self.entry_preferences_general_country.set_text(_DEFAULT_COUNTRY)
+        self.logfile_chooser_button.set_filename(_DEFAULT_LOGFILE_PATH)
+        
+    def _save_preferences(self):
+        home = os.path.expanduser('~')
+        location = os.path.join(home, _DIR_CONFIG_LINUX)
+
+        if not os.path.exists(location):
+            os.mkdir(location)
+
+        with open(location + '/' + _DIR_CONFIG_DEFAULTJSON, 'w', encoding='utf-8') as f:
+            json.dump({"callsign": self.entry_preferences_general_callsign.get_text(),
+                    "location": self.entry_preferences_general_location.get_text(),
+                    "country": self.entry_preferences_general_country.get_text(),
+                    "logfile_path": self.logfile_chooser_button.get_filename()}, f, ensure_ascii=False, indent=4)
+
+    def on_toolbutton_about_clicked(self, toolbutton):
+        response = self.aboutdialog.run()
+
+        if response == Gtk.ResponseType.DELETE_EVENT:
+            self.aboutdialog.hide()
+
+    def write_log(self, msg):
+        event = [str(datetime.now()), msg]
+
+        self.listmodel_events.append(event)
+
+        if not os.path.exists(_DEFAULT_LOGFILE_PATH):
+            os.mkdir(_DEFAULT_LOGFILE_PATH)
+
+        with open(self.logfile_chooser_button.get_filename() + '/' + _DEFAULT_LOGFILE, 'a') as logfile:
+            writer = csv.writer(logfile, delimiter='\t')
+            writer.writerow(event)

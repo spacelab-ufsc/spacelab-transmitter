@@ -85,6 +85,7 @@ def test_ui():
     entry_preferences_general_country   = builder.get_object("entry_preferences_general_country")
     entry_preferences_general_location  = builder.get_object("entry_preferences_general_location")
     entry_preferences_general_callsign  = builder.get_object("entry_preferences_general_callsign")
+    filechooserbutton_logfile           = builder.get_object("logfile_chooser_button")
 
     assert dialog_preferences                   != None
     assert button_preferences_ok                != None
@@ -93,3 +94,4 @@ def test_ui():
     assert entry_preferences_general_country    != None
     assert entry_preferences_general_location   != None
     assert entry_preferences_general_callsign   != None
+    assert filechooserbutton_logfile            != None
