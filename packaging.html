@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     
-    <title>Overview</title>
+    <title>Packaging the Project</title>
     
 
     <link rel="stylesheet" href="_static/css/redactor.css" type="text/css" />
@@ -15,8 +15,8 @@
     <link rel="index" title="Index" href="genindex.html"/>
     <link rel="search" title="Search" href="search.html"/>
     <link rel="top" title="Spacelab Transmitter  documentation" href="index.html"/>
-    <link rel="next" title="&lt;no title&gt;" href="Installation.html"/>
-    <link rel="prev" title="Spacelab Transmitter&#39;s documentation!" href="index.html"/> 
+    <link rel="next" title="Logging System" href="logfile.html"/>
+    <link rel="prev" title="&lt;no title&gt;" href="Installation.html"/> 
 </head>
 
 <body role="document">
@@ -58,11 +58,12 @@
     
     
         <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Overview</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#references">References</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Overview.html">Overview</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Packaging the Project</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#generating-an-rpm-package">Generating an RPM package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#generating-a-deb-package">Generating a DEB package</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="packaging.html">Packaging the Project</a></li>
 <li class="toctree-l1"><a class="reference internal" href="logfile.html">Logging System</a></li>
 </ul>
 
@@ -93,38 +94,44 @@
             <a href="index.html">Docs</a> /
         </li>
         
-        <li class="site-breadcrumbs__leaf">Overview</li>
+        <li class="site-breadcrumbs__leaf">Packaging the Project</li>
     
     </ul>
 </nav>
         <section class="site-content">
             <div class="container">
                 
-  <div class="section" id="overview">
-<h1>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h1>
-<a class="reference external image-reference" href="https://www.youtube.com/watch?v=JaDpDG2fYtY"><img alt="_images/enterprise.png" src="_images/enterprise.png" style="width: 50px;" /></a>
-<p>The Spacelab Package Transmitter is a Python in-development software to transmit packages to satellites.</p>
-<p>A list of known satellites that are planned to use this software are presented below:</p>
-<ul class="simple">
-<li><p><strong>FloripaSat-1</strong> <a class="footnote-reference brackets" href="#id4" id="id1">1</a></p></li>
-<li><p><strong>GOLDS-UFSC (a.k.a. FloripaSat-2)</strong> <a class="footnote-reference brackets" href="#id5" id="id2">2</a></p></li>
-<li><p><strong>Catarina-A1</strong></p></li>
-</ul>
-<p>The two satellites of the list above are developed (or in development) by the same research group: the <em>Space Technology Research Laboratory</em> (SpaceLab) <a class="footnote-reference brackets" href="#id6" id="id3">3</a>, from <em>Universidade Federal de Santa Catarina</em> (Brazil).</p>
-<p>The objective of this software is to become the &quot;universal&quot; software of the Spacelab's Satellites to transmit packages to any of its satellites.</p>
-<div class="section" id="references">
-<h2>References<a class="headerlink" href="#references" title="Permalink to this headline">¶</a></h2>
-<dl class="footnote brackets">
-<dt class="label" id="id4"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
-<dd><p>Marcelino, Gabriel M.; Martinez, Sara V.; Seman, Laio O., Slongo, Leonardo K.; Bezerra, Eduardo A. <em>A Critical Embedded System Challenge: The FloripaSat-1 Mission</em>. IEEE Latin America Transactions, Vol. 18, Issue 2, 2020.</p>
-</dd>
-<dt class="label" id="id5"><span class="brackets"><a class="fn-backref" href="#id2">2</a></span></dt>
-<dd><p><a class="reference external" href="https://github.com/spacelab-ufsc/floripasat2-doc">https://github.com/spacelab-ufsc/floripasat2-doc</a></p>
-</dd>
-<dt class="label" id="id6"><span class="brackets"><a class="fn-backref" href="#id3">3</a></span></dt>
-<dd><p><a class="reference external" href="https://spacelab.ufsc.br/">https://spacelab.ufsc.br/</a></p>
-</dd>
-</dl>
+  <div class="section" id="packaging-the-project">
+<h1>Packaging the Project<a class="headerlink" href="#packaging-the-project" title="Permalink to this headline">¶</a></h1>
+<p>This page presents the instructions to packaging the source files of the project.</p>
+<div class="section" id="generating-an-rpm-package">
+<h2>Generating an RPM package<a class="headerlink" href="#generating-an-rpm-package" title="Permalink to this headline">¶</a></h2>
+<p>To generate an RPM package, execute the command below:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="n">setup</span><span class="o">.</span><span class="n">py</span> <span class="n">bdist_rpm</span>
+</pre></div>
+</div>
+<p>If successful, the generated RPM package will be available in <em>dist/</em>.</p>
+</div>
+<div class="section" id="generating-a-deb-package">
+<h2>Generating a DEB package<a class="headerlink" href="#generating-a-deb-package" title="Permalink to this headline">¶</a></h2>
+<p>To generate a DEB package, execute the steps below:</p>
+<ol class="arabic simple">
+<li><p>Prepare the source files with setuptools:</p></li>
+</ol>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="n">setup</span><span class="o">.</span><span class="n">py</span> <span class="n">sdist</span>
+</pre></div>
+</div>
+<ol class="arabic simple" start="2">
+<li><p>Generate the DEB package:</p></li>
+</ol>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">./</span><span class="n">build_deb_pkg</span><span class="o">.</span><span class="n">sh</span>
+</pre></div>
+</div>
+<p>If successful, the generated DEB package will be available in <em>scripts/</em>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The current version of the build_deb_pkg.sh script was written to generate packages targeting Ubuntu 20.04! For other distros or Ubuntu versions, some modification inside the script are required.</p>
+</div>
 </div>
 </div>
 
@@ -136,14 +143,14 @@
         
             <nav class="site-bottom-navigation" role="navigation">
             
-                <a href="Installation.html" class="btn btn--primary btn--next right"
-                    title="&lt;no title&gt;" accesskey="n">
+                <a href="logfile.html" class="btn btn--primary btn--next right"
+                    title="Logging System" accesskey="n">
                     Next
                 </a>
             
             
-                <a href="index.html" class="btn btn--primary btn--prev"
-                    title="Spacelab Transmitter&#39;s documentation!" accesskey="p">
+                <a href="Installation.html" class="btn btn--primary btn--prev"
+                    title="&lt;no title&gt;" accesskey="p">
                     Previous
                 </a>
             
@@ -154,7 +161,7 @@
             <div class="source-link">
             
                 
-                    <a href="_sources/Overview.rst.txt" rel="nofollow">
+                    <a href="_sources/packaging.rst.txt" rel="nofollow">
                         <i class="mdi mdi-code-tags"></i>
                         View page source
                     </a>

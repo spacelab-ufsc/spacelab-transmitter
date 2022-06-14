@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     
-    <title>Spacelab Transmitter&#39;s documentation!</title>
+    <title>Logging System</title>
     
 
     <link rel="stylesheet" href="_static/css/redactor.css" type="text/css" />
@@ -14,8 +14,8 @@
     
     <link rel="index" title="Index" href="genindex.html"/>
     <link rel="search" title="Search" href="search.html"/>
-    <link rel="top" title="Spacelab Transmitter  documentation" href="#"/>
-    <link rel="next" title="Overview" href="Overview.html"/> 
+    <link rel="top" title="Spacelab Transmitter  documentation" href="index.html"/>
+    <link rel="prev" title="Packaging the Project" href="packaging.html"/> 
 </head>
 
 <body role="document">
@@ -31,7 +31,7 @@
 <nav>
 
 
-    <a href="#" class="branding-link">
+    <a href="index.html" class="branding-link">
     
         Spacelab Transmitter
     
@@ -56,10 +56,13 @@
     <section class="site-nav">
     
     
-        <ul>
+        <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="Overview.html">Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="packaging.html">Packaging the Project</a></li>
-<li class="toctree-l1"><a class="reference internal" href="logfile.html">Logging System</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Logging System</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#operation">Operation</a></li>
+</ul>
+</li>
 </ul>
 
     
@@ -86,34 +89,23 @@
     <ul>
     
         <li>
-            <a href="#">Docs</a> /
+            <a href="index.html">Docs</a> /
         </li>
         
-        <li class="site-breadcrumbs__leaf">Spacelab Transmitter's documentation!</li>
+        <li class="site-breadcrumbs__leaf">Logging System</li>
     
     </ul>
 </nav>
         <section class="site-content">
             <div class="container">
                 
-  <div class="section" id="spacelab-transmitter-s-documentation">
-<h1>Spacelab Transmitter's documentation!<a class="headerlink" href="#spacelab-transmitter-s-documentation" title="Permalink to this headline">¶</a></h1>
-<div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="Overview.html">Overview</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="Overview.html#references">References</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="packaging.html">Packaging the Project</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="packaging.html#generating-an-rpm-package">Generating an RPM package</a></li>
-<li class="toctree-l2"><a class="reference internal" href="packaging.html#generating-a-deb-package">Generating a DEB package</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="logfile.html">Logging System</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="logfile.html#operation">Operation</a></li>
-</ul>
-</li>
-</ul>
+  <div class="section" id="logging-system">
+<h1>Logging System<a class="headerlink" href="#logging-system" title="Permalink to this headline">¶</a></h1>
+<p>The Logging System of the Spacelab Transmitter shows the events performed in the software - such as when a telecommand was executed - and their respective date and time.</p>
+<div class="section" id="operation">
+<h2>Operation<a class="headerlink" href="#operation" title="Permalink to this headline">¶</a></h2>
+<p>The logfile is automatically generated inside a default folder in the user home page in the archives called &quot;spacelab_transmitter&quot;. It is a .csv file displaying date and time on one column and the event on the other one.</p>
+<p>Future updating includes an option to choose the file folder.</p>
 </div>
 </div>
 
@@ -125,11 +117,11 @@
         
             <nav class="site-bottom-navigation" role="navigation">
             
-                <a href="Overview.html" class="btn btn--primary btn--next right"
-                    title="Overview" accesskey="n">
-                    Next
-                </a>
             
+                <a href="packaging.html" class="btn btn--primary btn--prev"
+                    title="Packaging the Project" accesskey="p">
+                    Previous
+                </a>
             
             </nav>
         
@@ -138,7 +130,7 @@
             <div class="source-link">
             
                 
-                    <a href="_sources/index.rst.txt" rel="nofollow">
+                    <a href="_sources/logfile.rst.txt" rel="nofollow">
                         <i class="mdi mdi-code-tags"></i>
                         View page source
                     </a>
