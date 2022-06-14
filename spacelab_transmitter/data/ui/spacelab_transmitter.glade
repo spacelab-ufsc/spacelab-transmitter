@@ -123,7 +123,6 @@ Author: Vitória Beatriz Bianchin <vitoriabbianchin@gmail.com>
                 <property name="can_focus">False</property>
                 <child>
                   <object class="GtkToggleButton" id="switch_transmissions_button">
-                    <property name="label">gtk-connect</property>
                     <property name="width_request">-1</property>
                     <property name="height_request">-1</property>
                     <property name="visible">True</property>
@@ -131,8 +130,14 @@ Author: Vitória Beatriz Bianchin <vitoriabbianchin@gmail.com>
                     <property name="receives_default">False</property>
                     <property name="tooltip_text" translatable="yes">Enable Transmissions</property>
                     <property name="action_name">enable</property>
-                    <property name="use_stock">True</property>
                     <property name="always_show_image">True</property>
+                    <child>
+                      <object class="GtkImage">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="stock">gtk-connect</property>
+                      </object>
+                    </child>
                   </object>
                 </child>
               </object>
@@ -309,7 +314,7 @@ Author: Vitória Beatriz Bianchin <vitoriabbianchin@gmail.com>
                             <property name="row_spacing">5</property>
                             <property name="column_spacing">5</property>
                             <child>
-                              <object class="GtkLabel" id="freq">
+                              <object class="GtkLabel" id="label_freq">
                                 <property name="width_request">-1</property>
                                 <property name="height_request">-1</property>
                                 <property name="visible">True</property>
@@ -323,7 +328,7 @@ Author: Vitória Beatriz Bianchin <vitoriabbianchin@gmail.com>
                               </packing>
                             </child>
                             <child>
-                              <object class="GtkLabel" id="samps">
+                              <object class="GtkLabel" id="label_samps">
                                 <property name="width_request">-1</property>
                                 <property name="height_request">-1</property>
                                 <property name="visible">True</property>
@@ -336,7 +341,7 @@ Author: Vitória Beatriz Bianchin <vitoriabbianchin@gmail.com>
                               </packing>
                             </child>
                             <child>
-                              <object class="GtkLabel" id="gain">
+                              <object class="GtkLabel" id="label_gain">
                                 <property name="width_request">-1</property>
                                 <property name="height_request">-1</property>
                                 <property name="visible">True</property>
@@ -351,8 +356,8 @@ Author: Vitória Beatriz Bianchin <vitoriabbianchin@gmail.com>
                               </packing>
                             </child>
                             <child>
-                              <object class="GtkSpinButton" id="tx_gain">
-                                <property name="name">tx_gain</property>
+                              <object class="GtkSpinButton" id="spinbutton_tx_gain">
+                                <property name="name">spinbutton_tx_gain</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
                                 <property name="max_length">100</property>
@@ -366,7 +371,7 @@ Author: Vitória Beatriz Bianchin <vitoriabbianchin@gmail.com>
                               </packing>
                             </child>
                             <child>
-                              <object class="GtkEntry" id="sample_rate">
+                              <object class="GtkEntry" id="entry_sample_rate">
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="text" translatable="yes">1000000</property>
@@ -378,7 +383,7 @@ Author: Vitória Beatriz Bianchin <vitoriabbianchin@gmail.com>
                               </packing>
                             </child>
                             <child>
-                              <object class="GtkEntry" id="carrier_frequency">
+                              <object class="GtkEntry" id="entry_carrier_frequency">
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="text" translatable="yes">437000000</property>
