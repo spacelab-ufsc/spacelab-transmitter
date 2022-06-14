@@ -236,10 +236,10 @@ class SpaceLabTransmitter:
         config = json.loads(f.read())
         f.close()
 
-        self.entry_preferences_general_callsign.set_text(config[_DEFAULT_CALLSIGN])
-        self.entry_preferences_general_location.set_text(config[_DEFAULT_LOCATION])
-        self.entry_preferences_general_country.set_text(config[_DEFAULT_COUNTRY])
-        self.logfile_chooser_button.set_filename(config[_DEFAULT_LOGFILE_PATH])
+        self.entry_preferences_general_callsign.set_text(config["callsign"])
+        self.entry_preferences_general_location.set_text(config["location"])
+        self.entry_preferences_general_country.set_text(config["country"])
+        self.logfile_chooser_button.set_filename(config["logfile_path"])
 
     def _load_default_preferences(self):
         self.entry_preferences_general_callsign.set_text(_DEFAULT_CALLSIGN)
@@ -255,10 +255,10 @@ class SpaceLabTransmitter:
             os.mkdir(location)
 
         with open(location + '/' + _DIR_CONFIG_DEFAULTJSON, 'w', encoding='utf-8') as f:
-            json.dump({_DEFAULT_CALLSIGN: self.entry_preferences_general_callsign.get_text(),
-                    _DEFAULT_LOCATION: self.entry_preferences_general_location.get_text(),
-                    _DEFAULT_COUNTRY: self.entry_preferences_general_country.get_text(),
-                    _DEFAULT_LOGFILE_PATH: self.logfile_chooser_button.get_filename()}, f, ensure_ascii=False, indent=4)
+            json.dump({"callsign": self.entry_preferences_general_callsign.get_text(),
+                    "location": self.entry_preferences_general_location.get_text(),
+                    "country": self.entry_preferences_general_country.get_text(),
+                    "logfile_path": self.logfile_chooser_button.get_filename()}, f, ensure_ascii=False, indent=4)
 
     def on_toolbutton_about_clicked(self, toolbutton):
         response = self.aboutdialog.run()
