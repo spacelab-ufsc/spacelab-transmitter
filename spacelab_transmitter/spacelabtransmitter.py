@@ -103,8 +103,8 @@ class SpaceLabTransmitter:
         self.window.connect("destroy", Gtk.main_quit)
 
         #Ping 
-        self.ping_request = self.builder.get_object("ping_request")
-        self.ping_request.connect("clicked", self.on_ping_request_command_clicked)
+        self.button_ping_request = self.builder.get_object("button_ping_request")
+        self.button_ping_request.connect("clicked", self.on_button_ping_request_command_clicked)
 
         #Entry_preferences_general_callsign builder
         self.entry_preferences_general_callsign = self.builder.get_object("entry_preferences_general_callsign")
@@ -132,6 +132,9 @@ class SpaceLabTransmitter:
         self.toolbutton_about = self.builder.get_object("toolbutton_about")
         self.toolbutton_about.connect("clicked", self.on_toolbutton_about_clicked)
 
+        #Toggl button switch transmission
+        self.toggle_button_switch = self.builder.get_object("toggle_button_switch")
+        self.toggle_button_switch.connect("clicked", self.on_toggle_button_switch_clicked)
 
         # Logfile chooser button
         self.logfile_chooser_button = self.builder.get_object("logfile_chooser_button")
@@ -150,6 +153,23 @@ class SpaceLabTransmitter:
         cell = Gtk.CellRendererText()
         self.combobox_satellite.pack_start(cell, True)
         self.combobox_satellite.add_attribute(cell, "text", 0)
+
+        #Telecommands buttons
+
+        self.button_ping_request = self.builder.get_object("button_ping_request")
+        self.button_enter_hibernation = self.builder.get_object("button_enter_hibernation")
+        self.button_deactivate_module = self.builder.get_object("button_deactivate_module")
+        self.button_erase_memory = self.builder.get_object("button_erase_memory")
+        self.button_set_parameter = self.builder.get_object("button_set_parameter")
+        self.button_data_request = self.builder.get_object("button_data_request")
+        self.button_leave_hibernation = self.builder.get_object("button_leave_hibernation")
+        self.button_activate_payload = self.builder.get_object("button_activate_payload")
+        self.button_force_reset = self.builder.get_object("button_force_reset")
+        self.button_get_parameter = self.builder.get_object("button_get_parameter")
+        self.button_broadcast_message = self.builder.get_object("button_broadcast_message")
+        self.button_activate_module = self.builder.get_object("button_activate_module")
+        self.button_deactivate_payload = self.builder.get_object("button_deactivate_payload")
+        self.button_get_payload_data = self.builder.get_object("button_get_payload_data")
 
         #Preferences dialog
         self.button_preferences = self.builder.get_object("button_preferences")
@@ -174,7 +194,7 @@ class SpaceLabTransmitter:
     def destroy(window, self):
         Gtk.main_quit()
 
-    def on_ping_request_command_clicked(self, button):
+    def on_button_ping_request_command_clicked(self, button):
         pngh = PyNGHam()
         callsign = self.entry_preferences_general_callsign.get_text()
 
@@ -277,3 +297,35 @@ class SpaceLabTransmitter:
         with open(self.logfile_chooser_button.get_filename() + '/' + _DEFAULT_LOGFILE, 'a') as logfile:
             writer = csv.writer(logfile, delimiter='\t')
             writer.writerow(event)
+
+    def on_toggle_button_switch_clicked(self, buton):
+        if self.toggle_button_switch.get_active() == False:
+            self.button_ping_request.set_sensitive(False)
+            self.button_enter_hibernation.set_sensitive(False)
+            self.button_deactivate_module.set_sensitive(False)
+            self.button_erase_memory.set_sensitive(False)
+            self.button_set_parameter.set_sensitive(False)
+            self.button_data_request.set_sensitive(False)
+            self.button_leave_hibernation.set_sensitive(False)
+            self.button_activate_payload.set_sensitive(False)
+            self.button_force_reset.set_sensitive(False)
+            self.button_get_parameter.set_sensitive(False)
+            self.button_broadcast_message.set_sensitive(False)
+            self.button_activate_module.set_sensitive(False)
+            self.button_deactivate_payload.set_sensitive(False)
+            self.button_get_payload_data.set_sensitive(False)
+        elif self.toggle_button_switch.get_active() == True:
+            self.button_ping_request.set_sensitive(True)
+            self.button_enter_hibernation.set_sensitive(True)
+            self.button_deactivate_module.set_sensitive(True)
+            self.button_erase_memory.set_sensitive(True)
+            self.button_set_parameter.set_sensitive(True)
+            self.button_data_request.set_sensitive(True)
+            self.button_leave_hibernation.set_sensitive(True)
+            self.button_activate_payload.set_sensitive(True)
+            self.button_force_reset.set_sensitive(True)
+            self.button_get_parameter.set_sensitive(True)
+            self.button_broadcast_message.set_sensitive(True)
+            self.button_activate_module.set_sensitive(True)
+            self.button_deactivate_payload.set_sensitive(True)
+            self.button_get_payload_data.set_sensitive(True)
