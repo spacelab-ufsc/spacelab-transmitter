@@ -25,7 +25,7 @@
         },
         {
             "name": "Data request",
-            "authentication": false,
+            "authentication": true,
             "fields": [
                 {
                     "name": "id",
@@ -97,7 +97,7 @@
         },
         {
             "name": "Enter hibernation",
-            "authentication": false,
+            "authentication": true,
             "fields": [
                 {
                     "name": "id",
@@ -127,7 +127,7 @@
         },
         {
             "name": "Leave hibernation",
-            "authentication": false,
+            "authentication": true,
             "fields": [
                 {
                     "name": "id",
@@ -151,7 +151,7 @@
         },
         {
             "name": "Activate module",
-            "authentication": false,
+            "authentication": true,
             "fields": [
                 {
                     "name": "id",
@@ -181,7 +181,7 @@
         },
         {
             "name": "Deactivate module",
-            "authentication": false,
+            "authentication": true,
             "fields": [
                 {
                     "name": "id",
@@ -211,7 +211,7 @@
         },
         {
             "name": "Activate payload",
-            "authentication": false,
+            "authentication": true,
             "fields": [
                 {
                     "name": "id",
@@ -241,7 +241,7 @@
         },
         {
             "name": "Deactivate payload",
-            "authentication": false,
+            "authentication": true,
             "fields": [
                 {
                     "name": "id",
@@ -271,7 +271,7 @@
         },
         {
             "name": "Erase memory",
-            "authentication": false,
+            "authentication": true,
             "fields": [
                 {
                     "name": "id",
@@ -295,7 +295,7 @@
         },
         {
             "name": "Force reset",
-            "authentication": false,
+            "authentication": true,
             "fields": [
                 {
                     "name": "id",
@@ -319,7 +319,7 @@
         },
         {
             "name": "Get payload data",
-            "authentication": false,
+            "authentication": true,
             "fields": [
                 {
                     "name": "id",
@@ -355,7 +355,7 @@
         },
         {
             "name": "Set parameter",
-            "authentication": false,
+            "authentication": true,
             "fields": [
                 {
                     "name": "id",
@@ -397,7 +397,7 @@
         },
         {
             "name": "Get parameter",
-            "authentication": false,
+            "authentication": true,
             "fields": [
                 {
                     "name": "id",
