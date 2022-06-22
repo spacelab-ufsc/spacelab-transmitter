@@ -132,9 +132,9 @@ class SpaceLabTransmitter:
         self.toolbutton_about = self.builder.get_object("toolbutton_about")
         self.toolbutton_about.connect("clicked", self.on_toolbutton_about_clicked)
 
-        #Toggl button switch transmission
-        self.toggle_button_switch = self.builder.get_object("toggle_button_switch")
-        self.toggle_button_switch.connect("clicked", self.on_toggle_button_switch_clicked)
+        #Switch button transmission
+        self.switch_button = self.builder.get_object("switch_button")
+        self.switch_button.connect("state-set", self.on_switch_button_clicked)
 
         # Logfile chooser button
         self.logfile_chooser_button = self.builder.get_object("logfile_chooser_button")
@@ -298,8 +298,8 @@ class SpaceLabTransmitter:
             writer = csv.writer(logfile, delimiter='\t')
             writer.writerow(event)
 
-    def on_toggle_button_switch_clicked(self, buton):
-        if self.toggle_button_switch.get_active() == False:
+    def on_switch_button_clicked(self, false, button):
+        if self.switch_button.get_active() == False:
             self.button_ping_request.set_sensitive(False)
             self.button_enter_hibernation.set_sensitive(False)
             self.button_deactivate_module.set_sensitive(False)
@@ -314,7 +314,7 @@ class SpaceLabTransmitter:
             self.button_activate_module.set_sensitive(False)
             self.button_deactivate_payload.set_sensitive(False)
             self.button_get_payload_data.set_sensitive(False)
-        elif self.toggle_button_switch.get_active() == True:
+        elif self.switch_button.get_active() == True:
             self.button_ping_request.set_sensitive(True)
             self.button_enter_hibernation.set_sensitive(True)
             self.button_deactivate_module.set_sensitive(True)
