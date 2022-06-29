@@ -57,6 +57,8 @@ Author: Vitória Beatriz Bianchin <vitoriabbianchin@gmail.com>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
+                <property name="margin_top">1</property>
+                <property name="margin_bottom">5</property>
               </object>
               <packing>
                 <property name="expand">True</property>
@@ -70,6 +72,10 @@ Author: Vitória Beatriz Bianchin <vitoriabbianchin@gmail.com>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
+                <property name="margin_left">1</property>
+                <property name="margin_right">5</property>
+                <property name="margin_top">1</property>
+                <property name="margin_bottom">5</property>
                 <property name="image_position">right</property>
               </object>
               <packing>
@@ -518,6 +524,7 @@ Author: Vitória Beatriz Bianchin <vitoriabbianchin@gmail.com>
                           <object class="GtkButton" id="button_ping_request">
                             <property name="label" translatable="yes">Ping Request</property>
                             <property name="visible">True</property>
+                            <property name="sensitive">False</property>
                             <property name="can_focus">True</property>
                             <property name="receives_default">True</property>
                           </object>
@@ -531,6 +538,7 @@ Author: Vitória Beatriz Bianchin <vitoriabbianchin@gmail.com>
                           <object class="GtkButton" id="button_enter_hibernation">
                             <property name="label" translatable="yes">Enter Hibernation</property>
                             <property name="visible">True</property>
+                            <property name="sensitive">False</property>
                             <property name="can_focus">True</property>
                             <property name="receives_default">True</property>
                           </object>
@@ -544,6 +552,7 @@ Author: Vitória Beatriz Bianchin <vitoriabbianchin@gmail.com>
                           <object class="GtkButton" id="button_deactivate_module">
                             <property name="label" translatable="yes">Deactivate Module</property>
                             <property name="visible">True</property>
+                            <property name="sensitive">False</property>
                             <property name="can_focus">True</property>
                             <property name="receives_default">True</property>
                           </object>
@@ -557,6 +566,7 @@ Author: Vitória Beatriz Bianchin <vitoriabbianchin@gmail.com>
                           <object class="GtkButton" id="button_erase_memory">
                             <property name="label" translatable="yes">Erase Memory</property>
                             <property name="visible">True</property>
+                            <property name="sensitive">False</property>
                             <property name="can_focus">True</property>
                             <property name="receives_default">True</property>
                           </object>
@@ -570,6 +580,7 @@ Author: Vitória Beatriz Bianchin <vitoriabbianchin@gmail.com>
                           <object class="GtkButton" id="button_set_parameter">
                             <property name="label" translatable="yes">Set Parameter</property>
                             <property name="visible">True</property>
+                            <property name="sensitive">False</property>
                             <property name="can_focus">True</property>
                             <property name="receives_default">True</property>
                           </object>
@@ -595,6 +606,7 @@ Author: Vitória Beatriz Bianchin <vitoriabbianchin@gmail.com>
                           <object class="GtkButton" id="button_data_request">
                             <property name="label" translatable="yes">Data Request</property>
                             <property name="visible">True</property>
+                            <property name="sensitive">False</property>
                             <property name="can_focus">True</property>
                             <property name="receives_default">True</property>
                           </object>
@@ -608,6 +620,7 @@ Author: Vitória Beatriz Bianchin <vitoriabbianchin@gmail.com>
                           <object class="GtkButton" id="button_leave_hibernation">
                             <property name="label" translatable="yes">Leave Hibernation</property>
                             <property name="visible">True</property>
+                            <property name="sensitive">False</property>
                             <property name="can_focus">True</property>
                             <property name="receives_default">True</property>
                           </object>
@@ -621,6 +634,7 @@ Author: Vitória Beatriz Bianchin <vitoriabbianchin@gmail.com>
                           <object class="GtkButton" id="button_activate_payload">
                             <property name="label" translatable="yes">Activate Payload</property>
                             <property name="visible">True</property>
+                            <property name="sensitive">False</property>
                             <property name="can_focus">True</property>
                             <property name="receives_default">True</property>
                           </object>
@@ -634,6 +648,7 @@ Author: Vitória Beatriz Bianchin <vitoriabbianchin@gmail.com>
                           <object class="GtkButton" id="button_force_reset">
                             <property name="label" translatable="yes">Force Reset</property>
                             <property name="visible">True</property>
+                            <property name="sensitive">False</property>
                             <property name="can_focus">True</property>
                             <property name="receives_default">True</property>
                           </object>
@@ -647,6 +662,7 @@ Author: Vitória Beatriz Bianchin <vitoriabbianchin@gmail.com>
                           <object class="GtkButton" id="button_get_parameter">
                             <property name="label" translatable="yes">Get Parameter</property>
                             <property name="visible">True</property>
+                            <property name="sensitive">False</property>
                             <property name="can_focus">True</property>
                             <property name="receives_default">True</property>
                           </object>
@@ -672,6 +688,7 @@ Author: Vitória Beatriz Bianchin <vitoriabbianchin@gmail.com>
                           <object class="GtkButton" id="button_broadcast_message">
                             <property name="label" translatable="yes">Broadcast Message</property>
                             <property name="visible">True</property>
+                            <property name="sensitive">False</property>
                             <property name="can_focus">True</property>
                             <property name="receives_default">True</property>
                           </object>
@@ -685,6 +702,7 @@ Author: Vitória Beatriz Bianchin <vitoriabbianchin@gmail.com>
                           <object class="GtkButton" id="button_activate_module">
                             <property name="label" translatable="yes">Activate Module</property>
                             <property name="visible">True</property>
+                            <property name="sensitive">False</property>
                             <property name="can_focus">True</property>
                             <property name="receives_default">True</property>
                           </object>
@@ -698,6 +716,7 @@ Author: Vitória Beatriz Bianchin <vitoriabbianchin@gmail.com>
                           <object class="GtkButton" id="button_deactivate_payload">
                             <property name="label" translatable="yes">Deactivate Payload</property>
                             <property name="visible">True</property>
+                            <property name="sensitive">False</property>
                             <property name="can_focus">True</property>
                             <property name="receives_default">True</property>
                           </object>
@@ -711,6 +730,7 @@ Author: Vitória Beatriz Bianchin <vitoriabbianchin@gmail.com>
                           <object class="GtkButton" id="button_get_payload_data">
                             <property name="label" translatable="yes">Get Payload Data</property>
                             <property name="visible">True</property>
+                            <property name="sensitive">False</property>
                             <property name="can_focus">True</property>
                             <property name="receives_default">True</property>
                           </object>
