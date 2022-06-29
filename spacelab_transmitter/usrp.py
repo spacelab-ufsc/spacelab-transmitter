@@ -53,7 +53,7 @@ class USRP:
         """
         samples = signal.resample_poly(samples, self._sample_rate, rate)
 
-        if self._usrp.send_waveform(samples, dur, freq, self._sample_rate, [0], self._gain) >= len(samples):
+        if self._usrp.send_waveform(samples, dur, freq, self._sample_rate, [0], self._gain):
             return True
         else:
             return False
