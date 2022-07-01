@@ -1,5 +1,5 @@
 #
-#  version.py
+#  test_telecommands.py
 #  
 #  Copyright The SpaceLab-Transmitter Contributors.
 #  
@@ -20,11 +20,32 @@
 #  
 #
 
-__author__      = "Vitória Beatriz Bianchin"
-__copyright__   = "Copyright The SpaceLab-Transmitter Contributors"
-__credits__     = ["Vitória Beatriz Bianchin"]
-__license__     = "GPLv3"
-__version__     = "0.2.5"
-__maintainer__  = "Gabriel Mariano Marcelino - PU5GMA"
-__email__       = "gabriel.mm8@gmail.com"
-__status__      = "Development"
+
+import random
+import string
+
+from spacelab_transmitter.tc_ping import Ping
+
+def test_tc_ping():
+    x = Ping()
+
+    for i in range(100):
+        # Random callsign
+        src_adr = ''.join(random.choice(string.ascii_uppercase) for i in range(random.randint(1, 7)))
+
+        # Convert callsign from string to list of bytes
+        src_adr_as_list = [ord(i) for i in src_adr]
+
+        # Compute the number spaces for padding (the callsign field is fixed as 7 bytes long)
+        spaces = (7 - len(src_adr)) * [ord(" ")]
+
+        # Generate ping command
+        res = x.generate(src_adr)
+
+        assert res == [0x40] + spaces + src_adr_as_list
+
+def test_tc_broadcast():
+    pass
+
+def test_tc_enter_hibernation():
+    pass
