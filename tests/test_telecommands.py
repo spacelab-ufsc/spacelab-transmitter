@@ -21,10 +21,14 @@
 #
 
 
+import sys
 import random
 import string
 
+sys.path.append(".")
+
 from spacelab_transmitter.tc_ping import Ping
+from spacelab_transmitter.tc_broadcast import Broadcast
 
 def test_tc_ping():
     x = Ping()
