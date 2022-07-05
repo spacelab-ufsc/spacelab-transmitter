@@ -24,21 +24,25 @@
 import sys
 import random
 import string
+import hashlib
+import hmac
 
 sys.path.append(".")
 
 from spacelab_transmitter.tc_ping import Ping
 from spacelab_transmitter.tc_broadcast import Broadcast
 
+from spacelab_transmitter.tc_set_parameter import SetParameter
+
 def test_tc_ping():
     x = Ping()
 
     for i in range(100):
         # Random callsign
-        src_adr = ''.join(random.choice(string.ascii_uppercase) for i in range(random.randint(1, 7)))
+        src_adr = ''.join(random.choice(string.ascii_uppercase) for j in range(random.randint(1, 7)))
 
         # Convert callsign from string to list of bytes
-        src_adr_as_list = [ord(i) for i in src_adr]
+        src_adr_as_list = [ord(j) for j in src_adr]
 
         # Compute the number spaces for padding (the callsign field is fixed as 7 bytes long)
         spaces = (7 - len(src_adr)) * [ord(" ")]
@@ -53,3 +57,37 @@ def test_tc_broadcast():
 
 def test_tc_enter_hibernation():
     pass
+
+def test_tc_set_parameter():
+    x = SetParameter()
+
+    # Random callsign
+    src_adr = ''.join(random.choice(string.ascii_uppercase) for j in range(random.randint(1, 7)))
+
+    # Random subsystem ID
+    s_id = random.randint(0, 255)
+
+    # Random parameter ID
+    param_id = random.randint(0, 255)
+
+    # Random parameter value
+    param_val = random.randint(0, 2**32 - 1)
+
+    # Random key
+    key = ''.join(random.choice(string.ascii_uppercase) for j in range(16))
+
+    res = x.generate(src_adr, s_id, param_id, param_val, key)
+
+    # Convert callsign from string to list of bytes
+    src_adr_as_list = [ord(j) for j in src_adr]
+
+    # Compute the number spaces for padding (the callsign field is fixed as 7 bytes long)
+    spaces = (7 - len(src_adr)) * [ord(" ")]
+
+    exp_pl = [0x4C] + spaces + src_adr_as_list + [s_id] + [param_id] + [(param_val >> 24) & 0xFF, (param_val >> 16) & 0xFF, (param_val >> 8) & 0xFF, param_val & 0xFF]
+
+    hashed = hmac.new(key.encode('utf-8'), bytes(exp_pl), hashlib.sha1)
+
+    exp_res = exp_pl + list(hashed.digest())
+
+    assert res == exp_res
