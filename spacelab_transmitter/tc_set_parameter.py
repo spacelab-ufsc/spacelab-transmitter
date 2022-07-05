@@ -21,6 +21,9 @@
 #
 
 
+import hashlib
+import hmac
+
 from spacelab_transmitter.telecommand import Telecommand
 
 class SetParameter(Telecommand):
@@ -56,4 +59,6 @@ class SetParameter(Telecommand):
         pl.append((param_val >> 8) & 0xFF)
         pl.append(param_val & 0xFF)
 
-        return pl + self._compute_hash(pl, key)
+        hashed = hmac.new(key.encode('utf-8'), bytes(pl), hashlib.sha1)
+
+        return pl + list(hashed.digest())
