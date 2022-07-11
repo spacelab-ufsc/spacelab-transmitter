@@ -33,6 +33,7 @@ from spacelab_transmitter.tc_ping import Ping
 from spacelab_transmitter.tc_broadcast import Broadcast
 
 from spacelab_transmitter.tc_activate_module import ActivateModule
+from spacelab_transmitter.tc_deactivate_module import DeactivateModule
 from spacelab_transmitter.tc_set_parameter import SetParameter
 
 def test_tc_ping():
@@ -82,6 +83,36 @@ def test_tc_activate_module():
         res = x.generate(src_adr, mod_id, key)
 
         exp_pl = [0x45] + spaces + src_adr_as_list + [mod_id]
+
+        hashed = hmac.new(key.encode('utf-8'), bytes(exp_pl), hashlib.sha1)
+
+        exp_res = exp_pl + list(hashed.digest())
+
+        assert res == exp_res
+
+def test_tc_deactivate_module():
+    x = DeactivateModule()
+
+    for i in range(100):
+        # Random callsign
+        src_adr = ''.join(random.choice(string.ascii_uppercase) for j in range(random.randint(1, 7)))
+
+        # Random module ID
+        mod_id = random.randint(0, 255)
+
+        # Random key
+        key = ''.join(random.choice(string.ascii_uppercase) for j in range(16))
+
+        # Convert callsign from string to list of bytes
+        src_adr_as_list = [ord(j) for j in src_adr]
+
+        # Compute the number spaces for padding (the callsign field is fixed as 7 bytes long)
+        spaces = (7 - len(src_adr)) * [ord(" ")]
+
+        # Generate deactivate module command
+        res = x.generate(src_adr, mod_id, key)
+
+        exp_pl = [0x46] + spaces + src_adr_as_list + [mod_id]
 
         hashed = hmac.new(key.encode('utf-8'), bytes(exp_pl), hashlib.sha1)
 
