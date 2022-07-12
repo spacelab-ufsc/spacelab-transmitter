@@ -55,7 +55,38 @@ def test_tc_ping():
         assert res == [0x40] + spaces + src_adr_as_list
 
 def test_tc_broadcast():
-    pass
+    x = Broadcast()
+
+    for i in range(100):
+
+        #Random callsign 
+        src_adr = ''.join(random.choice(string.ascii_uppercase) for j in range(random.randint(1,7)))
+
+        # Convert callsign from string to list of bytes
+        src_adr_as_list = [ord(j) for j in src_adr]
+
+        # Compute the number spaces for padding (the callsign field is fixed as 7 bytes long)
+        src_adr_spaces = (7 - len(src_adr)) * [ord(" ")]
+
+        #dst_adr
+        dst_adr = ''.join(random.choice(string.ascii_uppercase) for j in range(random.randint(1,7)))
+
+        # Compute the number spaces for padding (the callsign field is fixed as 7 bytes long)
+        dst_adr_spaces = (7 - len(dst_adr)) * [ord(" ")]
+
+        #convert destination callsign from string to list of bytes
+        src_dst_as_list = [ord(j) for j in src_adr]
+
+        #msg 
+        msg = ''.join(random.choice(string.ascii_uppercase) for j in range(random.randint(1,38)))
+
+        #convert destination callsign from string to list of bytes
+        msg_as_list = [ord(j) for j in src_adr]
+
+        #generate
+        res = x.generate(src_adr, dst_adr, msg)
+
+        assert res == [0x42] + src_adr_spaces + src_adr_as_list + dst_adr_spaces + src_dst_as_list + msg_as_list
 
 def test_tc_enter_hibernation():
     pass
