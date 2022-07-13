@@ -81,7 +81,7 @@ def test_tc_broadcast():
         msg = ''.join(random.choice(string.ascii_uppercase) for j in range(random.randint(1,38)))
 
         #convert destination callsign from string to list of bytes
-        msg_as_list = [ord(j) for j in src_adr]
+        msg_as_list = [ord(j) for j in msg]
 
         #generate
         res = x.generate(src_adr, dst_adr, msg)
