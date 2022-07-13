@@ -75,7 +75,7 @@ def test_tc_broadcast():
         dst_adr_spaces = (7 - len(dst_adr)) * [ord(" ")]
 
         #convert destination callsign from string to list of bytes
-        src_dst_as_list = [ord(j) for j in src_adr]
+        dst_adr_as_list = [ord(j) for j in dst_adr]
 
         #msg 
         msg = ''.join(random.choice(string.ascii_uppercase) for j in range(random.randint(1,38)))
@@ -86,7 +86,7 @@ def test_tc_broadcast():
         #generate
         res = x.generate(src_adr, dst_adr, msg)
 
-        assert res == [0x42] + src_adr_spaces + src_adr_as_list + dst_adr_spaces + src_dst_as_list + msg_as_list
+        assert res == [0x42] + src_adr_spaces + src_adr_as_list + dst_adr_spaces + dst_adr_as_list + msg_as_list
 
 def test_tc_enter_hibernation():
     pass
