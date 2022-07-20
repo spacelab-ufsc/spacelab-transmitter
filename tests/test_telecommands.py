@@ -31,7 +31,8 @@ sys.path.append(".")
 
 from spacelab_transmitter.tc_ping import Ping
 from spacelab_transmitter.tc_broadcast import Broadcast
-
+from spacelab_transmitter.tc_enter_hibernation import Enter_hibernation
+from spacelab_transmitter.tc_leave_hibernation import LeaveHibernation
 from spacelab_transmitter.tc_activate_module import ActivateModule
 from spacelab_transmitter.tc_deactivate_module import DeactivateModule
 from spacelab_transmitter.tc_set_parameter import SetParameter
@@ -89,7 +90,41 @@ def test_tc_broadcast():
         assert res == [0x42] + src_adr_spaces + src_adr_as_list + dst_adr_spaces + dst_adr_as_list + msg_as_list
 
 def test_tc_enter_hibernation():
-    pass
+    x = Enter_hibernation()
+
+    for i in range(100):
+        #Callsign and conversion
+        src_adr = ''.join(random.choice(string.ascii_uppercase) for j in range(random.randint(1, 7)))
+        src_adr_as_list = [ord(j) for j in src_adr]
+        src_adr_spaces = (7 - len(src_adr)) * [ord(" ")]
+
+        #hbn_hours
+        hbn_hours = random.randint(0, 2**16)
+        hbn_hours_as_list = [(hbn_hours >> 8) & 0xFF, (hbn_hours >> 0) & 0xFF]
+
+        # Random key
+        key = ''.join(random.choice(string.ascii_uppercase) for j in range(16))
+
+        #generate 
+        res = x.generate(src_adr, hbn_hours, key)
+        assert res == [0x43] + src_adr_spaces + src_adr_as_list + hbn_hours_as_list
+
+def test_tc_leave_hibernation():
+    x = LeaveHibernation()
+        
+    for i in range(100):
+        #Callsign and conversion
+        src_adr = ''.join(random.choice(string.ascii_uppercase) for j in range(random.randint(1, 7)))
+        src_adr_as_list = [ord(j) for j in src_adr]
+        src_adr_spaces = (7 - len(src_adr)) * [ord(" ")]
+
+        # Random key
+        key = ''.join(random.choice(string.ascii_uppercase) for j in range(16))
+
+        #generate 
+        res = x.generate(src_adr, key)
+        assert res == [0x44] + src_adr_spaces + src_adr_as_list
+
 
 def test_tc_activate_module():
     x = ActivateModule()
