@@ -96,18 +96,22 @@ def test_tc_enter_hibernation():
         #Callsign and conversion
         src_adr = ''.join(random.choice(string.ascii_uppercase) for j in range(random.randint(1, 7)))
         src_adr_as_list = [ord(j) for j in src_adr]
-        src_adr_spaces = (7 - len(src_adr)) * [ord(" ")]
+        spaces = (7 - len(src_adr)) * [ord(" ")]
 
         #hbn_hours
         hbn_hours = random.randint(0, 2**16)
         hbn_hours_as_list = [(hbn_hours >> 8) & 0xFF, (hbn_hours >> 0) & 0xFF]
 
+        #hash
+        hashed = hmac.new(key.encode('utf-8'), bytes(exp_pl), hashlib.sha1)
+
         # Random key
         key = ''.join(random.choice(string.ascii_uppercase) for j in range(16))
 
         #generate 
+        exp_pl = [0x44] + spaces + src_adr_as_list
         res = x.generate(src_adr, hbn_hours, key)
-        assert res == [0x43] + src_adr_spaces + src_adr_as_list + hbn_hours_as_list
+        assert res == exp_pl + list(hashed.digest())
 
 def test_tc_leave_hibernation():
     x = LeaveHibernation()
@@ -116,14 +120,18 @@ def test_tc_leave_hibernation():
         #Callsign and conversion
         src_adr = ''.join(random.choice(string.ascii_uppercase) for j in range(random.randint(1, 7)))
         src_adr_as_list = [ord(j) for j in src_adr]
-        src_adr_spaces = (7 - len(src_adr)) * [ord(" ")]
+        spaces = (7 - len(src_adr)) * [ord(" ")]
 
         # Random key
         key = ''.join(random.choice(string.ascii_uppercase) for j in range(16))
 
+        #hash
+        hashed = hmac.new(key.encode('utf-8'), bytes(exp_pl), hashlib.sha1)
+
         #generate 
+        exp_pl = [0x44] + spaces + src_adr_as_list
         res = x.generate(src_adr, key)
-        assert res == [0x44] + src_adr_spaces + src_adr_as_list
+        assert res == exp_pl + list(hashed.digest())
 
 
 def test_tc_activate_module():
