@@ -106,7 +106,7 @@ def test_tc_enter_hibernation():
         key = ''.join(random.choice(string.ascii_uppercase) for j in range(16))
 
         #hash
-        exp_pl = [0x44] + spaces + src_adr_as_list + hbn_hours_as_list
+        exp_pl = [0x43] + spaces + src_adr_as_list + hbn_hours_as_list
         hashed = hmac.new(key.encode('utf-8'), bytes(exp_pl), hashlib.sha1)
 
 
