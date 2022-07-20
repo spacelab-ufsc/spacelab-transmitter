@@ -103,13 +103,13 @@ def test_tc_enter_hibernation():
         hbn_hours_as_list = [(hbn_hours >> 8) & 0xFF, (hbn_hours >> 0) & 0xFF]
 
         #hash
+        exp_pl = [0x44] + spaces + src_adr_as_list + hbn_hours_as_list
         hashed = hmac.new(key.encode('utf-8'), bytes(exp_pl), hashlib.sha1)
 
         # Random key
         key = ''.join(random.choice(string.ascii_uppercase) for j in range(16))
 
         #generate 
-        exp_pl = [0x44] + spaces + src_adr_as_list
         res = x.generate(src_adr, hbn_hours, key)
         assert res == exp_pl + list(hashed.digest())
 
@@ -124,12 +124,12 @@ def test_tc_leave_hibernation():
 
         # Random key
         key = ''.join(random.choice(string.ascii_uppercase) for j in range(16))
+        exp_pl = [0x44] + spaces + src_adr_as_list
 
         #hash
         hashed = hmac.new(key.encode('utf-8'), bytes(exp_pl), hashlib.sha1)
 
         #generate 
-        exp_pl = [0x44] + spaces + src_adr_as_list
         res = x.generate(src_adr, key)
         assert res == exp_pl + list(hashed.digest())
 
