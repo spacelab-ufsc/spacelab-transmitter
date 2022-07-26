@@ -41,6 +41,7 @@ from pyngham import PyNGHam
 import spacelab_transmitter.version
 from spacelab_transmitter.gmsk import GMSK
 from spacelab_transmitter.usrp import USRP
+from spacelab_transmitter.tc_ping import Ping
 
 #here's for importing the other files of spacelab-transmitter that are missing or not ready
 
@@ -195,15 +196,14 @@ class SpaceLabTransmitter:
         Gtk.main_quit()
 
     def on_button_ping_request_command_clicked(self, button):
-        pngh = PyNGHam()
         callsign = self.entry_preferences_general_callsign.get_text()
 
-        n = 7 - len(callsign)
-        if n != 7:
-            final_callsign = n*" " + callsign
-        x = [ord(i) for i in final_callsign]
+        pg = Ping()
 
-        pl = [0x40] + x
+        pl = pg.generate(callsign)
+
+        pngh = PyNGHam()
+
         pkt = pngh.encode(pl)
 
         sat_json = str()
@@ -222,7 +222,7 @@ class SpaceLabTransmitter:
         sdr = USRP(int(self.entry_sample_rate.get_text()), int(tx_gain))
 
         if sdr.transmit(samples, duration_s, sample_rate, int(carrier_frequency)):
-            self.write_log("Ping request transmitted to " + sat_json + " from" + final_callsign + " in " + carrier_frequency + " Hz with a gain of " + tx_gain + " dB")
+            self.write_log("Ping request transmitted to " + sat_json + " from" + callsign + " in " + carrier_frequency + " Hz with a gain of " + tx_gain + " dB")
         else:
             self.write_log("Error transmitting a ping telecommand!")
 
