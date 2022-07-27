@@ -33,6 +33,8 @@ import csv
 
 import gi
 
+from spacelab_transmitter.tc_deactivate_module import DeactivateModule
+
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 from gi.repository import GdkPixbuf
@@ -160,6 +162,7 @@ class SpaceLabTransmitter:
         self.button_enter_hibernation = self.builder.get_object("button_enter_hibernation")
         self.button_enter_hibernation.connect("clicked", self.on_button_enter_hibernation_clicked)
         self.button_deactivate_module = self.builder.get_object("button_deactivate_module")
+        self.button_deactivate_module.connect("clicked", self.on_button_deactivate_module_clicked)
         self.button_erase_memory = self.builder.get_object("button_erase_memory")
         self.button_set_parameter = self.builder.get_object("button_set_parameter")
         self.button_data_request = self.builder.get_object("button_data_request")
@@ -236,7 +239,6 @@ class SpaceLabTransmitter:
 
         pl = eh.generate(callsign, hbn_hours, key)
 
-
         pngh = PyNGHam()
 
         pkt = pngh.encode(pl)
@@ -261,7 +263,39 @@ class SpaceLabTransmitter:
         else:
             self.write_log("Error transmitting an Enter Hibernation telecommand!")
 
+    def on_button_deactivate_module_clicked(self, button):
+        callsign = self.entry_preferences_general_callsign.get_text()
 
+        key = "1234567812345678"
+        mod_id = 2
+
+        eh = DeactivateModule()
+
+        pl = eh.generate(callsign, mod_id, key)
+
+        pngh = PyNGHam()
+
+        pkt = pngh.encode(pl)
+
+        sat_json = str()
+        if self.combobox_satellite.get_active() == 0:
+            sat_json = 'FloripaSat-1'
+        elif self.combobox_satellite.get_active() == 1:
+            sat_json = 'GOLDS-UFSC'
+
+        carrier_frequency = self.entry_carrier_frequency.get_text()
+        tx_gain = self.spinbutton_tx_gain.get_text()
+
+        mod = GMSK(0.5, 1200)   # BT = 0.5, 1200 bps
+
+        samples, sample_rate, duration_s = mod.modulate(pkt, 1000)
+
+        sdr = USRP(int(self.entry_sample_rate.get_text()), int(tx_gain))
+
+        if sdr.transmit(samples, duration_s, sample_rate, int(carrier_frequency)):
+            self.write_log("Deactivate Module transmitted to " + sat_json + " from" + callsign + " in " + carrier_frequency + " Hz with a gain of " + tx_gain + " dB")
+        else:
+            self.write_log("Error transmitting an Deactivate Module telecommand!")
 
     def on_button_preferences_clicked(self, button):
         response = self.dialog_preferences.run()
