@@ -38,6 +38,8 @@ from spacelab_transmitter.tc_leave_hibernation import LeaveHibernation
 from spacelab_transmitter.tc_activate_module import ActivateModule
 from spacelab_transmitter.tc_deactivate_module import DeactivateModule
 from spacelab_transmitter.tc_set_parameter import SetParameter
+from spacelab_transmitter.tc_erase_memory import EraseMemory
+from spacelab_transmitter.tc_force_reset import ForceReset
 
 def test_tc_ping():
     x = Ping()
