@@ -32,6 +32,7 @@ import json
 import csv
 
 import gi
+
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 from gi.repository import GdkPixbuf
@@ -42,6 +43,7 @@ import spacelab_transmitter.version
 from spacelab_transmitter.gmsk import GMSK
 from spacelab_transmitter.usrp import USRP
 from spacelab_transmitter.tc_ping import Ping
+from spacelab_transmitter.tc_enter_hibernation import Enter_hibernation
 
 #here's for importing the other files of spacelab-transmitter that are missing or not ready
 
@@ -103,10 +105,6 @@ class SpaceLabTransmitter:
         self.window.set_wmclass(self.window.get_title(), self.window.get_title())
         self.window.connect("destroy", Gtk.main_quit)
 
-        #Ping 
-        self.button_ping_request = self.builder.get_object("button_ping_request")
-        self.button_ping_request.connect("clicked", self.on_button_ping_request_command_clicked)
-
         #Entry_preferences_general_callsign builder
         self.entry_preferences_general_callsign = self.builder.get_object("entry_preferences_general_callsign")
 
@@ -158,7 +156,9 @@ class SpaceLabTransmitter:
         #Telecommands buttons
 
         self.button_ping_request = self.builder.get_object("button_ping_request")
+        self.button_ping_request.connect("clicked", self.on_button_ping_request_command_clicked)
         self.button_enter_hibernation = self.builder.get_object("button_enter_hibernation")
+        self.button_enter_hibernation.connect("clicked", self.on_button_enter_hibernation_clicked)
         self.button_deactivate_module = self.builder.get_object("button_deactivate_module")
         self.button_erase_memory = self.builder.get_object("button_erase_memory")
         self.button_set_parameter = self.builder.get_object("button_set_parameter")
@@ -225,6 +225,43 @@ class SpaceLabTransmitter:
             self.write_log("Ping request transmitted to " + sat_json + " from" + callsign + " in " + carrier_frequency + " Hz with a gain of " + tx_gain + " dB")
         else:
             self.write_log("Error transmitting a ping telecommand!")
+
+    def on_button_enter_hibernation_clicked(self, button):
+        callsign = self.entry_preferences_general_callsign.get_text()
+
+        hbn_hours = 0
+        key = "1234567812345678"
+
+        eh = Enter_hibernation()
+
+        pl = eh.generate(callsign, hbn_hours, key)
+
+
+        pngh = PyNGHam()
+
+        pkt = pngh.encode(pl)
+
+        sat_json = str()
+        if self.combobox_satellite.get_active() == 0:
+            sat_json = 'FloripaSat-1'
+        elif self.combobox_satellite.get_active() == 1:
+            sat_json = 'GOLDS-UFSC'
+
+        carrier_frequency = self.entry_carrier_frequency.get_text()
+        tx_gain = self.spinbutton_tx_gain.get_text()
+
+        mod = GMSK(0.5, 1200)   # BT = 0.5, 1200 bps
+
+        samples, sample_rate, duration_s = mod.modulate(pkt, 1000)
+
+        sdr = USRP(int(self.entry_sample_rate.get_text()), int(tx_gain))
+
+        if sdr.transmit(samples, duration_s, sample_rate, int(carrier_frequency)):
+            self.write_log("Enter Hibernation transmitted to " + sat_json + " from" + callsign + " in " + carrier_frequency + " Hz with a gain of " + tx_gain + " dB")
+        else:
+            self.write_log("Error transmitting an Enter Hibernation telecommand!")
+
+
 
     def on_button_preferences_clicked(self, button):
         response = self.dialog_preferences.run()
