@@ -26,8 +26,6 @@ import random
 import string
 import hashlib
 import hmac
-from spacelab_transmitter.tc_erase_memory import EraseMemory
-from spacelab_transmitter.tc_force_reset import ForceReset
 
 sys.path.append(".")
 
