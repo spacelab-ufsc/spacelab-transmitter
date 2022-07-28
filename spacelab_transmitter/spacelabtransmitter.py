@@ -32,10 +32,12 @@ import json
 import csv
 
 import gi
+from spacelab_transmitter.tc_activate_module import ActivateModule
 from spacelab_transmitter.tc_data_request import DataRequest
 
 from spacelab_transmitter.tc_deactivate_module import DeactivateModule
 from spacelab_transmitter.tc_erase_memory import EraseMemory
+from spacelab_transmitter.tc_force_reset import ForceReset
 from spacelab_transmitter.tc_leave_hibernation import LeaveHibernation
 from spacelab_transmitter.tc_set_parameter import SetParameter
 
@@ -267,6 +269,40 @@ class SpaceLabTransmitter:
         else:
             self.write_log("Error transmitting an Enter Hibernation telecommand!")
 
+    def on_button_activate_module_clicked(self, button):
+        callsign = self.entry_preferences_general_callsign.get_text()
+
+        key = "1234567812345678"
+        mod_id = 2
+
+        am = ActivateModule()
+
+        pl = am.generate(callsign, mod_id, key)
+
+        pngh = PyNGHam()
+
+        pkt = pngh.encode(pl)
+
+        sat_json = str()
+        if self.combobox_satellite.get_active() == 0:
+            sat_json = 'FloripaSat-1'
+        elif self.combobox_satellite.get_active() == 1:
+            sat_json = 'GOLDS-UFSC'
+
+        carrier_frequency = self.entry_carrier_frequency.get_text()
+        tx_gain = self.spinbutton_tx_gain.get_text()
+
+        mod = GMSK(0.5, 1200)   # BT = 0.5, 1200 bps
+
+        samples, sample_rate, duration_s = mod.modulate(pkt, 1000)
+
+        sdr = USRP(int(self.entry_sample_rate.get_text()), int(tx_gain))
+
+        if sdr.transmit(samples, duration_s, sample_rate, int(carrier_frequency)):
+            self.write_log("Activate Module transmitted to " + sat_json + " from" + callsign + " in " + carrier_frequency + " Hz with a gain of " + tx_gain + " dB")
+        else:
+            self.write_log("Error transmitting a Deactivate Module telecommand!")
+
     def on_button_deactivate_module_clicked(self, button):
         callsign = self.entry_preferences_general_callsign.get_text()
 
@@ -297,9 +333,9 @@ class SpaceLabTransmitter:
         sdr = USRP(int(self.entry_sample_rate.get_text()), int(tx_gain))
 
         if sdr.transmit(samples, duration_s, sample_rate, int(carrier_frequency)):
-            self.write_log("Deactivate Module transmitted to " + sat_json + " from" + callsign + " in " + carrier_frequency + " Hz with a gain of " + tx_gain + " dB")
+            self.write_log("Activate Module transmitted to " + sat_json + " from" + callsign + " in " + carrier_frequency + " Hz with a gain of " + tx_gain + " dB")
         else:
-            self.write_log("Error transmitting a Deactivate Module telecommand!")
+            self.write_log("Error transmitting a Activate Module telecommand!")
 
     def on_button_erase_memory_clicked(self, button):
         callsign = self.entry_preferences_general_callsign.get_text()
@@ -438,6 +474,39 @@ class SpaceLabTransmitter:
             self.write_log("Leave Hibernation transmitted to " + sat_json + " from" + callsign + " in " + carrier_frequency + " Hz with a gain of " + tx_gain + " dB")
         else:
             self.write_log("Error transmitting a Leave Hibernation telecommand!")
+
+    def on_button_force_reset_clicked(self, button):
+        callsign = self.entry_preferences_general_callsign.get_text()
+
+        key = "1234567812345678"
+
+        fr = ForceReset()
+
+        pl = fr.generate(callsign, key)
+
+        pngh = PyNGHam()
+
+        pkt = pngh.encode(pl)
+
+        sat_json = str()
+        if self.combobox_satellite.get_active() == 0:
+            sat_json = 'FloripaSat-1'
+        elif self.combobox_satellite.get_active() == 1:
+            sat_json = 'GOLDS-UFSC'
+
+        carrier_frequency = self.entry_carrier_frequency.get_text()
+        tx_gain = self.spinbutton_tx_gain.get_text()
+
+        mod = GMSK(0.5, 1200)   # BT = 0.5, 1200 bps
+
+        samples, sample_rate, duration_s = mod.modulate(pkt, 1000)
+
+        sdr = USRP(int(self.entry_sample_rate.get_text()), int(tx_gain))
+
+        if sdr.transmit(samples, duration_s, sample_rate, int(carrier_frequency)):
+            self.write_log("Force Reset transmitted to " + sat_json + " from" + callsign + " in " + carrier_frequency + " Hz with a gain of " + tx_gain + " dB")
+        else:
+            self.write_log("Error transmitting an Force Reset telecommand!")
 
     def on_button_preferences_clicked(self, button):
         response = self.dialog_preferences.run()
