@@ -34,6 +34,8 @@ import csv
 import gi
 
 from spacelab_transmitter.tc_deactivate_module import DeactivateModule
+from spacelab_transmitter.tc_erase_memory import EraseMemory
+from spacelab_transmitter.tc_set_parameter import SetParameter
 
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
@@ -269,9 +271,9 @@ class SpaceLabTransmitter:
         key = "1234567812345678"
         mod_id = 2
 
-        eh = DeactivateModule()
+        dm = DeactivateModule()
 
-        pl = eh.generate(callsign, mod_id, key)
+        pl = dm.generate(callsign, mod_id, key)
 
         pngh = PyNGHam()
 
@@ -295,7 +297,77 @@ class SpaceLabTransmitter:
         if sdr.transmit(samples, duration_s, sample_rate, int(carrier_frequency)):
             self.write_log("Deactivate Module transmitted to " + sat_json + " from" + callsign + " in " + carrier_frequency + " Hz with a gain of " + tx_gain + " dB")
         else:
-            self.write_log("Error transmitting an Deactivate Module telecommand!")
+            self.write_log("Error transmitting a Deactivate Module telecommand!")
+
+    def on_button_erase_memory_clicked(self, button):
+        callsign = self.entry_preferences_general_callsign.get_text()
+
+        key = "1234567812345678"
+
+        em = EraseMemory()
+
+        pl = em.generate(callsign, key)
+
+        pngh = PyNGHam()
+
+        pkt = pngh.encode(pl)
+
+        sat_json = str()
+        if self.combobox_satellite.get_active() == 0:
+            sat_json = 'FloripaSat-1'
+        elif self.combobox_satellite.get_active() == 1:
+            sat_json = 'GOLDS-UFSC'
+
+        carrier_frequency = self.entry_carrier_frequency.get_text()
+        tx_gain = self.spinbutton_tx_gain.get_text()
+
+        mod = GMSK(0.5, 1200)   # BT = 0.5, 1200 bps
+
+        samples, sample_rate, duration_s = mod.modulate(pkt, 1000)
+
+        sdr = USRP(int(self.entry_sample_rate.get_text()), int(tx_gain))
+
+        if sdr.transmit(samples, duration_s, sample_rate, int(carrier_frequency)):
+            self.write_log("Erase Memory transmitted to " + sat_json + " from" + callsign + " in " + carrier_frequency + " Hz with a gain of " + tx_gain + " dB")
+        else:
+            self.write_log("Error transmitting an Erase Memory telecommand!")
+
+    def on_button_set_parameter_clicked(self, button):
+        callsign = self.entry_preferences_general_callsign.get_text()
+
+        key = "1234567812345678"
+        s_id = 1
+        param_id = 1 
+        param_val = "1234"
+
+
+        sp = SetParameter()
+
+        pl = sp.generate(callsign,s_id, param_id, param_val, key)
+
+        pngh = PyNGHam()
+
+        pkt = pngh.encode(pl)
+
+        sat_json = str()
+        if self.combobox_satellite.get_active() == 0:
+            sat_json = 'FloripaSat-1'
+        elif self.combobox_satellite.get_active() == 1:
+            sat_json = 'GOLDS-UFSC'
+
+        carrier_frequency = self.entry_carrier_frequency.get_text()
+        tx_gain = self.spinbutton_tx_gain.get_text()
+
+        mod = GMSK(0.5, 1200)   # BT = 0.5, 1200 bps
+
+        samples, sample_rate, duration_s = mod.modulate(pkt, 1000)
+
+        sdr = USRP(int(self.entry_sample_rate.get_text()), int(tx_gain))
+
+        if sdr.transmit(samples, duration_s, sample_rate, int(carrier_frequency)):
+            self.write_log("Set Parameter transmitted to " + sat_json + " from" + callsign + " in " + carrier_frequency + " Hz with a gain of " + tx_gain + " dB")
+        else:
+            self.write_log("Error transmitting a Set Parameter telecommand!")
 
     def on_button_preferences_clicked(self, button):
         response = self.dialog_preferences.run()
