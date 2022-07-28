@@ -32,9 +32,11 @@ import json
 import csv
 
 import gi
+from spacelab_transmitter.tc_data_request import DataRequest
 
 from spacelab_transmitter.tc_deactivate_module import DeactivateModule
 from spacelab_transmitter.tc_erase_memory import EraseMemory
+from spacelab_transmitter.tc_leave_hibernation import LeaveHibernation
 from spacelab_transmitter.tc_set_parameter import SetParameter
 
 gi.require_version('Gtk', '3.0')
@@ -340,7 +342,6 @@ class SpaceLabTransmitter:
         param_id = 1 
         param_val = "1234"
 
-
         sp = SetParameter()
 
         pl = sp.generate(callsign,s_id, param_id, param_val, key)
@@ -368,6 +369,75 @@ class SpaceLabTransmitter:
             self.write_log("Set Parameter transmitted to " + sat_json + " from" + callsign + " in " + carrier_frequency + " Hz with a gain of " + tx_gain + " dB")
         else:
             self.write_log("Error transmitting a Set Parameter telecommand!")
+
+    def on_button_data_request_clicked(self, button):
+        callsign = self.entry_preferences_general_callsign.get_text()
+
+        key = "1234567812345678"
+        data_id = 1
+        start_ts = "1234"
+        end_ts = "1234"
+
+        dr = DataRequest()
+
+        pl = dr.generate(callsign, data_id, start_ts, end_ts, key)
+
+        pngh = PyNGHam()
+
+        pkt = pngh.encode(pl)
+
+        sat_json = str()
+        if self.combobox_satellite.get_active() == 0:
+            sat_json = 'FloripaSat-1'
+        elif self.combobox_satellite.get_active() == 1:
+            sat_json = 'GOLDS-UFSC'
+
+        carrier_frequency = self.entry_carrier_frequency.get_text()
+        tx_gain = self.spinbutton_tx_gain.get_text()
+
+        mod = GMSK(0.5, 1200)   # BT = 0.5, 1200 bps
+
+        samples, sample_rate, duration_s = mod.modulate(pkt, 1000)
+
+        sdr = USRP(int(self.entry_sample_rate.get_text()), int(tx_gain))
+
+        if sdr.transmit(samples, duration_s, sample_rate, int(carrier_frequency)):
+            self.write_log("Data Request transmitted to " + sat_json + " from" + callsign + " in " + carrier_frequency + " Hz with a gain of " + tx_gain + " dB")
+        else:
+            self.write_log("Error transmitting a Data Request telecommand!")
+    
+    def on_button_leave_hibernation_clicked(self, button):
+        callsign = self.entry_preferences_general_callsign.get_text()
+
+        key = "1234567812345678"
+
+        lh = LeaveHibernation()
+
+        pl = lh.generate(callsign, key)
+
+        pngh = PyNGHam()
+
+        pkt = pngh.encode(pl)
+
+        sat_json = str()
+        if self.combobox_satellite.get_active() == 0:
+            sat_json = 'FloripaSat-1'
+        elif self.combobox_satellite.get_active() == 1:
+            sat_json = 'GOLDS-UFSC'
+
+        carrier_frequency = self.entry_carrier_frequency.get_text()
+        tx_gain = self.spinbutton_tx_gain.get_text()
+
+        mod = GMSK(0.5, 1200)   # BT = 0.5, 1200 bps
+
+        samples, sample_rate, duration_s = mod.modulate(pkt, 1000)
+
+        sdr = USRP(int(self.entry_sample_rate.get_text()), int(tx_gain))
+
+        if sdr.transmit(samples, duration_s, sample_rate, int(carrier_frequency)):
+            self.write_log("Leave Hibernation transmitted to " + sat_json + " from" + callsign + " in " + carrier_frequency + " Hz with a gain of " + tx_gain + " dB")
+        else:
+            self.write_log("Error transmitting a Leave Hibernation telecommand!")
 
     def on_button_preferences_clicked(self, button):
         response = self.dialog_preferences.run()
