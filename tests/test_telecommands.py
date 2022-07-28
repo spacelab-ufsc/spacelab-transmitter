@@ -285,13 +285,14 @@ def test_tc_get_payload_data():
         pl_id = random.randint(0, 255)
 
         #Random pl_args 
-        pl_args = random.sample(range(0, 255), 12)
-        pl_args_bytes = bytearray(pl_args)
+        #pl_args = random.sample(range(0, 255), 12)
+        pl_args = ''.join(random.choice(string.ascii_uppercase) for j in range(random.randint(1,12)))
+        pl_args_as_list = [ord(j) for j in pl_args]
 
         # Random key
         key = ''.join(random.choice(string.ascii_uppercase) for j in range(16))
         
-        exp_pl = [0x4A] + spaces + src_adr_as_list + [pl_id] + [pl_args_bytes]
+        exp_pl = [0x4A] + spaces + src_adr_as_list + [pl_id] + [pl_args_as_list]
 
         #hash
         hashed = hmac.new(key.encode('utf-8'), bytes(exp_pl), hashlib.sha1)
