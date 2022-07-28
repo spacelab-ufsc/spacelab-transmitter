@@ -297,7 +297,7 @@ def test_tc_get_payload_data():
         hashed = hmac.new(key.encode('utf-8'), bytes(exp_pl), hashlib.sha1)
 
         #generate 
-        res = x.generate(src_adr, key)
+        res = x.generate(src_adr, src_adr, pl_id, pl_args, key)
         assert res == exp_pl + list(hashed.digest())
 
 def test_tc_data_request():
