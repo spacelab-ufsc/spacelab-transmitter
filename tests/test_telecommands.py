@@ -286,7 +286,7 @@ def test_tc_get_payload_data():
 
         #Random pl_args 
         pl_args = random.sample(range(0, 255), 12)
-        pl_args_bytes = bytes(pl_args)
+        pl_args_bytes = bytearray(pl_args)
 
         # Random key
         key = ''.join(random.choice(string.ascii_uppercase) for j in range(16))
