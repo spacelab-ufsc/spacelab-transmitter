@@ -376,7 +376,7 @@ class SpaceLabTransmitter:
         key = "1234567812345678"
         s_id = 1
         param_id = 1 
-        param_val = "1234"
+        param_val = 29
 
         sp = SetParameter()
 
@@ -411,8 +411,8 @@ class SpaceLabTransmitter:
 
         key = "1234567812345678"
         data_id = 1
-        start_ts = "1234"
-        end_ts = "1234"
+        start_ts = 42
+        end_ts = 42
 
         dr = DataRequest()
 
