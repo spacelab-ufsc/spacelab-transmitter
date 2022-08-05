@@ -26,6 +26,7 @@ import random
 import string
 import hashlib
 import hmac
+from spacelab_transmitter.tc_data_request import DataRequest
 
 sys.path.append(".")
 
@@ -302,7 +303,32 @@ def test_tc_get_payload_data():
         assert res == exp_pl + list(hashed.digest())
 
 def test_tc_data_request():
-    pass
+    x = DataRequest()
+
+    for i in range(100):
+        #Callsign and conversion
+        src_adr = ''.join(random.choice(string.ascii_uppercase) for j in range(random.randint(1, 7)))
+        src_adr_as_list = [ord(j) for j in src_adr]
+        spaces = (7 - len(src_adr)) * [ord(" ")]
+
+        #Random data_id
+        data_id = random.randint(0, 255)
+
+        #Random start_ts and end_ts
+        start_ts = random.randint(0, 2**32 - 1)
+        end_ts = random.randint(0, 2**32 - 1)
+
+        # Random key
+        key = ''.join(random.choice(string.ascii_uppercase) for j in range(16))
+        
+        exp_pl = [0x41] + spaces + src_adr_as_list + [data_id] + [start_ts] + [end_ts]
+
+        #hash
+        hashed = hmac.new(key.encode('utf-8'), bytes(exp_pl), hashlib.sha1)
+
+        #generate 
+        res = x.generate(src_adr, data_id, start_ts,end_ts, key)
+        assert res == exp_pl + list(hashed.digest())
 
 def test_tc_get_parameter():
     pass
