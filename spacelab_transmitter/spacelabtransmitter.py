@@ -575,9 +575,9 @@ class SpaceLabTransmitter:
         sdr = USRP(int(self.entry_sample_rate.get_text()), int(tx_gain))
 
         if sdr.transmit(samples, duration_s, sample_rate, int(carrier_frequency)):
-            self.write_log("Activate Module transmitted to " + sat_json + " from" + callsign + " in " + carrier_frequency + " Hz with a gain of " + tx_gain + " dB")
+            self.write_log("Get Parameter transmitted to " + sat_json + " from" + callsign + " in " + carrier_frequency + " Hz with a gain of " + tx_gain + " dB")
         else:
-            self.write_log("Error transmitting an Activate Module telecommand!")
+            self.write_log("Error transmitting an Get Parameter telecommand!")
 
     def on_button_preferences_clicked(self, button):
         response = self.dialog_preferences.run()
