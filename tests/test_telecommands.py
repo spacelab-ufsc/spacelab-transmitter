@@ -338,7 +338,7 @@ def test_tc_data_request():
         hashed = hmac.new(key.encode('utf-8'), bytes(exp_pl), hashlib.sha1)
 
         #generate 
-        res = x.generate(src_adr, data_id, start_ts,end_ts, key)
+        res = x.generate(src_adr, data_id, start_ts_list ,end_ts_list, key)
         assert res == exp_pl + list(hashed.digest())
 
 def test_tc_get_parameter():
