@@ -26,7 +26,6 @@ import random
 import string
 import hashlib
 import hmac
-from spacelab_transmitter.tc_data_request import DataRequest
 
 sys.path.append(".")
 
@@ -40,6 +39,8 @@ from spacelab_transmitter.tc_set_parameter import SetParameter
 from spacelab_transmitter.tc_erase_memory import EraseMemory
 from spacelab_transmitter.tc_force_reset import ForceReset
 from spacelab_transmitter.tc_get_payload_data import GetPayloadData
+from spacelab_transmitter.tc_data_request import DataRequest
+from spacelab_transmitter.tc_get_parameter import GetParameter
 
 def test_tc_ping():
     x = Ping()
