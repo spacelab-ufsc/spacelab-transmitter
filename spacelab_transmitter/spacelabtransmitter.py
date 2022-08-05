@@ -32,7 +32,9 @@ import json
 import csv
 
 import gi
+from numpy import broadcast
 from spacelab_transmitter.tc_activate_module import ActivateModule
+from spacelab_transmitter.tc_broadcast import Broadcast
 from spacelab_transmitter.tc_data_request import DataRequest
 
 from spacelab_transmitter.tc_deactivate_module import DeactivateModule
@@ -583,14 +585,13 @@ class SpaceLabTransmitter:
     def on_button_get_payload_data_clicked(self, button):
         callsign = self.entry_preferences_general_callsign.get_text()
 
-        subsys_id = 1
-        param_id = 1
-        param_value = 1
+        pl_id = 1
+        pl_args = 1
         key = "1234567812345678"
 
         gpd = GetPayloadData()
 
-        pl = gpd.generate(callsign, subsys_id, param_id, param_value, key)
+        pl = gpd.generate(callsign, pl_id, pl_args, key)
 
         pngh = PyNGHam()
 
@@ -612,9 +613,42 @@ class SpaceLabTransmitter:
         sdr = USRP(int(self.entry_sample_rate.get_text()), int(tx_gain))
 
         if sdr.transmit(samples, duration_s, sample_rate, int(carrier_frequency)):
-            self.write_log("Get Parameter transmitted to " + sat_json + " from" + callsign + " in " + carrier_frequency + " Hz with a gain of " + tx_gain + " dB")
+            self.write_log("Get Payload Data transmitted to " + sat_json + " from" + callsign + " in " + carrier_frequency + " Hz with a gain of " + tx_gain + " dB")
         else:
-            self.write_log("Error transmitting a Get Parameter telecommand!")
+            self.write_log("Error transmitting a Get Payload Data telecommand!")
+
+    def on_button_broadcast_message_clicked(self, button):
+            callsign = self.entry_preferences_general_callsign.get_text()
+            dst_adr = "ABC1234"
+            msg = "testing"
+
+            bm = Broadcast()
+
+            pl = bm.generate(callsign, dst_adr, msg)
+
+            pngh = PyNGHam()
+
+            pkt = pngh.encode(pl)
+
+            sat_json = str()
+            if self.combobox_satellite.get_active() == 0:
+                sat_json = 'FloripaSat-1'
+            elif self.combobox_satellite.get_active() == 1:
+                sat_json = 'GOLDS-UFSC'
+
+            carrier_frequency = self.entry_carrier_frequency.get_text()
+            tx_gain = self.spinbutton_tx_gain.get_text()
+
+            mod = GMSK(0.5, 1200)   # BT = 0.5, 1200 bps
+
+            samples, sample_rate, duration_s = mod.modulate(pkt, 1000)
+
+            sdr = USRP(int(self.entry_sample_rate.get_text()), int(tx_gain))
+
+            if sdr.transmit(samples, duration_s, sample_rate, int(carrier_frequency)):
+                self.write_log("Broadcast Message transmitted to " + sat_json + " from" + callsign + " in " + carrier_frequency + " Hz with a gain of " + tx_gain + " dB")
+            else:
+                self.write_log("Error transmitting a Broadcast Message telecommand!")
 
     def on_button_preferences_clicked(self, button):
         response = self.dialog_preferences.run()
