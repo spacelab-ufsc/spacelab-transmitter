@@ -321,8 +321,18 @@ def test_tc_data_request():
 
         # Random key
         key = ''.join(random.choice(string.ascii_uppercase) for j in range(16))
+
+        start_ts_list = [(start_ts >> 24) & 0xFF,
+        (start_ts >> 16) & 0xFF,
+        (start_ts >> 8) & 0xFF, 
+        start_ts & 0xFF] 
         
-        exp_pl = [0x41] + spaces + src_adr_as_list + [data_id] + [start_ts] + [end_ts]
+        end_ts_list = [(start_ts >> 24) & 0xFF,
+        (start_ts >> 16) & 0xFF,
+        (start_ts >> 8) & 0xFF, 
+        start_ts & 0xFF] 
+
+        exp_pl = [0x41] + spaces + src_adr_as_list + [data_id] + start_ts_list + end_ts_list
 
         #hash
         hashed = hmac.new(key.encode('utf-8'), bytes(exp_pl), hashlib.sha1)
