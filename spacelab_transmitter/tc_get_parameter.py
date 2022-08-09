@@ -34,7 +34,7 @@ class GetParameter(Telecommand):
         """
         super().__init__(0x4D, "get_parameter")
     
-    def generate(self, src_adr, subsys_id, param_id, param_value, key):
+    def generate(self, src_adr, subsys_id, param_id, key):
 
         """This telecommand is composed by four fields:
 
@@ -48,18 +48,12 @@ class GetParameter(Telecommand):
         :param: src_adr: is the callsign of the source (ASCII string).
         :param: subsys_id: is the subsystem ID [1 byte].
         :param: param_id: is the parameter ID [1 byte].
-        :param: param_value: is the parameter value [32 bits integers].
         :param: key: is the telecommand key (ASCII string).
         :return: The generated payload as list of integers.
 
         """
 
         pl = [self.get_id()] + self._prepare_callsign(src_adr) + subsys_id + param_id 
-
-        pl.append((param_value >> 32) & 0xFF)
-        pl.append((param_value >> 16) & 0xFF)
-        pl.append((param_value >> 8) & 0xFF)
-        pl.append((param_value >> 0) & 0xFF)
 
         hashed = hmac.new(key.encode('utf-8'), bytes(pl), hashlib.sha1)
 
