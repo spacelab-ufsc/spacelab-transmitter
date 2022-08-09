@@ -53,7 +53,7 @@ class GetParameter(Telecommand):
 
         """
 
-        pl = [self.get_id()] + self._prepare_callsign(src_adr) + subsys_id + param_id 
+        pl = [self.get_id()] + self._prepare_callsign(src_adr) + [subsys_id] + [param_id] 
 
         hashed = hmac.new(key.encode('utf-8'), bytes(pl), hashlib.sha1)
 
