@@ -551,12 +551,11 @@ class SpaceLabTransmitter:
 
         subsys_id = 1
         param_id = 1
-        param_value = 1
         key = "1234567812345678"
 
         gp = GetParameter()
 
-        pl = gp.generate(callsign, subsys_id, param_id, param_value, key)
+        pl = gp.generate(callsign, subsys_id, param_id, key)
 
         pngh = PyNGHam()
 
