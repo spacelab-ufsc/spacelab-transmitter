@@ -1,5 +1,16 @@
 ===========================================
 
+v0.3 - 2022/08/09
+
+- UI updated
+- Clicked button events created
+- Telecommands' classes created
+- Unit tests for telecommands implementation
+- General improvements and fixes
+
+===========================================
+===========================================
+
 v0.2 - 2022/06/14
 
 - UI updated
