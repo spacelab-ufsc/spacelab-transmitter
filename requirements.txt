@@ -2,3 +2,4 @@ PyGObject
 pyngham
 numpy
 scipy
+ephem

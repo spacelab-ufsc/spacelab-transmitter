@@ -49,17 +49,18 @@ This program will support the satellites below:
 * [PyNGHam](https://pypi.org/project/pyngham/)
 * [NumPy](https://pypi.org/project/numpy/)
 * [SciPy](https://pypi.org/project/scipy/)
+* [PyEphem](https://pypi.org/project/ephem/)
 * [UHD](https://github.com/EttusResearch/uhd)
 
 ## Installation on Ubuntu
 
-```sudo apt install python3 python3-gi python3-numpy python3-scipy python3-uhd```
+```sudo apt install python3 python3-gi python3-numpy python3-scipy python3-ephem python3-uhd```
 
 ```pip install pyngham```
 
 ## Installation on Fedora
 
-```sudo dnf install python3 python3-gobject python3-numpy python3-scipy uhd uhd-devel```
+```sudo dnf install python3 python3-gobject python3-numpy python3-scipy python3-ephem uhd uhd-devel```
 
 ```pip install pyngham```
 
