@@ -18,8 +18,8 @@ be transmitted together with the packet payload. The used hash algorithm is the 
 .. image:: img/hmac.png
    :width: 500
 
-Telecommands
-============
+Telecommands Available
+======================
 
 +-------------------+------------+
 | Telecommand       |    Type    |  
