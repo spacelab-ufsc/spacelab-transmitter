@@ -1,6 +1,6 @@
-********
+########
 Overview 
-********
+########
 
 .. image:: enterprise.png
    :target: https://www.youtube.com/watch?v=JaDpDG2fYtY
@@ -15,9 +15,49 @@ A list of known satellites that are planned to use this software are presented b
 * **Catarina-A1**
 
 
-The two satellites of the list above are developed (or in development) by the same research group: the *Space Technology Research Laboratory* (SpaceLab) [3]_, from *Universidade Federal de Santa Catarina* (Brazil).
+The satellites of the list above are developed (or in development) by the same research group: the *Space Technology Research Laboratory* (SpaceLab) [3]_, from *Universidade Federal de Santa Catarina* (Brazil).
+
+
+The Software
+============
+
+.. image:: img/front_page.png
+   :width: 700
 
 The objective of this software is to become the "universal" software of the Spacelab's Satellites to transmit packages to any of its satellites.
+As it is first focused on GOLDS-UFSC, right when we run the software we can see 14 buttons with the respective telecommands of this sattelite:
+
++-------------------+------------+
+| Telecommand       | Function   |  
++===================+============+
+| Ping Request      |            | 
++-------------------+------------+
+| Data Request      |            |
++-------------------+------------+
+| Broadcast Message |            | 
++-------------------+------------+ 
+| Enter Hibernation |            | 
++-------------------+------------+
+| Leave Hibernation |            |
++-------------------+------------+
+| Activate Module   |            |
++-------------------+------------+
+| Deactivate Module |            |
++-------------------+------------+
+| Activate Payload  |            |
++-------------------+------------+
+| Deactivate Payload|            |
++-------------------+------------+
+| Erase Memory      |            |
++-------------------+------------+
+| Force Reset       |            |
++-------------------+------------+
+| Get Payload Data  |            |
++-------------------+------------+
+| Set Parameter     |            |
++-------------------+------------+
+| Get Parameter     |            |
++-------------------+------------+
 
 References
 ==========
