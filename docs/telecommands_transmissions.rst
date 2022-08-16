@@ -9,7 +9,7 @@ The Spacelab-Transmitter is the software for the Spacelab's Ground Station (GRS)
  
 In order to not depend on another software to transmit telecommands, it was implemented a GMSK modulator in the code so that the Spacelab Transmitter works alone with the Software-Defined Radio.
 
-The default Software-Defined Radio used in Spacelab is the USRP B210 so the code was written based in the integration with this specific SDR.
+The default Software-Defined Radio used in Spacelab is the USRP B210 so the code was written based in the integration with this specific SDR, and the modulation is the GMSK. In the code we have a class for USRP and for GMSK and also in every telecommand transmission function in the SpacelabTransmitter class we have implemented both of their codes.
 
 .. image:: img/usrp.png
    :width: 500
@@ -17,10 +17,13 @@ The default Software-Defined Radio used in Spacelab is the USRP B210 so the code
 GMSK Implementation
 ===================
 
-explain what is gmsk, how it works 
+Modulation and GMSK
+*******************
 
-explain our code: it was based in code .... of the book ....
 
+**In the code of the gmsk class:**
+
+**In the code of the telecommands transmission:**
 
 
 Integration with USRP SDR
@@ -33,7 +36,7 @@ The IEEE considers Software defined to be refered to the use of software process
 system or device to implement operating (but not control) functions and Software-Defined Radio (SDR) a radio in which some or all of the physical layer functions are software
 defined. [1]_ 
 
-As said before,the SDR used in Spacelab transmissions to satellites is the USRP B210.
+As said before,the SDR used in Spacelab transmissions to satellites is the USRP B210 and the modulation used is the GMSK. 
 
 USRP
 ****
@@ -53,7 +56,7 @@ The folder has a specific file for usrp class, where it has a constructor functi
 - sample rate;
 - gain.
 
-In the code:
+**In the code of the usrp class:**
 
  ``samples = signal.resample_poly(samples, self._sample_rate, rate)``
 
@@ -64,6 +67,26 @@ In the code:
 
 And the true/false return is for if it was successfull or not.
 
+**In the code of the telecommands transmission:**
+
+The previous parameters are set in the software and the code extracts the user inputs from the UI (GTK) to assign to the usrp values. 
+
+ ``carrier_frequency = self.entry_carrier_frequency.get_text()``
+ 
+ ``tx_gain = self.spinbutton_tx_gain.get_text()``
+ 
+ ``samples, sample_rate, duration_s = mod.modulate(pkt, 1000)``
+ 
+ ``sdr = USRP(int(self.entry_sample_rate.get_text()), int(tx_gain))``
+ 
+ ``if sdr.transmit(samples, duration_s, sample_rate, int(carrier_frequency)):``
+
+  ``self.write_log("Set Parameter transmitted to " + sat_json + " from" + callsign + " in " + carrier_frequency + " Hz with a gain of " + tx_gain + " dB")``
+
+ ``else:``
+
+  ``self.write_log("Error transmitting a Set Parameter telecommand!")``
+            
 References
 ==========
 
