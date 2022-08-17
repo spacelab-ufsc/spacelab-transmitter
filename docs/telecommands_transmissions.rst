@@ -49,10 +49,11 @@ The class have the following functions:
 
 In all telecommands functions in the SpacelabTransmitter class we have the following line:
 
- ``mod = GMSK(0.5, 1200)``
+.. code-block:: python
 
-Which means that we have bit period (BT) = 0.5 and the desired data rate in 1200 bps.
+   mod = GMSK(0.5, 1200)
 
+Which means that we have bit period (BT) = 0.5 and the desired data rate in 1200 bps. BT and baudrate can be configured but in the example we have GOLDS-UFSC with those values depending on the communication link.
 
 Integration with USRP SDR
 =========================
@@ -86,12 +87,13 @@ The folder has a specific file for usrp class, where it has a constructor functi
 
 **In the code of the usrp class:**
 
- ``samples = signal.resample_poly(samples, self._sample_rate, rate)``
+.. code-block:: python
 
- ``if self._usrp.send_waveform(samples, dur, freq, self._sample_rate, [0], self._gain):``
-    ``return True``
- ``else:``
-    ``return False``
+   samples = signal.resample_poly(samples, self._sample_rate, rate)
+   if self._usrp.send_waveform(samples, dur, freq, self._sample_rate, [0], self._gain):
+      return True
+   else:
+      return False
 
 And the true/false return is for if it was successfull or not.
 
@@ -99,26 +101,29 @@ And the true/false return is for if it was successfull or not.
 
 The previous parameters are set in the software and the code extracts the user inputs from the UI (GTK) to assign to the usrp values. 
 
- ``carrier_frequency = self.entry_carrier_frequency.get_text()``
- 
- ``tx_gain = self.spinbutton_tx_gain.get_text()``
- 
- ``samples, sample_rate, duration_s = mod.modulate(pkt, 1000)``
- 
- ``sdr = USRP(int(self.entry_sample_rate.get_text()), int(tx_gain))``
- 
- ``if sdr.transmit(samples, duration_s, sample_rate, int(carrier_frequency)):``
+.. code-block:: python
 
-  ``self.write_log("Set Parameter transmitted to " + sat_json + " from" + callsign + " in " + carrier_frequency + " Hz with a gain of " + tx_gain + " dB")``
+   carrier_frequency = self.entry_carrier_frequency.get_text()
+ 
+   tx_gain = self.spinbutton_tx_gain.get_text()
+ 
+   samples, sample_rate, duration_s = mod.modulate(pkt, 1000)
+ 
+   sdr = USRP(int(self.entry_sample_rate.get_text()), int(tx_gain))
+ 
+   if sdr.transmit(samples, duration_s, sample_rate, int(carrier_frequency)):
 
- ``else:``
+      self.write_log("Set Parameter transmitted to " + sat_json + " from" + callsign + " in " + carrier_frequency + " Hz with a gain of " + tx_gain + " dB")
 
-  ``self.write_log("Error transmitting a Set Parameter telecommand!")``
+   else:
+
+      self.write_log("Error transmitting a Set Parameter telecommand!")
             
 References
 ==========
 
 Viswanathan, Mathuranathan. **Digital Modulations Using Python**. 1st ed., vol. 1, Independently published, 2019.
+
 Turletti, Thierry. (1996). **GMSK in a nutshell**. 
 
 .. [1] https://www.electronics-notes.com/articles/radio/modulation/what-is-gmsk-gaussian-minimum-shift-keying.php
