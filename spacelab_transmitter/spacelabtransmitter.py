@@ -181,6 +181,7 @@ class SpaceLabTransmitter:
         self.button_force_reset = self.builder.get_object("button_force_reset")
         self.button_get_parameter = self.builder.get_object("button_get_parameter")
         self.button_broadcast_message = self.builder.get_object("button_broadcast_message")
+        self.button_broadcast_message.connect("clicked", self.on_button_broadcast_message_clicked)
         self.button_activate_module = self.builder.get_object("button_activate_module")
         self.button_deactivate_payload = self.builder.get_object("button_deactivate_payload")
         self.button_get_payload_data = self.builder.get_object("button_get_payload_data")
@@ -201,6 +202,15 @@ class SpaceLabTransmitter:
         self.entry_preferences_general_location = self.builder.get_object("entry_preferences_general_location")
         self.entry_preferences_general_country = self.builder.get_object("entry_preferences_general_country")
 
+        #Broadcast Message 
+        self.dialog_broadcast = self.builder.get_object("dialog_broadcast")
+        self.entry_msg = self.builder.get_object("entry_msg")
+        self.entry_dst_callsign = self.builder.get_object("entry_dst_callsign")
+        self.button_broadcast_send = self.builder.get_object("button_broadcast_send")
+        self.button_broadcast_send.connect("clicked", self.on_button_broadcast_send_clicked)
+        self.button_broadcast_cancel = self.builder.get_object("button_broadcast_cancel")
+        self.button_broadcast_cancel.connect("clicked", self.on_button_broadcast_cancel_clicked)
+    
     def run(self):
         self.window.show_all()          
         Gtk.main()
@@ -617,37 +627,47 @@ class SpaceLabTransmitter:
             self.write_log("Error transmitting a Get Payload Data telecommand!")
 
     def on_button_broadcast_message_clicked(self, button):
-            callsign = self.entry_preferences_general_callsign.get_text()
-            dst_adr = "ABC1234"
-            msg = "testing"
+        self.dialog_broadcast.run()    
 
-            bm = Broadcast()
+    def _transmit_tc(self, pkt, tc_name):
+        sat_json = str()
+        if self.combobox_satellite.get_active() == 0:
+            sat_json = 'FloripaSat-1'
+        elif self.combobox_satellite.get_active() == 1:
+            sat_json = 'GOLDS-UFSC'
 
-            pl = bm.generate(callsign, dst_adr, msg)
+        carrier_frequency = self.entry_carrier_frequency.get_text()
+        tx_gain = self.spinbutton_tx_gain.get_text()
+        callsign = self.entry_preferences_general_callsign.get_text()
 
-            pngh = PyNGHam()
+        mod = GMSK(0.5, 1200)   # BT = 0.5, 1200 bps
 
-            pkt = pngh.encode(pl)
+        samples, sample_rate, duration_s = mod.modulate(pkt, 1000)
 
-            sat_json = str()
-            if self.combobox_satellite.get_active() == 0:
-                sat_json = 'FloripaSat-1'
-            elif self.combobox_satellite.get_active() == 1:
-                sat_json = 'GOLDS-UFSC'
+        sdr = USRP(int(self.entry_sample_rate.get_text()), int(tx_gain))
 
-            carrier_frequency = self.entry_carrier_frequency.get_text()
-            tx_gain = self.spinbutton_tx_gain.get_text()
+        if sdr.transmit(samples, duration_s, sample_rate, int(carrier_frequency)):
+            self.write_log(tc_name + " transmitted to " + sat_json + " from" + callsign + " in " + carrier_frequency + " Hz with a gain of " + tx_gain + " dB")
+        else:
+            self.write_log("Error transmitting a " + tc_name + " telecommand!")
 
-            mod = GMSK(0.5, 1200)   # BT = 0.5, 1200 bps
+    def on_button_broadcast_cancel_clicked(self, button):
+        self.dialog_broadcast.hide()
 
-            samples, sample_rate, duration_s = mod.modulate(pkt, 1000)
+    def on_button_broadcast_send_clicked(self, button):
+        dst_adr = self.entry_dst_callsign.get_text()
+        msg = self.entry_msg.get_text()
 
-            sdr = USRP(int(self.entry_sample_rate.get_text()), int(tx_gain))
+        bm = Broadcast()
 
-            if sdr.transmit(samples, duration_s, sample_rate, int(carrier_frequency)):
-                self.write_log("Broadcast Message transmitted to " + sat_json + " from" + callsign + " in " + carrier_frequency + " Hz with a gain of " + tx_gain + " dB")
-            else:
-                self.write_log("Error transmitting a Broadcast Message telecommand!")
+        pl = bm.generate(self.entry_preferences_general_callsign.get_text(), dst_adr, msg)
+
+        pngh = PyNGHam()
+
+        pkt = pngh.encode(pl)
+
+        self._transmit_tc(pkt, "Broadcast Message")
+        self.dialog_broadcast.hide()
 
     def on_button_preferences_clicked(self, button):
         response = self.dialog_preferences.run()
