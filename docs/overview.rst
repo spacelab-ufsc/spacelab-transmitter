@@ -2,7 +2,7 @@
 Overview 
 ########
 
-.. image:: enterprise.png
+.. image:: img/enterprise.png
    :target: https://www.youtube.com/watch?v=JaDpDG2fYtY
    :width: 50px                                                                                                                                                                                                                                     
 The *Spacelab-Transmitter* is a Python in-development software to transmit telecommands to satellites using an SDR (Software Defined Radio).
@@ -18,7 +18,7 @@ The satellites of the list above are developed (or in development) by the same r
 The Software
 ============
 
-.. image:: img/front_page.png
+.. image:: img/main-window.png
    :width: 700
 
 The objective of this software is to become the "universal" software of the Spacelab's Satellites to transmit telecommands to any of its satellites.

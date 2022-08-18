@@ -31,9 +31,9 @@ SpaceLab Packet Transmitter is a software to transmit audio records to the satel
 
 It is still under construction and the following information is what is expected by the final product.
 
-Software front page screenshot:
+Below, there is an image of the main window of the software:
 
-<img src="docs/img/front_page.png" width=""/>
+<img src="docs/img/main-window.png" width=""/>
 
 ## Satellites
 
