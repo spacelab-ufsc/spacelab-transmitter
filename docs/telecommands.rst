@@ -47,7 +47,7 @@ The table below lists all the 14 available telecommands, including their IDs, si
 Ping Request
 ------------
 
-TODO
+The ping request telecommand is a simple command to test the communication with the satellite. When the satellite receives a ping packet, it will respond with another ping packet (with another packet ID, as defined in the downlink packets list). There are no additional parameters in the ping packet, just the packet ID and the source callsign (or address). It is also a public telecommand, anyone can send a ping request telecommand to a satellite.
 
 Data Request
 ------------
@@ -57,7 +57,7 @@ TODO
 Bloadcast Message
 -----------------
 
-TODO
+The "broadcast message" is another public telecommand, no authentication or key is required to send this telecommand to a satellite. This command has the purpose of making a satellite transmit a custom message back to Earth. This can be useful for communication tasks, like a station sending data to another. There are two parameters in this telecommand: the destination callsign (or address), and the content of the message, which can be any sequence of ASCII characters or any byte value. There is a limit of 38 characters in the message field.
 
 Enter Hibernation
 -----------------
@@ -97,7 +97,7 @@ TODO
 Force Reset
 -----------
 
-TODO
+This telecommand performs a general reset of the satellite. When received, the satellite reset all subsystems. This is a private telecommand, and a key is required to send this command to a satellite. There is no additional content in this packet, just the packet ID and the source callsign (or address).
 
 Get Payload Data
 ----------------
