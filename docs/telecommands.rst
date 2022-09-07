@@ -62,12 +62,12 @@ The "broadcast message" is another public telecommand, no authentication or key 
 Enter Hibernation
 -----------------
 
-TODO
+This telecommand activates the hibernation mode in a satellite. During the hibernation mode, no transmissions are made by the satellite, it keeps just listening for new incoming packets (reception). The satellite will stay in hibernation mode for a custom period (1 to 65536 minutes), or until a "Leave Hibernation" mode is received. This is a private telecommand, a key is required to send it. Beyond the packet ID and the source callsign (or address), the number o minutes (2 bytes long) is also transmitted.
 
 Leave Hibernation
 -----------------
 
-TODO
+This telecommand complements the "enter hibernation" telecommand by deactivating the hibernation mode in the satellite. When a satellite receives this telecommand it enables the transmission again immediatly. This is also a private telecommand, a specific key is required to send it. There is no additional content to this telecommand packet, just the packet ID and the source callsign (or address).
 
 Activate Module
 ---------------
@@ -92,7 +92,7 @@ TODO
 Erase Memory
 ------------
 
-TODO
+The telecommand "erase memory" erases all the content presented in the non-volatile memories of the onboard computer of a satellite. This is a private command, and a key is required to send it. No additional content is required in a erase memory telecommand packet, just the packet ID and the source callsign (or address).
 
 Force Reset
 -----------
