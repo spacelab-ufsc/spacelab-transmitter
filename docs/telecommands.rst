@@ -72,22 +72,36 @@ This telecommand complements the "enter hibernation" telecommand by deactivating
 Activate Module
 ---------------
 
-TODO
+The "Activate Module" telecommand is a command to activate a internal module of the satellite. Each module has a unique ID that is passed as an argument of this telecommand's packet. The table below shows the current used IDs.
+
++--------------------+---------------+
+| **Module**         | **ID Number** |
++====================+===============+
+| Battery heater     | 1             |
++--------------------+---------------+
+| Beacon             | 2             |
++--------------------+---------------+
+| Periodic telemetry | 3             |
++--------------------+---------------+
+
+This is also a private telecommand, and a key is required to transmit it.
 
 Deactivate Module
 -----------------
 
-TODO
+The "Deactivate Module" telecommand complements the telecommand above and works the same way and with the same parameters, but in this case, has the purpose of deactivating a given module of the satellite.
 
 Activate Payload
 ----------------
 
-TODO
+This telecommand is similar to the telecommand "Activate Module", but in this case is used for activate payloads of the satellite. Each satellite will have a list of IDs of the set of payloads.
+
+This is also a private telecommand and a key is required to transmit it.
 
 Deactivate Payload
 ------------------
 
-TODO
+Same as the "Deativate Module" telecommand, but for payloads.
 
 Erase Memory
 ------------
