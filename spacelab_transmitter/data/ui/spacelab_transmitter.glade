@@ -614,12 +614,15 @@ Author: Vitória Beatriz Bianchin <vitoriabbianchin@gmail.com>
                   <object class="GtkBox">
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
+                    <property name="margin-left">5</property>
                     <property name="orientation">vertical</property>
+                    <property name="spacing">5</property>
                     <property name="homogeneous">True</property>
                     <child>
                       <object class="GtkBox">
                         <property name="visible">True</property>
                         <property name="can-focus">False</property>
+                        <property name="spacing">5</property>
                         <property name="homogeneous">True</property>
                         <child>
                           <object class="GtkButton" id="button_ping_request">
@@ -702,6 +705,7 @@ Author: Vitória Beatriz Bianchin <vitoriabbianchin@gmail.com>
                       <object class="GtkBox">
                         <property name="visible">True</property>
                         <property name="can-focus">False</property>
+                        <property name="spacing">5</property>
                         <property name="homogeneous">True</property>
                         <child>
                           <object class="GtkButton" id="button_data_request">
@@ -784,6 +788,7 @@ Author: Vitória Beatriz Bianchin <vitoriabbianchin@gmail.com>
                       <object class="GtkBox">
                         <property name="visible">True</property>
                         <property name="can-focus">False</property>
+                        <property name="spacing">5</property>
                         <property name="homogeneous">True</property>
                         <child>
                           <object class="GtkButton" id="button_broadcast_message">
@@ -859,6 +864,7 @@ Author: Vitória Beatriz Bianchin <vitoriabbianchin@gmail.com>
                     <property name="height-request">180</property>
                     <property name="visible">True</property>
                     <property name="can-focus">True</property>
+                    <property name="margin-left">5</property>
                     <property name="shadow-type">in</property>
                     <child>
                       <object class="GtkTreeView" id="treeview_events">
