@@ -22,9 +22,9 @@
 
 __author__      = "Vitória Beatriz Bianchin"
 __copyright__   = "Copyright The SpaceLab-Transmitter Contributors"
-__credits__     = ["Vitória Beatriz Bianchin"]
+__credits__     = ["Gabriel Mariano Marcelino, Vitória Beatriz Bianchin"]
 __license__     = "GPLv3"
-__version__     = "0.3.0"
+__version__     = "0.3.1"
 __maintainer__  = "Gabriel Mariano Marcelino - PU5GMA"
 __email__       = "gabriel.mm8@gmail.com"
 __status__      = "Development"
