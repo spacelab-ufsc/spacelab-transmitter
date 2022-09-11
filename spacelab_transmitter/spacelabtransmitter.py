@@ -147,6 +147,9 @@ class SpaceLabTransmitter:
         self.switch_button = self.builder.get_object("switch_button")
         self.switch_button.connect("state-set", self.on_switch_button_clicked)
 
+        # Switch button Doppler correction
+        self.switch_doppler = self.builder.get_object("switch_doppler")
+
         # Logfile chooser button
         self.logfile_chooser_button = self.builder.get_object("logfile_chooser_button")
         self.logfile_chooser_button.set_filename(_DEFAULT_LOGFILE_PATH)
