@@ -37,7 +37,7 @@ Author: Vitória Beatriz Bianchin <vitoriabbianchin@gmail.com>
   <object class="GtkDialog" id="dialog_password">
     <property name="name">Passwork </property>
     <property name="can-focus">False</property>
-    <property name="title" translatable="yes">Password</property>
+    <property name="title" translatable="yes">Enter the Password</property>
     <property name="type-hint">dialog</property>
     <child internal-child="vbox">
       <object class="GtkBox">
@@ -89,15 +89,21 @@ Author: Vitória Beatriz Bianchin <vitoriabbianchin@gmail.com>
           </packing>
         </child>
         <child>
-          <!-- n-columns=3 n-rows=3 -->
+          <!-- n-columns=2 n-rows=1 -->
           <object class="GtkGrid">
             <property name="visible">True</property>
             <property name="can-focus">False</property>
+            <property name="margin-left">10</property>
+            <property name="margin-right">10</property>
+            <property name="margin-top">5</property>
+            <property name="margin-bottom">5</property>
+            <property name="row-spacing">5</property>
+            <property name="column-spacing">5</property>
             <child>
               <object class="GtkLabel" id="label_password">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
-                <property name="margin-left">10</property>
+                <property name="halign">start</property>
                 <property name="label" translatable="yes">Key:</property>
               </object>
               <packing>
@@ -110,10 +116,7 @@ Author: Vitória Beatriz Bianchin <vitoriabbianchin@gmail.com>
                 <property name="name">entry_password</property>
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
-                <property name="margin-left">16</property>
-                <property name="margin-right">16</property>
-                <property name="margin-top">12</property>
-                <property name="margin-bottom">12</property>
+                <property name="hexpand">True</property>
                 <property name="visibility">False</property>
                 <property name="invisible-char">*</property>
               </object>
@@ -121,27 +124,6 @@ Author: Vitória Beatriz Bianchin <vitoriabbianchin@gmail.com>
                 <property name="left-attach">1</property>
                 <property name="top-attach">0</property>
               </packing>
-            </child>
-            <child>
-              <placeholder/>
-            </child>
-            <child>
-              <placeholder/>
-            </child>
-            <child>
-              <placeholder/>
-            </child>
-            <child>
-              <placeholder/>
-            </child>
-            <child>
-              <placeholder/>
-            </child>
-            <child>
-              <placeholder/>
-            </child>
-            <child>
-              <placeholder/>
             </child>
           </object>
           <packing>
