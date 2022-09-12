@@ -47,72 +47,86 @@ The table below lists all the 14 available telecommands, including their IDs, si
 Ping Request
 ------------
 
-TODO
+The ping request telecommand is a simple command to test the communication with the satellite. When the satellite receives a ping packet, it will respond with another ping packet (with another packet ID, as defined in the downlink packets list). There are no additional parameters in the ping packet, just the packet ID and the source callsign (or address). It is also a public telecommand, anyone can send a ping request telecommand to a satellite.
 
 Data Request
 ------------
 
-TODO
+The data request telecommand is a command to download data from the satellite. This command allows a ground station to get specific parameters from a given period (stored in the non-volatile memory of the onboard computer of the satellite). The list of possible parameters varies according to the satellite. The required fields of this telecommand are the parameter ID (1 byte), the start period in milliseconds (epoch, 4 bytes), and the end period in milliseconds (epoch, 4 bytes). This is a private telecommand, and a key is required to send it.
 
 Bloadcast Message
 -----------------
 
-TODO
+The "broadcast message" is another public telecommand, no authentication or key is required to send this telecommand to a satellite. This command has the purpose of making a satellite transmit a custom message back to Earth. This can be useful for communication tasks, like a station sending data to another. There are two parameters in this telecommand: the destination callsign (or address), and the content of the message, which can be any sequence of ASCII characters or any byte value. There is a limit of 38 characters in the message field.
 
 Enter Hibernation
 -----------------
 
-TODO
+This telecommand activates the hibernation mode in a satellite. During the hibernation mode, no transmissions are made by the satellite, it keeps just listening for new incoming packets (reception). The satellite will stay in hibernation mode for a custom period (1 to 65536 minutes), or until a "Leave Hibernation" mode is received. This is a private telecommand, a key is required to send it. Beyond the packet ID and the source callsign (or address), the number o minutes (2 bytes long) is also transmitted.
 
 Leave Hibernation
 -----------------
 
-TODO
+This telecommand complements the "enter hibernation" telecommand by deactivating the hibernation mode in the satellite. When a satellite receives this telecommand it enables the transmission again immediatly. This is also a private telecommand, a specific key is required to send it. There is no additional content to this telecommand packet, just the packet ID and the source callsign (or address).
 
 Activate Module
 ---------------
 
-TODO
+The "Activate Module" telecommand is a command to activate a internal module of the satellite. Each module has a unique ID that is passed as an argument of this telecommand's packet. The table below shows the current used IDs.
+
++--------------------+---------------+
+| **Module**         | **ID Number** |
++====================+===============+
+| Battery heater     | 1             |
++--------------------+---------------+
+| Beacon             | 2             |
++--------------------+---------------+
+| Periodic telemetry | 3             |
++--------------------+---------------+
+
+This is also a private telecommand, and a key is required to transmit it.
 
 Deactivate Module
 -----------------
 
-TODO
+The "Deactivate Module" telecommand complements the telecommand above and works the same way and with the same parameters, but in this case, has the purpose of deactivating a given module of the satellite.
 
 Activate Payload
 ----------------
 
-TODO
+This telecommand is similar to the telecommand "Activate Module", but in this case is used for activate payloads of the satellite. Each satellite will have a list of IDs of the set of payloads.
+
+This is also a private telecommand and a key is required to transmit it.
 
 Deactivate Payload
 ------------------
 
-TODO
+Same as the "Deativate Module" telecommand, but for payloads.
 
 Erase Memory
 ------------
 
-TODO
+The telecommand "erase memory" erases all the content presented in the non-volatile memories of the onboard computer of a satellite. This is a private command, and a key is required to send it. No additional content is required in a erase memory telecommand packet, just the packet ID and the source callsign (or address).
 
 Force Reset
 -----------
 
-TODO
+This telecommand performs a general reset of the satellite. When received, the satellite reset all subsystems. This is a private telecommand, and a key is required to send this command to a satellite. There is no additional content in this packet, just the packet ID and the source callsign (or address).
 
 Get Payload Data
 ----------------
 
-TODO
+This telecommand allows a ground station to download data from a specific payload of the satellite. The required fields are the payload ID, and optionally, arguments to be passed to the payload. The IDs and arguments vary according to the satellite. This is a private telecommand, and a key is required to send it.
 
 Set Parameter
 -------------
 
-TODO
+This telecommand allows the configuration of specific parameters of a given subsystem of the satellite. The required fields are the ID of the subsystem to set (1 byte), the ID of the parameter to set (1 byte), and the new value of the parameter (4 bytes long). The possible IDs (subsystem and parameter) vary according to the satellite. This is a private telecommand, and a key is required to send it.
 
 Get Parameter
 -------------
 
-TODO
+The telecommand "Get Parameter" complements the "Set Parameter" telecommand. It has the purpose of reading specific parameters of a given subsystem. The required fields are the subsystem's ID (1 byte) and the parameter ID (1 byte). The possible IDs (subsystem and parameter) vary according to the satellite. This is a private telecommand, and a key is required to send it.
 
 Authentication
 ==============
