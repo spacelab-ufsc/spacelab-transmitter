@@ -626,8 +626,8 @@ class SpaceLabTransmitter:
         else:
             self.write_log("Error transmitting a Get Payload Data telecommand!")
 
-    def on_button_broadcast_message_clicked(self, button):
-        self.dialog_broadcast.run()    
+    def on_button_broadcast_message_clicked(self, button): 
+        self.dialog_broadcast.run() 
 
     def _transmit_tc(self, pkt, tc_name):
         sat_json = str()
@@ -652,7 +652,7 @@ class SpaceLabTransmitter:
             self.write_log("Error transmitting a " + tc_name + " telecommand!")
 
     def on_button_broadcast_cancel_clicked(self, button):
-        self.dialog_broadcast.hide()
+        self.dialog_broadcast.hide
 
     def on_button_broadcast_send_clicked(self, button):
         dst_adr = self.entry_dst_callsign.get_text()
