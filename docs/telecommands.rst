@@ -52,7 +52,7 @@ The ping request telecommand is a simple command to test the communication with 
 Data Request
 ------------
 
-TODO
+The data request telecommand is a command to download data from the satellite. This command allows a ground station to get specific parameters from a given period (stored in the non-volatile memory of the onboard computer of the satellite). The list of possible parameters varies according to the satellite. The required fields of this telecommand are the parameter ID (1 byte), the start period in milliseconds (epoch, 4 bytes), and the end period in milliseconds (epoch, 4 bytes). This is a private telecommand, and a key is required to send it.
 
 Bloadcast Message
 -----------------
@@ -116,7 +116,7 @@ This telecommand performs a general reset of the satellite. When received, the s
 Get Payload Data
 ----------------
 
-TODO
+This telecommand allows a ground station to download data from a specific payload of the satellite. The required fields are the payload ID, and optionally, arguments to be passed to the payload. The IDs and arguments vary according to the satellite. This is a private telecommand, and a key is required to send it.
 
 Set Parameter
 -------------
