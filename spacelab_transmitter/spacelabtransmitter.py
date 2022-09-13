@@ -205,14 +205,14 @@ class SpaceLabTransmitter:
         self.entry_preferences_general_location = self.builder.get_object("entry_preferences_general_location")
         self.entry_preferences_general_country = self.builder.get_object("entry_preferences_general_country")
 
-        # Broadcast Message
-#        self.dialog_broadcast = self.builder.get_object("dialog_broadcast")
-#        self.entry_msg = self.builder.get_object("entry_msg")
-#        self.entry_dst_callsign = self.builder.get_object("entry_dst_callsign")
-#        self.button_broadcast_send = self.builder.get_object("button_broadcast_send")
-#        self.button_broadcast_send.connect("clicked", self.on_button_broadcast_send_clicked)
-#        self.button_broadcast_cancel = self.builder.get_object("button_broadcast_cancel")
-#        self.button_broadcast_cancel.connect("clicked", self.on_button_broadcast_cancel_clicked)
+        #Broadcast Message
+        self.dialog_broadcast = self.builder.get_object("dialog_broadcast")
+        self.entry_msg = self.builder.get_object("entry_msg")
+        self.entry_dst_callsign = self.builder.get_object("entry_dst_callsign")
+        self.button_broadcast_send = self.builder.get_object("button_broadcast_send")
+        self.button_broadcast_send.connect("clicked", self.on_button_broadcast_send_clicked)
+        self.button_broadcast_cancel = self.builder.get_object("button_broadcast_cancel")
+        self.button_broadcast_cancel.connect("clicked", self.on_button_broadcast_cancel_clicked)
     
     def run(self):
         self.window.show_all()          
