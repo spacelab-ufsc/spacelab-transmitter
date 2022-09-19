@@ -219,19 +219,35 @@ class SpaceLabTransmitter:
 
         #Activate Module
         self.dialog_activate_module = self.builder.get_object("dialog_activate_module")
-        self.entry_activate_id = self.builder.get_object("entry_activate_id")
-        self.button_activate_send = self.builder.get_object("button_activate_send")
-        self.button_activate_send.connect("clicked", self.on_button_activate_send_clicked)
-        self.button_activate_cancel = self.builder.get_object("button_activate_cancel")
-        self.button_activate_cancel.connect("clicked", self.on_button_activate_cancel_clicked)
+        self.entry_activate_module_id = self.builder.get_object("entry_activate_module_id")
+        self.button_activate_module_send = self.builder.get_object("button_activate_module_send")
+        self.button_activate_module_send.connect("clicked", self.on_button_activate_module_send_clicked)
+        self.button_activate_module_cancel = self.builder.get_object("button_activate_module_cancel")
+        self.button_activate_module_cancel.connect("clicked", self.on_button_activate_module_cancel_clicked)
     
         #Deactivate Module
         self.dialog_deactivate_module = self.builder.get_object("dialog_deactivate_module")
-        self.entry_deactivate_id = self.builder.get_object("entry_deactivate_id")
-        self.button_deactivate_send = self.builder.get_object("button_deactivate_send")
-        self.button_deactivate_send.connect("clicked", self.on_button_deactivate_send_clicked)
-        self.button_deactivate_cancel = self.builder.get_object("button_deactivate_cancel")
-        self.button_deactivate_cancel.connect("clicked", self.on_button_deactivate_cancel_clicked)
+        self.entry_deactivate_module_id = self.builder.get_object("entry_deactivate_module_id")
+        self.button_deactivate_module_send = self.builder.get_object("button_deactivate_module_send")
+        self.button_deactivate_module_send.connect("clicked", self.on_button_deactivate_module_send_clicked)
+        self.button_deactivate_module_cancel = self.builder.get_object("button_deactivate_module_cancel")
+        self.button_deactivate_module_cancel.connect("clicked", self.on_button_deactivate_module_cancel_clicked)
+
+        #Activate Payload
+        self.dialog_activate_payload = self.builder.get_object("dialog_activate_payload")
+        self.entry_activate_payload_id = self.builder.get_object("entry_activate_payload_id")
+        self.button_activate_payload_send = self.builder.get_object("button_activate_payload_send")
+        #self.button_activate_payload_send.connect("clicked", self.on_button_activate_payload_send_clicked)
+        self.button_activate_payload_cancel = self.builder.get_object("button_activate_payload_cancel")
+        #self.button_activate_payload_cancel.connect("clicked", self.on_button_activate_payload_cancel_clicked)
+
+        #Deactivate Payload
+        self.dialog_deactivate_payload = self.builder.get_object("dialog_deactivate_payload")
+        self.entry_deactivate_payload_id = self.builder.get_object("entry_deactivate_payload_id")
+        self.button_deactivate_payload_send = self.builder.get_object("button_deactivate_payload_send")
+        #self.button_deactivate_payload_send.connect("clicked", self.on_button_deactivate_payload_send_clicked)
+        self.button_deactivate_payload_cancel = self.builder.get_object("button_deactivate_payload_cancel")
+        #self.button_deactivate_payload_cancel.connect("clicked", self.on_button_deactivate_payload_cancel_clicked)
 
         #Key dialog
         self.dialog_password = self.builder.get_object("dialog_password")
@@ -352,12 +368,12 @@ class SpaceLabTransmitter:
         if sdr.transmit(samples, duration_s, sample_rate, int(carrier_frequency)):
             self.write_log("Activate Module transmitted to " + sat_json + " from" + callsign + " in " + carrier_frequency + " Hz with a gain of " + tx_gain + " dB")
         else:
-            self.write_log("Error transmitting a Deactivate Module telecommand!")
+            self.write_log("Error transmitting an Activate Module telecommand!")
 
-    def on_button_activate_send_clicked(self):
+    def on_button_activate_module_send_clicked(self):
         pass 
 
-    def on_button_activate_cancel_clicked(self):
+    def on_button_activate_module_cancel_clicked(self):
         self.dialog_activate_module.hide()
 
     def on_button_deactivate_module_clicked(self, button):
@@ -390,15 +406,22 @@ class SpaceLabTransmitter:
         sdr = USRP(int(self.entry_sample_rate.get_text()), int(tx_gain))
 
         if sdr.transmit(samples, duration_s, sample_rate, int(carrier_frequency)):
-            self.write_log("Activate Module transmitted to " + sat_json + " from" + callsign + " in " + carrier_frequency + " Hz with a gain of " + tx_gain + " dB")
+            self.write_log("Deactivate Module transmitted to " + sat_json + " from" + callsign + " in " + carrier_frequency + " Hz with a gain of " + tx_gain + " dB")
         else:
-            self.write_log("Error transmitting a Activate Module telecommand!")
+            self.write_log("Error transmitting a Deactivate Module telecommand!")
 
-    def on_button_deactivate_send_clicked(self):
+    def on_button_deactivate_module_send_clicked(self):
         pass 
 
-    def on_button_deactivate_cancel_clicked(self):
+    def on_button_deactivate_module_cancel_clicked(self):
         self.dialog_deactivate_module.hide()
+
+    def on_button_deactivate_payload_clicked(self):
+        pass
+
+    def on_button_activate_payload_clicked(self):
+        pass
+
 
     def on_button_erase_memory_clicked(self, button):
         callsign = self.entry_preferences_general_callsign.get_text()
