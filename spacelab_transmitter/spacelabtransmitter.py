@@ -83,6 +83,8 @@ _DEFAULT_COUNTRY                = 'Brazil'
 
 _DIR_CONFIG_DEFAULTJSON   = 'spacelab_transmitter.json'
 
+_KEY = "1234567812345678"
+
 #Defining logfile default local
 _DIR_CONFIG_LOGFILE_LINUX       = 'spacelab_transmitter'
 _DEFAULT_LOGFILE_PATH           = os.path.join(os.path.expanduser('~'), _DIR_CONFIG_LOGFILE_LINUX)
@@ -214,6 +216,23 @@ class SpaceLabTransmitter:
         self.button_broadcast_cancel = self.builder.get_object("button_broadcast_cancel")
         self.button_broadcast_cancel.connect("clicked", self.on_button_broadcast_cancel_clicked)
     
+        #Key dialog
+        self.dialog_password = self.builder.get_object("dialog_password")
+        self.entry_password = self.builder.get_object("entry_password")
+        self.button_password_send = self.builder.get_object("button_password_send")
+        self.button_password_send.connect("clicked", self.on_button_password_send_clicked)
+        self.button_password_cancel = self.builder.get_object("button_broadcast_cancel")
+        self.button_password_cancel.connect("clicked", self.on_button_password_cancel_clicked)
+        self.button_ok_password = self.builder.get_object("button_ok_password")
+        self.button_ok_password.connect("clicked", self.on_button_ok_password_clicked)
+  
+
+
+        self.dialog_incorrect_key = self.builder.get_object("dialog_incorrect_key")
+        self.button_key_ok = self.builder.get_object("button_key_ok")
+        self.button_key_ok.connect("clicked", self.on_button_key_ok_clicked)
+        
+
     def run(self):
         self.window.show_all()          
         Gtk.main()
@@ -495,8 +514,6 @@ class SpaceLabTransmitter:
     def on_button_force_reset_clicked(self, button):
         callsign = self.entry_preferences_general_callsign.get_text()
 
-        key = "1234567812345678"
-
         fr = ForceReset()
 
         pl = fr.generate(callsign, key)
@@ -505,7 +522,9 @@ class SpaceLabTransmitter:
 
         pkt = pngh.encode(pl)
 
-        sat_json = str()
+        label = "Force Reset"
+
+    """sat_json = str()
         if self.combobox_satellite.get_active() == 0:
             sat_json = 'FloripaSat-1'
         elif self.combobox_satellite.get_active() == 1:
@@ -523,7 +542,19 @@ class SpaceLabTransmitter:
         if sdr.transmit(samples, duration_s, sample_rate, int(carrier_frequency)):
             self.write_log("Force Reset transmitted to " + sat_json + " from" + callsign + " in " + carrier_frequency + " Hz with a gain of " + tx_gain + " dB")
         else:
-            self.write_log("Error transmitting a Force Reset telecommand!")
+            self.write_log("Error transmitting a Force Reset telecommand!")"""
+
+    def on_button_password_send_clicked(self, pkt, label, key):
+        if (key == _KEY):
+            self._transmit_tc(pkt, label)
+        else:
+            self.dialog_incorrect_key.run()
+
+    def on_button_password_cancel_clicked(self):
+        self.dialog_password.hide()
+    
+    def on_button_ok_password_clicked(self, key):
+        key = self.entry_password.get_text()
 
     def on_button_activate_module_clicked(self, button):
         callsign = self.entry_preferences_general_callsign.get_text()
@@ -671,6 +702,8 @@ class SpaceLabTransmitter:
 
         self._transmit_tc(pkt, "Broadcast Message")
         self.dialog_broadcast.hide()
+
+    #CODE REGARDING PREFERENCES 
 
     def on_button_preferences_clicked(self, button):
         response = self.dialog_preferences.run()
