@@ -34,19 +34,19 @@ class DeactivatePayload(Telecommand):
         """
         Constructor.
         """
-        super().__init__(0x46, "deactivate_payload")
+        super().__init__(0x48, "deactivate_payload")
     
-    def generate(self, src_adr, mod_id, key):
+    def generate(self, src_adr, pl_id, key):
         """
         Generates the telecommand's payload.
 
         :param: src_adr: is the callsign of the source (ASCII string).
-        :param: mod_id: is the ID of the payload to deactivate.
+        :param: pl_id: is the ID of the payload to deactivate.
         :param: key: is the telecommand key (ASCII string).
 
         :return: The generated payload as list of integers.
         """
-        pl = [self.get_id()] + self._prepare_callsign(src_adr) + [mod_id]
+        pl = [self.get_id()] + self._prepare_callsign(src_adr) + [pl_id]
 
         hashed = hmac.new(key.encode('utf-8'), bytes(pl), hashlib.sha1)
 
