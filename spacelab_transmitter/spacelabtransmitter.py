@@ -216,6 +216,23 @@ class SpaceLabTransmitter:
         self.button_broadcast_cancel = self.builder.get_object("button_broadcast_cancel")
         self.button_broadcast_cancel.connect("clicked", self.on_button_broadcast_cancel_clicked)
     
+
+        #Activate Module
+        self.dialog_activate_module = self.builder.get_object("dialog_activate_module")
+        self.entry_activate_id = self.builder.get_object("entry_activate_id")
+        self.button_activate_send = self.builder.get_object("button_activate_send")
+        self.button_activate_send.connect("clicked", self.on_button_activate_send_clicked)
+        self.button_activate_cancel = self.builder.get_object("button_activate_cancel")
+        self.button_activate_cancel.connect("clicked", self.on_button_activate_cancel_clicked)
+    
+        #Deactivate Module
+        self.dialog_deactivate_module = self.builder.get_object("dialog_deactivate_module")
+        self.entry_deactivate_id = self.builder.get_object("entry_deactivate_id")
+        self.button_deactivate_send = self.builder.get_object("button_deactivate_send")
+        self.button_deactivate_send.connect("clicked", self.on_button_deactivate_send_clicked)
+        self.button_deactivate_cancel = self.builder.get_object("button_deactivate_cancel")
+        self.button_deactivate_cancel.connect("clicked", self.on_button_deactivate_cancel_clicked)
+
         #Key dialog
         self.dialog_password = self.builder.get_object("dialog_password")
         self.entry_password = self.builder.get_object("entry_password")
@@ -226,8 +243,6 @@ class SpaceLabTransmitter:
         self.button_ok_password = self.builder.get_object("button_ok_password")
         self.button_ok_password.connect("clicked", self.on_button_ok_password_clicked)
   
-
-
         self.dialog_incorrect_key = self.builder.get_object("dialog_incorrect_key")
         self.button_key_ok = self.builder.get_object("button_key_ok")
         self.button_key_ok.connect("clicked", self.on_button_key_ok_clicked)
@@ -339,6 +354,12 @@ class SpaceLabTransmitter:
         else:
             self.write_log("Error transmitting a Deactivate Module telecommand!")
 
+    def on_button_activate_send_clicked(self):
+        pass 
+
+    def on_button_activate_cancel_clicked(self):
+        self.dialog_activate_module.hide()
+
     def on_button_deactivate_module_clicked(self, button):
         callsign = self.entry_preferences_general_callsign.get_text()
 
@@ -372,6 +393,12 @@ class SpaceLabTransmitter:
             self.write_log("Activate Module transmitted to " + sat_json + " from" + callsign + " in " + carrier_frequency + " Hz with a gain of " + tx_gain + " dB")
         else:
             self.write_log("Error transmitting a Activate Module telecommand!")
+
+    def on_button_deactivate_send_clicked(self):
+        pass 
+
+    def on_button_deactivate_cancel_clicked(self):
+        self.dialog_deactivate_module.hide()
 
     def on_button_erase_memory_clicked(self, button):
         callsign = self.entry_preferences_general_callsign.get_text()
@@ -555,6 +582,9 @@ class SpaceLabTransmitter:
     
     def on_button_ok_password_clicked(self, key):
         key = self.entry_password.get_text()
+
+    def on_button_key_ok_clicked(self):
+        self.dialog_incorrect_key.hide()
 
     def on_button_activate_module_clicked(self, button):
         callsign = self.entry_preferences_general_callsign.get_text()
