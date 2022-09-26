@@ -83,8 +83,6 @@ _DEFAULT_COUNTRY                = 'Brazil'
 
 _DIR_CONFIG_DEFAULTJSON   = 'spacelab_transmitter.json'
 
-_KEY = "1234567812345678"
-
 #Defining logfile default local
 _DIR_CONFIG_LOGFILE_LINUX       = 'spacelab_transmitter'
 _DEFAULT_LOGFILE_PATH           = os.path.join(os.path.expanduser('~'), _DIR_CONFIG_LOGFILE_LINUX)
@@ -105,6 +103,9 @@ class SpaceLabTransmitter:
         self._build_widgets()
         self.write_log("SpaceLab Transmitter initialized!")
         self._load_preferences()
+
+        self.pkt = []
+        self.label = ""
 
         #self.ngham = pyngham.PyNGHam()
         #self.decoded_packets_index = list()
@@ -216,6 +217,9 @@ class SpaceLabTransmitter:
         self.button_broadcast_cancel = self.builder.get_object("button_broadcast_cancel")
         self.button_broadcast_cancel.connect("clicked", self.on_button_broadcast_cancel_clicked)
     
+        #Force Reset
+        self.button_force_reset = self.builder.get_object("button_force_reset")
+        self.button_force_reset.connect("clicked", self.on_button_force_reset_clicked)
 
         #Activate Module
         self.dialog_activate_module = self.builder.get_object("dialog_activate_module")
@@ -256,8 +260,8 @@ class SpaceLabTransmitter:
         self.button_password_send.connect("clicked", self.on_button_password_send_clicked)
         self.button_password_cancel = self.builder.get_object("button_broadcast_cancel")
         self.button_password_cancel.connect("clicked", self.on_button_password_cancel_clicked)
-        self.button_ok_password = self.builder.get_object("button_ok_password")
-        self.button_ok_password.connect("clicked", self.on_button_ok_password_clicked)
+        #self.button_ok_password = self.builder.get_object("button_ok_password")
+        #self.button_ok_password.connect("clicked", self.on_button_ok_password_clicked)
   
         self.dialog_incorrect_key = self.builder.get_object("dialog_incorrect_key")
         self.button_key_ok = self.builder.get_object("button_key_ok")
@@ -562,17 +566,18 @@ class SpaceLabTransmitter:
             self.write_log("Error transmitting a Leave Hibernation telecommand!")
 
     def on_button_force_reset_clicked(self, button):
-        callsign = self.entry_preferences_general_callsign.get_text()
+        self.dialog_password.run()
+        callsign = self.entry_preferences_general_callsign.get_text() 
 
         fr = ForceReset()
-
+        key = self.entry_password.get_text()
         pl = fr.generate(callsign, key)
 
         pngh = PyNGHam()
 
-        pkt = pngh.encode(pl)
+        self.pkt = pngh.encode(pl)
 
-        label = "Force Reset"
+        self.label = "Force Reset"
 
     """sat_json = str()
         if self.combobox_satellite.get_active() == 0:
@@ -594,17 +599,12 @@ class SpaceLabTransmitter:
         else:
             self.write_log("Error transmitting a Force Reset telecommand!")"""
 
-    def on_button_password_send_clicked(self, pkt, label, key):
-        if (key == _KEY):
-            self._transmit_tc(pkt, label)
-        else:
-            self.dialog_incorrect_key.run()
+    def on_button_password_send_clicked(self, button):
+        print(self.pkt, self.label)
+        self._transmit_tc(self.pkt, self.label)
 
-    def on_button_password_cancel_clicked(self):
+    def on_button_password_cancel_clicked(self, button):
         self.dialog_password.hide()
-    
-    def on_button_ok_password_clicked(self, key):
-        key = self.entry_password.get_text()
 
     def on_button_key_ok_clicked(self):
         self.dialog_incorrect_key.hide()
@@ -739,7 +739,7 @@ class SpaceLabTransmitter:
             self.write_log("Error transmitting a " + tc_name + " telecommand!")
 
     def on_button_broadcast_cancel_clicked(self, button):
-        self.dialog_broadcast.hide
+        self.dialog_broadcast.hide()
 
     def on_button_broadcast_send_clicked(self, button):
         dst_adr = self.entry_dst_callsign.get_text()
