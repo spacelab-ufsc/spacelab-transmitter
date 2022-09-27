@@ -714,11 +714,10 @@ class SpaceLabTransmitter:
             self.write_log("Error transmitting a Get Payload Data telecommand!")
 
     def on_button_broadcast_message_clicked(self, button): 
-        response = self.dialog_preferences.run()
+        response = self.dialog_broadcast.run()
 
         if response == Gtk.ResponseType.DELETE_EVENT:
-            self._load_preferences()
-            self.dialog_preferences.hide()
+            self.dialog_broadcast.hide()
 
     def _transmit_tc(self, pkt, tc_name):
         sat_json = str()
