@@ -258,7 +258,7 @@ class SpaceLabTransmitter:
         self.entry_password = self.builder.get_object("entry_password")
         self.button_password_send = self.builder.get_object("button_password_send")
         self.button_password_send.connect("clicked", self.on_button_password_send_clicked)
-        self.button_password_cancel = self.builder.get_object("button_broadcast_cancel")
+        self.button_password_cancel = self.builder.get_object("button_password_cancel")
         self.button_password_cancel.connect("clicked", self.on_button_password_cancel_clicked)
         #self.button_ok_password = self.builder.get_object("button_ok_password")
         #self.button_ok_password.connect("clicked", self.on_button_ok_password_clicked)
@@ -714,7 +714,11 @@ class SpaceLabTransmitter:
             self.write_log("Error transmitting a Get Payload Data telecommand!")
 
     def on_button_broadcast_message_clicked(self, button): 
-        self.dialog_broadcast.run() 
+        response = self.dialog_preferences.run()
+
+        if response == Gtk.ResponseType.DELETE_EVENT:
+            self._load_preferences()
+            self.dialog_preferences.hide()
 
     def _transmit_tc(self, pkt, tc_name):
         sat_json = str()
