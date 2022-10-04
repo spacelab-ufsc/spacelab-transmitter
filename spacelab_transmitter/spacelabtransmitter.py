@@ -88,6 +88,26 @@ _DIR_CONFIG_LOGFILE_LINUX       = 'spacelab_transmitter'
 _DEFAULT_LOGFILE_PATH           = os.path.join(os.path.expanduser('~'), _DIR_CONFIG_LOGFILE_LINUX)
 _DEFAULT_LOGFILE                = 'logfile.csv'
 
+class DialogExample(Gtk.Dialog):
+    def __init__(self, parent):
+        super().__init__(title="My Dialog", transient_for=parent, flags=0)
+        self.add_buttons(
+            Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK
+        )
+
+        self.set_default_size(150, 100)
+
+        label = Gtk.Label(label="This is a dialog to display additional information")
+        self.entry_password = Gtk.Entry()
+
+        box = self.get_content_area()
+        box.add(label)
+        box.add(self.entry_password)
+        self.show_all()
+
+    def get_key(self):
+        return self.entry_password.get_text()
+
 class SpaceLabTransmitter:
 
     def __init__(self):
@@ -253,19 +273,6 @@ class SpaceLabTransmitter:
         self.button_deactivate_payload_cancel = self.builder.get_object("button_deactivate_payload_cancel")
         #self.button_deactivate_payload_cancel.connect("clicked", self.on_button_deactivate_payload_cancel_clicked)
 
-        #Key dialog
-        self.dialog_password = self.builder.get_object("dialog_password")
-        self.entry_password = self.builder.get_object("entry_password")
-        self.button_password_send = self.builder.get_object("button_password_send")
-        self.button_password_send.connect("clicked", self.on_button_password_send_clicked)
-        self.button_password_cancel = self.builder.get_object("button_password_cancel")
-        self.button_password_cancel.connect("clicked", self.on_button_password_cancel_clicked)
-        #self.button_ok_password = self.builder.get_object("button_ok_password")
-        #self.button_ok_password.connect("clicked", self.on_button_ok_password_clicked)
-  
-        self.dialog_incorrect_key = self.builder.get_object("dialog_incorrect_key")
-        self.button_key_ok = self.builder.get_object("button_key_ok")
-        self.button_key_ok.connect("clicked", self.on_button_key_ok_clicked)
         
 
     def run(self):
@@ -565,49 +572,39 @@ class SpaceLabTransmitter:
         else:
             self.write_log("Error transmitting a Leave Hibernation telecommand!")
 
-    def on_button_force_reset_clicked(self, button):
-        self.dialog_password.run()
-        callsign = self.entry_preferences_general_callsign.get_text() 
-
-        fr = ForceReset()
-        key = self.entry_password.get_text()
-        pl = fr.generate(callsign, key)
-
-        pngh = PyNGHam()
-
-        self.pkt = pngh.encode(pl)
-
-        self.label = "Force Reset"
-
-    """sat_json = str()
-        if self.combobox_satellite.get_active() == 0:
-            sat_json = 'FloripaSat-1'
-        elif self.combobox_satellite.get_active() == 1:
-            sat_json = 'GOLDS-UFSC'
-
-        carrier_frequency = self.entry_carrier_frequency.get_text()
-        tx_gain = self.spinbutton_tx_gain.get_text()
-
-        mod = GMSK(0.5, 1200)   # BT = 0.5, 1200 bps
-
-        samples, sample_rate, duration_s = mod.modulate(pkt, 1000)
-
-        sdr = USRP(int(self.entry_sample_rate.get_text()), int(tx_gain))
-
-        if sdr.transmit(samples, duration_s, sample_rate, int(carrier_frequency)):
-            self.write_log("Force Reset transmitted to " + sat_json + " from" + callsign + " in " + carrier_frequency + " Hz with a gain of " + tx_gain + " dB")
+    def on_button_force_reset_clicked(self, button_password_send):
+        #response = self.dialog_password.run()
+        dialog = DialogExample(self.window)
+        response = dialog.run()
+        if response == Gtk.ResponseType.OK:
+            callsign = self.entry_preferences_general_callsign.get_text()
+            fr = ForceReset()
+            key = dialog.get_key()
+            pl = fr.generate(callsign, key)
+            pngh = PyNGHam()
+            self.pkt = pngh.encode(pl)
+            self.label = "Force Reset"
+            self._transmit_tc(self.pkt, self.label)
+        elif response == Gtk.ResponseType.CANCEL:
+            dialog.destroy()
+        elif response == Gtk.ResponseType.DELETE_EVENT:
+            dialog.destroy()
         else:
-            self.write_log("Error transmitting a Force Reset telecommand!")"""
+            dialog.destroy()
 
-    def on_button_password_send_clicked(self, button):
+    def on_button_password_send_clicked(self, dialog_password):
+        #response = dialog_password.run()
+        dialog = DialogExample(self.window)
+        response = dialog.run()
+        if response == Gtk.ResponseType.OK:
+            print("The OK button was clicked")
+        elif response == Gtk.ResponseType.CANCEL:
+            print("The Cancel button was clicked")
         print(self.pkt, self.label)
         self._transmit_tc(self.pkt, self.label)
 
     def on_button_password_cancel_clicked(self, button):
-        self.dialog_password.hide()
-
-    def on_button_key_ok_clicked(self):
-        self.dialog_incorrect_key.hide()
+        self.dialog_password.destroy()
 
     def on_button_activate_module_clicked(self, button):
         callsign = self.entry_preferences_general_callsign.get_text()
