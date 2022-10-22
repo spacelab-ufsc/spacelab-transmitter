@@ -120,5 +120,5 @@ class DialogActivatePayload(Gtk.Dialog):
 
         self.show_all()
 
-    def get_deac_pl_id(self):
+    def get_ac_pl_id(self):
         return int(self.entry_activate_pl_id.get_text())

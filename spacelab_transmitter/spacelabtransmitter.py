@@ -450,7 +450,7 @@ class SpaceLabTransmitter:
                 callsign = self.entry_preferences_general_callsign.get_text()
                 fr = ActivatePayload()
                 key = dialog_password.get_key()
-                pl = fr.generate(callsign, dialog.get_deac_pl_id(),key) 
+                pl = fr.generate(callsign, dialog.get_ac_pl_id(),key) 
                 pngh = PyNGHam()
                 self.pkt = pngh.encode(pl)
                 self.label = "Activate Payload"
