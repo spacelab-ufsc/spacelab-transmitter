@@ -9,8 +9,11 @@ Spacelab Transmitter's documentation!
 .. toctree::
    :maxdepth: 2
 
-   Overview
-   Installation
-   packaging
+   overview
+   installation
+   usage_guide
+   telecommands
+   telecommands_transmissions
    logfile
-   telecommands_transmission
+   packaging
+   implementation

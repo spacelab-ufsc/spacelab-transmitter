@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     
-    <title>Telecommand Transmission</title>
+    <title>Telecommands Transmission</title>
     
 
     <link rel="stylesheet" href="_static/css/redactor.css" type="text/css" />
@@ -14,7 +14,9 @@
     
     <link rel="index" title="Index" href="genindex.html"/>
     <link rel="search" title="Search" href="search.html"/>
-    <link rel="top" title="Spacelab Transmitter  documentation" href="index.html"/> 
+    <link rel="top" title="Spacelab Transmitter  documentation" href="index.html"/>
+    <link rel="next" title="Logging System" href="logfile.html"/>
+    <link rel="prev" title="Telecommands" href="telecommands.html"/> 
 </head>
 
 <body role="document">
@@ -55,10 +57,19 @@
     <section class="site-nav">
     
     
-        <ul>
-<li class="toctree-l1"><a class="reference internal" href="Overview.html">Overview</a></li>
-<li class="toctree-l1"><a class="reference internal" href="packaging.html">Packaging the Project</a></li>
+        <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="telecommands.html">Telecommands</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Telecommands Transmission</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#introduction">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#gmsk-implementation">GMSK Implementation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#integration-with-usrp-sdr">Integration with USRP SDR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#references">References</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="logfile.html">Logging System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="packaging.html">Packaging the Project</a></li>
+<li class="toctree-l1"><a class="reference internal" href="implementation.html">Implementation</a></li>
 </ul>
 
     
@@ -88,24 +99,85 @@
             <a href="index.html">Docs</a> /
         </li>
         
-        <li class="site-breadcrumbs__leaf">Telecommand Transmission</li>
+        <li class="site-breadcrumbs__leaf">Telecommands Transmission</li>
     
     </ul>
 </nav>
         <section class="site-content">
             <div class="container">
                 
-  <div class="section" id="telecommand-transmission">
-<h1>Telecommand Transmission<a class="headerlink" href="#telecommand-transmission" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="telecommands-transmission">
+<h1>Telecommands Transmission<a class="headerlink" href="#telecommands-transmission" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="introduction">
 <h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
-<p>In order to not depend on another software to transmit telecommands, it was implemented a GMSK modulator in the code so that the Spacelab Transmitter works alone with the SDR.</p>
+<p>The Spacelab-Transmitter is the software for the Spacelab's Ground Station (GRS), it can transmit 14 telecommands as previously shown in the overview.</p>
+<p>In order to not depend on another software to transmit telecommands, it was implemented a GMSK modulator in the code so that the Spacelab Transmitter works alone with the Software-Defined Radio.</p>
+<p>The default Software-Defined Radio used in Spacelab is the USRP B210 so the code was written based in the integration with this specific SDR, and the modulation is the GMSK. In the code we have a class for USRP and for GMSK and also in every telecommand transmission function in the SpacelabTransmitter class we have implemented both of their codes.</p>
+<a class="reference internal image-reference" href="_images/usrp.png"><img alt="_images/usrp.png" src="_images/usrp.png" style="width: 500px;" /></a>
 </div>
 <div class="section" id="gmsk-implementation">
 <h2>GMSK Implementation<a class="headerlink" href="#gmsk-implementation" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="modulation-and-gmsk">
+<h3>Modulation and GMSK<a class="headerlink" href="#modulation-and-gmsk" title="Permalink to this headline">¶</a></h3>
+<p>In order transmit the data we need to modulate a carrier signal with the information, there are a lot of modulation schemes but the one used ins the Spacelab Trasnmitter is the GMSK, which means Gaussian Minimum Shift Keying.</p>
+<p>GMSK is a continuous phase scheme where there are no phase discontinuities so the carrier varies by the signal. We have a sinusoidal wave and before the modulation stage it is used a gaussian filter. In order to implement a GMSK modulator we can create a Non-Return-to-Zero (NRZ) squence, so that we have the frequency difference between the logical ones and zeros.</p>
+<a class="reference internal image-reference" href="_images/gmsk.png"><img alt="_images/gmsk.png" src="_images/gmsk.png" style="width: 350px;" /></a>
+<p>Image source: <a class="footnote-reference brackets" href="#id5" id="id1">1</a></p>
+<p><strong>GMSK Modulation Block Diagram:</strong> <a class="footnote-reference brackets" href="#id6" id="id2">2</a></p>
+<a class="reference internal image-reference" href="_images/gmsk_mod.png"><img alt="_images/gmsk_mod.png" src="_images/gmsk_mod.png" style="width: 500px;" /></a>
+<p><strong>In the code of the GMSK class:</strong></p>
+<p>The class have the following functions:</p>
+<ul class="simple">
+<li><p><strong>init</strong>, the constructor;</p></li>
+<li><p><strong>modulate</strong>, which modulates an integer stream using GMSK modulation;</p></li>
+<li><p><strong>get_iq</strong>, which computes the IQ data of the GMSK modulated signal;</p></li>
+<li><p><strong>modulate_time_domain</strong>, which generates the GMSK modulated signal in time domain;</p></li>
+<li><p><strong>_gaussian_lpf</strong>, which generates filter coefficients of Gaussian low pass filter (used in gmsk_mod);</p></li>
+<li><p><strong>_int_list_to_bit_list</strong>, which converts a integer list (bytes) to a bit list.</p></li>
+</ul>
+<p><strong>In the code of the telecommands transmission:</strong></p>
+<p>In all telecommands functions in the SpacelabTransmitter class we have the following line:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">mod</span> <span class="o">=</span> <span class="n">GMSK</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mi">1200</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Which means that we have bit period (BT) = 0.5 and the desired data rate in 1200 bps. BT and baudrate can be configured but in the example we have GOLDS-UFSC with those values depending on the communication link.</p>
+</div>
 </div>
 <div class="section" id="integration-with-usrp-sdr">
 <h2>Integration with USRP SDR<a class="headerlink" href="#integration-with-usrp-sdr" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="software-defined-radio">
+<h3>Software-Defined Radio<a class="headerlink" href="#software-defined-radio" title="Permalink to this headline">¶</a></h3>
+<p>The IEEE considers Software defined to be refered to the use of software processing within the radio
+system or device to implement operating (but not control) functions and Software-Defined Radio (SDR) a radio in which some or all of the physical layer functions are software
+defined. <a class="footnote-reference brackets" href="#id7" id="id3">3</a></p>
+<p>As said before,the SDR used in Spacelab transmissions to satellites is the USRP B210 and the modulation used is the GMSK.</p>
+</div>
+<div class="section" id="usrp">
+<h3>USRP<a class="headerlink" href="#usrp" title="Permalink to this headline">¶</a></h3>
+<p>Means Universal Software Radio Peripheral, it's a family os SDRs designed by the Ettus Research and NI. The B210 has a continuous frequency coverage from 70 MHz to 6 GHz <a class="footnote-reference brackets" href="#id8" id="id4">4</a>, which covers the frequencies used by the Spacelab's satellites.</p>
+</div>
+</div>
+<div class="section" id="references">
+<h2>References<a class="headerlink" href="#references" title="Permalink to this headline">¶</a></h2>
+<p>Viswanathan, Mathuranathan. <strong>Digital Modulations Using Python</strong>. 1st ed., vol. 1, Independently published, 2019.</p>
+<p>Turletti, Thierry. (1996). <strong>GMSK in a nutshell</strong>.</p>
+<dl class="footnote brackets">
+<dt class="label" id="id5"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
+<dd><p><a class="reference external" href="https://www.electronics-notes.com/articles/radio/modulation/what-is-gmsk-gaussian-minimum-shift-keying.php">https://www.electronics-notes.com/articles/radio/modulation/what-is-gmsk-gaussian-minimum-shift-keying.php</a></p>
+</dd>
+<dt class="label" id="id6"><span class="brackets"><a class="fn-backref" href="#id2">2</a></span></dt>
+<dd><p>Turletti, Thierry &amp; Bentzen, H.J. &amp; Tennenhouse, David. (1999). Toward the software realization of a GSM base station. Selected Areas in Communications, IEEE Journal on. 17. 603 - 612. 10.1109/49.761039.</p>
+</dd>
+<dt class="label" id="id7"><span class="brackets"><a class="fn-backref" href="#id3">3</a></span></dt>
+<dd><p>IEEE Project 1900.1 - Standard Definitions and Concepts for Dynamic Spectrum Access: Terminology Relating to Emerging Wireless Networks, System Functionality, and Spectrum Management <a class="reference external" href="https://standards.ieee.org/develop/project/1900.1.html">https://standards.ieee.org/develop/project/1900.1.html</a>.</p>
+</dd>
+<dt class="label" id="id8"><span class="brackets"><a class="fn-backref" href="#id4">4</a></span></dt>
+<dd><p><a class="reference external" href="https://www.ettus.com/all-products/ub210-kit/">https://www.ettus.com/all-products/ub210-kit/</a></p>
+</dd>
+<dt class="label" id="id9"><span class="brackets">5</span></dt>
+<dd><p><a class="reference external" href="https://pysdr.org/content/usrp.html">https://pysdr.org/content/usrp.html</a></p>
+</dd>
+</dl>
 </div>
 </div>
 
@@ -114,6 +186,21 @@
 
         </section>
 
+        
+            <nav class="site-bottom-navigation" role="navigation">
+            
+                <a href="logfile.html" class="btn btn--primary btn--next right"
+                    title="Logging System" accesskey="n">
+                    Next
+                </a>
+            
+            
+                <a href="telecommands.html" class="btn btn--primary btn--prev"
+                    title="Telecommands" accesskey="p">
+                    Previous
+                </a>
+            
+            </nav>
         
 
         

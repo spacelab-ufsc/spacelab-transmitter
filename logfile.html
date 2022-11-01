@@ -15,7 +15,8 @@
     <link rel="index" title="Index" href="genindex.html"/>
     <link rel="search" title="Search" href="search.html"/>
     <link rel="top" title="Spacelab Transmitter  documentation" href="index.html"/>
-    <link rel="prev" title="Packaging the Project" href="packaging.html"/> 
+    <link rel="next" title="Packaging the Project" href="packaging.html"/>
+    <link rel="prev" title="Telecommands Transmission" href="telecommands_transmissions.html"/> 
 </head>
 
 <body role="document">
@@ -57,12 +58,15 @@
     
     
         <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="Overview.html">Overview</a></li>
-<li class="toctree-l1"><a class="reference internal" href="packaging.html">Packaging the Project</a></li>
+<li class="toctree-l1"><a class="reference internal" href="overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="telecommands.html">Telecommands</a></li>
+<li class="toctree-l1"><a class="reference internal" href="telecommands_transmissions.html">Telecommands Transmission</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Logging System</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#operation">Operation</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="packaging.html">Packaging the Project</a></li>
+<li class="toctree-l1"><a class="reference internal" href="implementation.html">Implementation</a></li>
 </ul>
 
     
@@ -104,8 +108,8 @@
 <p>The Logging System of the Spacelab Transmitter shows the events performed in the software - such as when a telecommand was executed - and their respective date and time.</p>
 <div class="section" id="operation">
 <h2>Operation<a class="headerlink" href="#operation" title="Permalink to this headline">¶</a></h2>
-<p>The logfile is automatically generated inside a default folder in the user home page in the archives called &quot;spacelab_transmitter&quot;. It is a .csv file displaying date and time on one column and the event on the other one.</p>
-<p>Future updating includes an option to choose the file folder.</p>
+<p>The logfile is automatically generated inside a default folder in the user home page in the archives called &quot;spacelab_transmitter&quot;, but in the preferences of the software the user can choose in which folder to save the file.</p>
+<p>The generated archive is a .csv file displaying date and time on one column and the event on the other one. The event can be a successfull transmission, an error or even the software startup.</p>
 </div>
 </div>
 
@@ -117,9 +121,14 @@
         
             <nav class="site-bottom-navigation" role="navigation">
             
+                <a href="packaging.html" class="btn btn--primary btn--next right"
+                    title="Packaging the Project" accesskey="n">
+                    Next
+                </a>
             
-                <a href="packaging.html" class="btn btn--primary btn--prev"
-                    title="Packaging the Project" accesskey="p">
+            
+                <a href="telecommands_transmissions.html" class="btn btn--primary btn--prev"
+                    title="Telecommands Transmission" accesskey="p">
                     Previous
                 </a>
             

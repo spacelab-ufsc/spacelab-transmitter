@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+    <meta charset="utf-8">
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    
+    <title>Implementation</title>
+    
+
+    <link rel="stylesheet" href="_static/css/redactor.css" type="text/css" />
+    
+    
+    <link rel="index" title="Index" href="genindex.html"/>
+    <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="Spacelab Transmitter  documentation" href="index.html"/>
+    <link rel="prev" title="Packaging the Project" href="packaging.html"/> 
+</head>
+
+<body role="document">
+     
+
+    
+<a href="#" id="js-navigation-toggle" class="navigation-toggle">
+    <i class="mdi mdi-menu"></i><i class="mdi mdi-close"></i>
+</a>
+
+<section class="site-sidebar">
+
+<nav>
+
+
+    <a href="index.html" class="branding-link">
+    
+        Spacelab Transmitter
+    
+    
+    
+        
+        
+    
+    </a>
+
+    
+<section role="search">
+    <form action="search.html" method="get" class="site-searchform">
+        <input type="text" name="q" placeholder="Search docs" />
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+      </form>
+</section>
+
+
+
+    <section class="site-nav">
+    
+    
+        <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="telecommands.html">Telecommands</a></li>
+<li class="toctree-l1"><a class="reference internal" href="telecommands_transmissions.html">Telecommands Transmission</a></li>
+<li class="toctree-l1"><a class="reference internal" href="logfile.html">Logging System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="packaging.html">Packaging the Project</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Implementation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#telecommands-code">Telecommands Code</a></li>
+</ul>
+</li>
+</ul>
+
+    
+    </section>
+
+</nav>
+
+</section>
+
+    <main class="site-main" role="main">
+        
+
+
+
+
+
+
+
+
+
+
+
+<nav class="site-breadcrumbs">
+    <ul>
+    
+        <li>
+            <a href="index.html">Docs</a> /
+        </li>
+        
+        <li class="site-breadcrumbs__leaf">Implementation</li>
+    
+    </ul>
+</nav>
+        <section class="site-content">
+            <div class="container">
+                
+  <div class="section" id="implementation">
+<h1>Implementation<a class="headerlink" href="#implementation" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="telecommands-code">
+<h2>Telecommands Code<a class="headerlink" href="#telecommands-code" title="Permalink to this headline">¶</a></h2>
+<p>The Spacelab Transmitter has a generic telecommand class with these functions:</p>
+<ul class="simple">
+<li><p><strong>generate</strong>: which generate the telecommand payload;</p></li>
+<li><p><strong>set_id</strong>: which sets a new ID for the telecommand;</p></li>
+<li><p><strong>get_id</strong>: which gets the ID of the telecommand;</p></li>
+<li><p><strong>set_name</strong>: which sets a new name for the telecommand;</p></li>
+<li><p><strong>get_name</strong>: which gets the name of the telecommand;</p></li>
+<li><p><strong>_prepare_callsign</strong>: which prepares a callsign for a transmission.</p></li>
+</ul>
+<p>Each telecommand has its own class with the Telecommand class working as a &quot;superclass&quot; with 14 telecommands classes working as &quot;subclasses&quot; (this process is called &quot;inheritance&quot; in object-oriented programming).</p>
+<div class="section" id="usrp-integration">
+<h3>USRP Integration<a class="headerlink" href="#usrp-integration" title="Permalink to this headline">¶</a></h3>
+<p>The USRP hardware driver (UHD) is the driver provided to the USRP radios. Since the Spacelab Transmitter code is in Python, it's necessary to install UHD and Python API and test them <a href="#id2"><span class="problematic" id="id1">[5]_</span></a>.</p>
+<p>The folder has a specific file for usrp class, where it has a constructor function and the transmit function. To transmit it's necessary to have the:</p>
+<ul class="simple">
+<li><p>samples;</p></li>
+<li><p>duration;</p></li>
+<li><p>center frequency;</p></li>
+<li><p>sample rate;</p></li>
+<li><p>gain.</p></li>
+</ul>
+<p><strong>In the code of the usrp class:</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">samples</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">resample_poly</span><span class="p">(</span><span class="n">samples</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sample_rate</span><span class="p">,</span> <span class="n">rate</span><span class="p">)</span>
+<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_usrp</span><span class="o">.</span><span class="n">send_waveform</span><span class="p">(</span><span class="n">samples</span><span class="p">,</span> <span class="n">dur</span><span class="p">,</span> <span class="n">freq</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sample_rate</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gain</span><span class="p">):</span>
+   <span class="k">return</span> <span class="kc">True</span>
+<span class="k">else</span><span class="p">:</span>
+   <span class="k">return</span> <span class="kc">False</span>
+</pre></div>
+</div>
+<p>And the true/false return is for if it was successfull or not.</p>
+<p><strong>In the code of the telecommands transmission:</strong></p>
+<p>The previous parameters are set in the software and the code extracts the user inputs from the UI (GTK) to assign to the usrp values.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">carrier_frequency</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">entry_carrier_frequency</span><span class="o">.</span><span class="n">get_text</span><span class="p">()</span>
+
+<span class="n">tx_gain</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">spinbutton_tx_gain</span><span class="o">.</span><span class="n">get_text</span><span class="p">()</span>
+
+<span class="n">samples</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="n">duration_s</span> <span class="o">=</span> <span class="n">mod</span><span class="o">.</span><span class="n">modulate</span><span class="p">(</span><span class="n">pkt</span><span class="p">,</span> <span class="mi">1000</span><span class="p">)</span>
+
+<span class="n">sdr</span> <span class="o">=</span> <span class="n">USRP</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">entry_sample_rate</span><span class="o">.</span><span class="n">get_text</span><span class="p">()),</span> <span class="nb">int</span><span class="p">(</span><span class="n">tx_gain</span><span class="p">))</span>
+
+<span class="k">if</span> <span class="n">sdr</span><span class="o">.</span><span class="n">transmit</span><span class="p">(</span><span class="n">samples</span><span class="p">,</span> <span class="n">duration_s</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">carrier_frequency</span><span class="p">)):</span>
+   <span class="bp">self</span><span class="o">.</span><span class="n">write_log</span><span class="p">(</span><span class="s2">&quot;Set Parameter transmitted to &quot;</span> <span class="o">+</span> <span class="n">sat_json</span> <span class="o">+</span> <span class="s2">&quot; from&quot;</span> <span class="o">+</span> <span class="n">callsign</span> <span class="o">+</span> <span class="s2">&quot; in &quot;</span> <span class="o">+</span> <span class="n">carrier_frequency</span> <span class="o">+</span> <span class="s2">&quot; Hz with a gain of &quot;</span> <span class="o">+</span> <span class="n">tx_gain</span> <span class="o">+</span> <span class="s2">&quot; dB&quot;</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+   <span class="bp">self</span><span class="o">.</span><span class="n">write_log</span><span class="p">(</span><span class="s2">&quot;Error transmitting a Set Parameter telecommand!&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+
+
+            </div>
+
+        </section>
+
+        
+            <nav class="site-bottom-navigation" role="navigation">
+            
+            
+                <a href="packaging.html" class="btn btn--primary btn--prev"
+                    title="Packaging the Project" accesskey="p">
+                    Previous
+                </a>
+            
+            </nav>
+        
+
+        
+            <div class="source-link">
+            
+                
+                    <a href="_sources/implementation.rst.txt" rel="nofollow">
+                        <i class="mdi mdi-code-tags"></i>
+                        View page source
+                    </a>
+                
+            
+            </div>
+        
+
+
+
+    </main>
+
+    <footer class="site-footer">
+<div class="container">
+
+    <div role="contentinfo">
+        <p>
+                &copy; Copyright 2022, Vitoria Beatriz Bianchin.
+        </p>
+    </div>
+        <p>Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+        <a href="https://github.com/testthedocs/sphinx_ttd_theme">theme</a>
+        provided by <a href="https://testthedocs">TestTheDocs</a>. 
+
+</div>
+</footer>
+
+    
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'',
+            VERSION:'',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <script type="text/javascript" src="_static/js/theme-min.js"></script> 
+</body>
+</html>

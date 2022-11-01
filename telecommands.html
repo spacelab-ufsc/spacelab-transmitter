@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+    <meta charset="utf-8">
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    
+    <title>Telecommands</title>
+    
+
+    <link rel="stylesheet" href="_static/css/redactor.css" type="text/css" />
+    
+    
+    <link rel="index" title="Index" href="genindex.html"/>
+    <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="Spacelab Transmitter  documentation" href="index.html"/>
+    <link rel="next" title="Telecommands Transmission" href="telecommands_transmissions.html"/>
+    <link rel="prev" title="&lt;no title&gt;" href="installation.html"/> 
+</head>
+
+<body role="document">
+     
+
+    
+<a href="#" id="js-navigation-toggle" class="navigation-toggle">
+    <i class="mdi mdi-menu"></i><i class="mdi mdi-close"></i>
+</a>
+
+<section class="site-sidebar">
+
+<nav>
+
+
+    <a href="index.html" class="branding-link">
+    
+        Spacelab Transmitter
+    
+    
+    
+        
+        
+    
+    </a>
+
+    
+<section role="search">
+    <form action="search.html" method="get" class="site-searchform">
+        <input type="text" name="q" placeholder="Search docs" />
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+      </form>
+</section>
+
+
+
+    <section class="site-nav">
+    
+    
+        <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="overview.html">Overview</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Telecommands</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#introduction">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#available-telecommands">Available Telecommands</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#authentication">Authentication</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#structure-of-the-packets">Structure of the packets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="telecommands_transmissions.html">Telecommands Transmission</a></li>
+<li class="toctree-l1"><a class="reference internal" href="logfile.html">Logging System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="packaging.html">Packaging the Project</a></li>
+<li class="toctree-l1"><a class="reference internal" href="implementation.html">Implementation</a></li>
+</ul>
+
+    
+    </section>
+
+</nav>
+
+</section>
+
+    <main class="site-main" role="main">
+        
+
+
+
+
+
+
+
+
+
+
+
+<nav class="site-breadcrumbs">
+    <ul>
+    
+        <li>
+            <a href="index.html">Docs</a> /
+        </li>
+        
+        <li class="site-breadcrumbs__leaf">Telecommands</li>
+    
+    </ul>
+</nav>
+        <section class="site-content">
+            <div class="container">
+                
+  <div class="section" id="telecommands">
+<h1>Telecommands<a class="headerlink" href="#telecommands" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
+<p>The Spacelab-Transmitter has 14 available telecommands that interact with the lab's satellites, two of them are classified as public, that can be transmitted by any amateur radio. In the next section, these telecommands are described.</p>
+</div>
+<div class="section" id="available-telecommands">
+<h2>Available Telecommands<a class="headerlink" href="#available-telecommands" title="Permalink to this headline">¶</a></h2>
+<p>The table below lists all the 14 available telecommands, including their IDs, size and type of telecommand. In the next sections, each telecommand is described.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 21%" />
+<col style="width: 5%" />
+<col style="width: 50%" />
+<col style="width: 15%" />
+<col style="width: 9%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Telecommand</p></th>
+<th class="head"><p>ID</p></th>
+<th class="head"><p>Content</p></th>
+<th class="head"><p>Size (bytes)</p></th>
+<th class="head"><p>Type</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Ping Request</p></td>
+<td><p>40h</p></td>
+<td><p>None</p></td>
+<td><p>8</p></td>
+<td><p>Public</p></td>
+</tr>
+<tr class="row-odd"><td><p>Data Request</p></td>
+<td><p>41h</p></td>
+<td><p>Data ID + Start ts. + End ts. + Hash</p></td>
+<td><p>37</p></td>
+<td><p>Private</p></td>
+</tr>
+<tr class="row-even"><td><p>Broadcast Message</p></td>
+<td><p>42h</p></td>
+<td><p>Dst. callsign + message</p></td>
+<td><p>15 to 53</p></td>
+<td><p>Public</p></td>
+</tr>
+<tr class="row-odd"><td><p>Enter Hibernation</p></td>
+<td><p>43h</p></td>
+<td><p>Hibernation in hours + Hash</p></td>
+<td><p>30</p></td>
+<td><p>Private</p></td>
+</tr>
+<tr class="row-even"><td><p>Leave Hibernation</p></td>
+<td><p>44h</p></td>
+<td><p>Hash</p></td>
+<td><p>28</p></td>
+<td><p>Private</p></td>
+</tr>
+<tr class="row-odd"><td><p>Activate Module</p></td>
+<td><p>45h</p></td>
+<td><p>Module ID + Hash</p></td>
+<td><p>29</p></td>
+<td><p>Private</p></td>
+</tr>
+<tr class="row-even"><td><p>Deactivate Module</p></td>
+<td><p>46h</p></td>
+<td><p>Module ID + Hash</p></td>
+<td><p>29</p></td>
+<td><p>Private</p></td>
+</tr>
+<tr class="row-odd"><td><p>Activate Payload</p></td>
+<td><p>47h</p></td>
+<td><p>Payload ID + Hash</p></td>
+<td><p>29</p></td>
+<td><p>Private</p></td>
+</tr>
+<tr class="row-even"><td><p>Deactivate Payload</p></td>
+<td><p>48h</p></td>
+<td><p>Payload ID + Hash</p></td>
+<td><p>29</p></td>
+<td><p>Private</p></td>
+</tr>
+<tr class="row-odd"><td><p>Erase Memory</p></td>
+<td><p>49h</p></td>
+<td><p>Hash</p></td>
+<td><p>28</p></td>
+<td><p>Private</p></td>
+</tr>
+<tr class="row-even"><td><p>Force Reset</p></td>
+<td><p>4Ah</p></td>
+<td><p>Hash</p></td>
+<td><p>28</p></td>
+<td><p>Private</p></td>
+</tr>
+<tr class="row-odd"><td><p>Get Payload Data</p></td>
+<td><p>4Bh</p></td>
+<td><p>Payload ID + Args. + Hash</p></td>
+<td><p>41</p></td>
+<td><p>Private</p></td>
+</tr>
+<tr class="row-even"><td><p>Set Parameter</p></td>
+<td><p>4Ch</p></td>
+<td><p>Subsystem ID + Param. ID + Param. value + Hash</p></td>
+<td><p>34</p></td>
+<td><p>Private</p></td>
+</tr>
+<tr class="row-odd"><td><p>Get Parameter</p></td>
+<td><p>4Dh</p></td>
+<td><p>Subsystem ID + Parameter ID + Hash</p></td>
+<td><p>30</p></td>
+<td><p>Private</p></td>
+</tr>
+</tbody>
+</table>
+<div class="section" id="ping-request">
+<h3>Ping Request<a class="headerlink" href="#ping-request" title="Permalink to this headline">¶</a></h3>
+<p>The ping request telecommand is a simple command to test the communication with the satellite. When the satellite receives a ping packet, it will respond with another ping packet (with another packet ID, as defined in the downlink packets list). There are no additional parameters in the ping packet, just the packet ID and the source callsign (or address). It is also a public telecommand, anyone can send a ping request telecommand to a satellite.</p>
+</div>
+<div class="section" id="data-request">
+<h3>Data Request<a class="headerlink" href="#data-request" title="Permalink to this headline">¶</a></h3>
+<p>The data request telecommand is a command to download data from the satellite. This command allows a ground station to get specific parameters from a given period (stored in the non-volatile memory of the onboard computer of the satellite). The list of possible parameters varies according to the satellite. The required fields of this telecommand are the parameter ID (1 byte), the start period in milliseconds (epoch, 4 bytes), and the end period in milliseconds (epoch, 4 bytes). This is a private telecommand, and a key is required to send it.</p>
+</div>
+<div class="section" id="bloadcast-message">
+<h3>Bloadcast Message<a class="headerlink" href="#bloadcast-message" title="Permalink to this headline">¶</a></h3>
+<p>The &quot;broadcast message&quot; is another public telecommand, no authentication or key is required to send this telecommand to a satellite. This command has the purpose of making a satellite transmit a custom message back to Earth. This can be useful for communication tasks, like a station sending data to another. There are two parameters in this telecommand: the destination callsign (or address), and the content of the message, which can be any sequence of ASCII characters or any byte value. There is a limit of 38 characters in the message field.</p>
+</div>
+<div class="section" id="enter-hibernation">
+<h3>Enter Hibernation<a class="headerlink" href="#enter-hibernation" title="Permalink to this headline">¶</a></h3>
+<p>This telecommand activates the hibernation mode in a satellite. During the hibernation mode, no transmissions are made by the satellite, it keeps just listening for new incoming packets (reception). The satellite will stay in hibernation mode for a custom period (1 to 65536 minutes), or until a &quot;Leave Hibernation&quot; mode is received. This is a private telecommand, a key is required to send it. Beyond the packet ID and the source callsign (or address), the number o minutes (2 bytes long) is also transmitted.</p>
+</div>
+<div class="section" id="leave-hibernation">
+<h3>Leave Hibernation<a class="headerlink" href="#leave-hibernation" title="Permalink to this headline">¶</a></h3>
+<p>This telecommand complements the &quot;enter hibernation&quot; telecommand by deactivating the hibernation mode in the satellite. When a satellite receives this telecommand it enables the transmission again immediatly. This is also a private telecommand, a specific key is required to send it. There is no additional content to this telecommand packet, just the packet ID and the source callsign (or address).</p>
+</div>
+<div class="section" id="activate-module">
+<h3>Activate Module<a class="headerlink" href="#activate-module" title="Permalink to this headline">¶</a></h3>
+<p>The &quot;Activate Module&quot; telecommand is a command to activate a internal module of the satellite. Each module has a unique ID that is passed as an argument of this telecommand's packet. The table below shows the current used IDs.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 57%" />
+<col style="width: 43%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p><strong>Module</strong></p></th>
+<th class="head"><p><strong>ID Number</strong></p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Battery heater</p></td>
+<td><p>1</p></td>
+</tr>
+<tr class="row-odd"><td><p>Beacon</p></td>
+<td><p>2</p></td>
+</tr>
+<tr class="row-even"><td><p>Periodic telemetry</p></td>
+<td><p>3</p></td>
+</tr>
+</tbody>
+</table>
+<p>This is also a private telecommand, and a key is required to transmit it.</p>
+</div>
+<div class="section" id="deactivate-module">
+<h3>Deactivate Module<a class="headerlink" href="#deactivate-module" title="Permalink to this headline">¶</a></h3>
+<p>The &quot;Deactivate Module&quot; telecommand complements the telecommand above and works the same way and with the same parameters, but in this case, has the purpose of deactivating a given module of the satellite.</p>
+</div>
+<div class="section" id="activate-payload">
+<h3>Activate Payload<a class="headerlink" href="#activate-payload" title="Permalink to this headline">¶</a></h3>
+<p>This telecommand is similar to the telecommand &quot;Activate Module&quot;, but in this case is used for activate payloads of the satellite. Each satellite will have a list of IDs of the set of payloads.</p>
+<p>This is also a private telecommand and a key is required to transmit it.</p>
+</div>
+<div class="section" id="deactivate-payload">
+<h3>Deactivate Payload<a class="headerlink" href="#deactivate-payload" title="Permalink to this headline">¶</a></h3>
+<p>Same as the &quot;Deativate Module&quot; telecommand, but for payloads.</p>
+</div>
+<div class="section" id="erase-memory">
+<h3>Erase Memory<a class="headerlink" href="#erase-memory" title="Permalink to this headline">¶</a></h3>
+<p>The telecommand &quot;erase memory&quot; erases all the content presented in the non-volatile memories of the onboard computer of a satellite. This is a private command, and a key is required to send it. No additional content is required in a erase memory telecommand packet, just the packet ID and the source callsign (or address).</p>
+</div>
+<div class="section" id="force-reset">
+<h3>Force Reset<a class="headerlink" href="#force-reset" title="Permalink to this headline">¶</a></h3>
+<p>This telecommand performs a general reset of the satellite. When received, the satellite reset all subsystems. This is a private telecommand, and a key is required to send this command to a satellite. There is no additional content in this packet, just the packet ID and the source callsign (or address).</p>
+</div>
+<div class="section" id="get-payload-data">
+<h3>Get Payload Data<a class="headerlink" href="#get-payload-data" title="Permalink to this headline">¶</a></h3>
+<p>This telecommand allows a ground station to download data from a specific payload of the satellite. The required fields are the payload ID, and optionally, arguments to be passed to the payload. The IDs and arguments vary according to the satellite. This is a private telecommand, and a key is required to send it.</p>
+</div>
+<div class="section" id="set-parameter">
+<h3>Set Parameter<a class="headerlink" href="#set-parameter" title="Permalink to this headline">¶</a></h3>
+<p>This telecommand allows the configuration of specific parameters of a given subsystem of the satellite. The required fields are the ID of the subsystem to set (1 byte), the ID of the parameter to set (1 byte), and the new value of the parameter (4 bytes long). The possible IDs (subsystem and parameter) vary according to the satellite. This is a private telecommand, and a key is required to send it.</p>
+</div>
+<div class="section" id="get-parameter">
+<h3>Get Parameter<a class="headerlink" href="#get-parameter" title="Permalink to this headline">¶</a></h3>
+<p>The telecommand &quot;Get Parameter&quot; complements the &quot;Set Parameter&quot; telecommand. It has the purpose of reading specific parameters of a given subsystem. The required fields are the subsystem's ID (1 byte) and the parameter ID (1 byte). The possible IDs (subsystem and parameter) vary according to the satellite. This is a private telecommand, and a key is required to send it.</p>
+</div>
+</div>
+<div class="section" id="authentication">
+<h2>Authentication<a class="headerlink" href="#authentication" title="Permalink to this headline">¶</a></h2>
+<p>All the telecommands classified as private use an HMAC authentication scheme. Every type of private telecommand has a unique 16-digit ASCII character key that with the telecommand sequence (or message) generates an 160-bits (20-bytes) hash sequence to be transmitted together with the packet payload. The used hash algorithm is the SHA-1. <a class="footnote-reference brackets" href="#id6" id="id1">3</a>. The below illustrates this authentication method.</p>
+<a class="reference internal image-reference" href="_images/hmac.png"><img alt="_images/hmac.png" src="_images/hmac.png" style="width: 500px;" /></a>
+</div>
+<div class="section" id="structure-of-the-packets">
+<h2>Structure of the packets<a class="headerlink" href="#structure-of-the-packets" title="Permalink to this headline">¶</a></h2>
+<p>Every package payload countains its ID (1 byte), the source callsign (source address of the ground station, 7 bytes) and the package content (data, up to 212 bytes). This last one can either have none or many parameters depending on the function of the telecommand.</p>
+<p>The used communication protocol is a python variation of the NGHam <a class="footnote-reference brackets" href="#id4" id="id2">1</a>: the PyNGHam <a class="footnote-reference brackets" href="#id5" id="id3">2</a>.</p>
+<a class="reference internal image-reference" href="_images/ngham.png"><img alt="_images/ngham.png" src="_images/ngham.png" style="width: 300px;" /></a>
+</div>
+<div class="section" id="references">
+<h2>References<a class="headerlink" href="#references" title="Permalink to this headline">¶</a></h2>
+<dl class="footnote brackets">
+<dt class="label" id="id4"><span class="brackets"><a class="fn-backref" href="#id2">1</a></span></dt>
+<dd><p><a class="reference external" href="https://github.com/skagmo/ngham">https://github.com/skagmo/ngham</a></p>
+</dd>
+<dt class="label" id="id5"><span class="brackets"><a class="fn-backref" href="#id3">2</a></span></dt>
+<dd><p><a class="reference external" href="https://github.com/mgm8/pyngham">https://github.com/mgm8/pyngham</a></p>
+</dd>
+<dt class="label" id="id6"><span class="brackets"><a class="fn-backref" href="#id1">3</a></span></dt>
+<dd><p><a class="reference external" href="https://github.com/spacelab-ufsc/floripasat2-doc">https://github.com/spacelab-ufsc/floripasat2-doc</a></p>
+</dd>
+</dl>
+</div>
+</div>
+
+
+            </div>
+
+        </section>
+
+        
+            <nav class="site-bottom-navigation" role="navigation">
+            
+                <a href="telecommands_transmissions.html" class="btn btn--primary btn--next right"
+                    title="Telecommands Transmission" accesskey="n">
+                    Next
+                </a>
+            
+            
+                <a href="installation.html" class="btn btn--primary btn--prev"
+                    title="&lt;no title&gt;" accesskey="p">
+                    Previous
+                </a>
+            
+            </nav>
+        
+
+        
+            <div class="source-link">
+            
+                
+                    <a href="_sources/telecommands.rst.txt" rel="nofollow">
+                        <i class="mdi mdi-code-tags"></i>
+                        View page source
+                    </a>
+                
+            
+            </div>
+        
+
+
+
+    </main>
+
+    <footer class="site-footer">
+<div class="container">
+
+    <div role="contentinfo">
+        <p>
+                &copy; Copyright 2022, Vitoria Beatriz Bianchin.
+        </p>
+    </div>
+        <p>Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+        <a href="https://github.com/testthedocs/sphinx_ttd_theme">theme</a>
+        provided by <a href="https://testthedocs">TestTheDocs</a>. 
+
+</div>
+</footer>
+
+    
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'',
+            VERSION:'',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <script type="text/javascript" src="_static/js/theme-min.js"></script> 
+</body>
+</html>
