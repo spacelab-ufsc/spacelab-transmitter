@@ -41,6 +41,9 @@ from spacelab_transmitter.tc_force_reset import ForceReset
 from spacelab_transmitter.tc_get_payload_data import GetPayloadData
 from spacelab_transmitter.tc_data_request import DataRequest
 from spacelab_transmitter.tc_get_parameter import GetParameter
+from spacelab_transmitter.tc_get_parameter import GetParameter
+from spacelab_transmitter.tc_activate_payload import ActivatePayload
+from spacelab_transmitter.tc_deactivate_payload import DeactivatePayload
 
 def test_tc_ping():
     x = Ping()
@@ -366,5 +369,50 @@ def test_tc_get_parameter():
         res = x.generate(src_adr, subsys_id, param_id, key)
         assert res == exp_pl + list(hashed.digest())
 
+def test_tc_activate_payload():
+    x = ActivatePayload()
 
+    for i in range(100):
+        #Callsign and conversion
+        src_adr = ''.join(random.choice(string.ascii_uppercase) for j in range(random.randint(1, 7)))
+        src_adr_as_list = [ord(j) for j in src_adr]
+        spaces = (7 - len(src_adr)) * [ord(" ")]
 
+        #Random id
+        pl_id = random.randint(0, 255)
+
+        # Random key
+        key = ''.join(random.choice(string.ascii_uppercase) for j in range(16))
+
+        exp_pl = [0x47] + spaces + src_adr_as_list + [pl_id] 
+
+        #hash
+        hashed = hmac.new(key.encode('utf-8'), bytes(exp_pl), hashlib.sha1)
+
+        #generate 
+        res = x.generate(src_adr, pl_id, key)
+        assert res == exp_pl + list(hashed.digest())
+
+def test_tc_dactivate_payload():
+    x = DeactivatePayload()
+
+    for i in range(100):
+        #Callsign and conversion
+        src_adr = ''.join(random.choice(string.ascii_uppercase) for j in range(random.randint(1, 7)))
+        src_adr_as_list = [ord(j) for j in src_adr]
+        spaces = (7 - len(src_adr)) * [ord(" ")]
+
+        #Random id
+        pl_id = random.randint(0, 255)
+
+        # Random key
+        key = ''.join(random.choice(string.ascii_uppercase) for j in range(16))
+
+        exp_pl = [0x48] + spaces + src_adr_as_list + [pl_id] 
+
+        #hash
+        hashed = hmac.new(key.encode('utf-8'), bytes(exp_pl), hashlib.sha1)
+
+        #generate 
+        res = x.generate(src_adr, pl_id, key)
+        assert res == exp_pl + list(hashed.digest())

@@ -38,12 +38,18 @@ from spacelab_transmitter.tc_broadcast import Broadcast
 from spacelab_transmitter.tc_data_request import DataRequest
 
 from spacelab_transmitter.tc_deactivate_module import DeactivateModule
+from spacelab_transmitter.tc_activate_payload import ActivatePayload
+from spacelab_transmitter.tc_deactivate_payload import DeactivatePayload
 from spacelab_transmitter.tc_erase_memory import EraseMemory
 from spacelab_transmitter.tc_force_reset import ForceReset
 from spacelab_transmitter.tc_get_parameter import GetParameter
 from spacelab_transmitter.tc_get_payload_data import GetPayloadData
 from spacelab_transmitter.tc_leave_hibernation import LeaveHibernation
 from spacelab_transmitter.tc_set_parameter import SetParameter
+from spacelab_transmitter.telecommands_transmission import DialogDataRequest, DialogDeactivatePayload, DialogEnterHibernation, DialogActivatePayload, DialogGetPayloadData, DialogSetParameter
+from spacelab_transmitter.telecommands_transmission import DialogDeactivateModule, DialogDeactivatePayload
+from spacelab_transmitter.telecommands_transmission import DialogActivateModule, DialogGetParameter
+
 
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
@@ -88,6 +94,33 @@ _DIR_CONFIG_LOGFILE_LINUX       = 'spacelab_transmitter'
 _DEFAULT_LOGFILE_PATH           = os.path.join(os.path.expanduser('~'), _DIR_CONFIG_LOGFILE_LINUX)
 _DEFAULT_LOGFILE                = 'logfile.csv'
 
+class DialogPassword(Gtk.Dialog):
+    def __init__(self, parent):
+        super().__init__(title="Authentification", transient_for=parent, flags=0)
+        self.add_buttons(
+            Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK
+        )
+
+        self.set_default_size(150, 100)
+
+        label = Gtk.Label(label="Enter the key")
+        self.entry_password = Gtk.Entry()
+
+        grid = Gtk.Grid()
+        grid.add(label)
+        grid.attach(self.entry_password, 0, 1, 1, 1)
+        
+
+        box = self.get_content_area()
+        box.add(grid)
+
+        '''box.add(label)
+        box.add(self.entry_password)'''
+        self.show_all()
+
+    def get_key(self):
+        return self.entry_password.get_text()
+
 class SpaceLabTransmitter:
 
     def __init__(self):
@@ -104,6 +137,9 @@ class SpaceLabTransmitter:
         self.write_log("SpaceLab Transmitter initialized!")
         self._load_preferences()
 
+        self.pkt = []
+        self.label = ""
+
         #self.ngham = pyngham.PyNGHam()
         #self.decoded_packets_index = list()
 
@@ -117,7 +153,7 @@ class SpaceLabTransmitter:
         self.window.set_wmclass(self.window.get_title(), self.window.get_title())
         self.window.connect("destroy", Gtk.main_quit)
 
-        #Entry_preferences_general_callsign builder
+        # Entry_preferences_general_callsign builder
         self.entry_preferences_general_callsign = self.builder.get_object("entry_preferences_general_callsign")
 
         # Events treeview
@@ -131,7 +167,7 @@ class SpaceLabTransmitter:
         column = Gtk.TreeViewColumn("Event", cell, text=1)
         self.treeview_events.append_column(column)
 
-        #About dialog
+        # About dialog
         self.aboutdialog = self.builder.get_object("aboutdialog_spacelab_transmitter")
         self.aboutdialog.set_version(spacelab_transmitter.version.__version__)
         if os.path.isfile(_LOGO_FILE_LOCAL):
@@ -143,9 +179,12 @@ class SpaceLabTransmitter:
         self.toolbutton_about = self.builder.get_object("toolbutton_about")
         self.toolbutton_about.connect("clicked", self.on_toolbutton_about_clicked)
 
-        #Switch button transmission
+        # Switch button transmission
         self.switch_button = self.builder.get_object("switch_button")
         self.switch_button.connect("state-set", self.on_switch_button_clicked)
+
+        # Switch button Doppler correction
+        self.switch_doppler = self.builder.get_object("switch_doppler")
 
         # Logfile chooser button
         self.logfile_chooser_button = self.builder.get_object("logfile_chooser_button")
@@ -165,27 +204,7 @@ class SpaceLabTransmitter:
         self.combobox_satellite.pack_start(cell, True)
         self.combobox_satellite.add_attribute(cell, "text", 0)
 
-        #Telecommands buttons
-
-        self.button_ping_request = self.builder.get_object("button_ping_request")
-        self.button_ping_request.connect("clicked", self.on_button_ping_request_command_clicked)
-        self.button_enter_hibernation = self.builder.get_object("button_enter_hibernation")
-        self.button_enter_hibernation.connect("clicked", self.on_button_enter_hibernation_clicked)
-        self.button_deactivate_module = self.builder.get_object("button_deactivate_module")
-        self.button_deactivate_module.connect("clicked", self.on_button_deactivate_module_clicked)
-        self.button_erase_memory = self.builder.get_object("button_erase_memory")
-        self.button_set_parameter = self.builder.get_object("button_set_parameter")
-        self.button_data_request = self.builder.get_object("button_data_request")
-        self.button_leave_hibernation = self.builder.get_object("button_leave_hibernation")
-        self.button_activate_payload = self.builder.get_object("button_activate_payload")
-        self.button_force_reset = self.builder.get_object("button_force_reset")
-        self.button_get_parameter = self.builder.get_object("button_get_parameter")
-        self.button_broadcast_message = self.builder.get_object("button_broadcast_message")
-        self.button_activate_module = self.builder.get_object("button_activate_module")
-        self.button_deactivate_payload = self.builder.get_object("button_deactivate_payload")
-        self.button_get_payload_data = self.builder.get_object("button_get_payload_data")
-
-        #Preferences dialog
+        # Preferences dialog
         self.button_preferences = self.builder.get_object("button_preferences")
         self.button_preferences.connect("clicked", self.on_button_preferences_clicked)
 
@@ -200,6 +219,72 @@ class SpaceLabTransmitter:
         self.entry_preferences_general_callsign = self.builder.get_object("entry_preferences_general_callsign")
         self.entry_preferences_general_location = self.builder.get_object("entry_preferences_general_location")
         self.entry_preferences_general_country = self.builder.get_object("entry_preferences_general_country")
+
+        #Ping Request
+        self.button_ping_request = self.builder.get_object("button_ping_request")
+        self.button_ping_request.connect("clicked", self.on_button_ping_request_command_clicked)
+
+        #Broadcast Message
+        self.button_broadcast_message = self.builder.get_object("button_broadcast_message")
+        self.button_broadcast_message.connect("clicked", self.on_button_broadcast_message_clicked)
+
+        self.dialog_broadcast = self.builder.get_object("dialog_broadcast")
+        self.entry_msg = self.builder.get_object("entry_msg")
+        self.entry_dst_callsign = self.builder.get_object("entry_dst_callsign")
+        self.button_broadcast_send = self.builder.get_object("button_broadcast_send")
+        self.button_broadcast_send.connect("clicked", self.on_button_broadcast_send_clicked)
+        self.button_broadcast_cancel = self.builder.get_object("button_broadcast_cancel")
+        self.button_broadcast_cancel.connect("clicked", self.on_button_broadcast_cancel_clicked)
+
+        #Force Reset
+        self.button_force_reset = self.builder.get_object("button_force_reset")
+        self.button_force_reset.connect("clicked", self.on_button_force_reset_clicked)
+        
+        #Erase Memory
+        self.button_erase_memory = self.builder.get_object("button_erase_memory")
+        self.button_erase_memory.connect("clicked", self.on_button_erase_memory_clicked)
+        
+        #Enter Hibernation
+        self.button_enter_hibernation = self.builder.get_object("button_enter_hibernation")
+        self.button_enter_hibernation.connect("clicked", self.on_button_enter_hibernation_clicked)
+
+        #Leave Hibernation
+        self.button_leave_hibernation = self.builder.get_object("button_leave_hibernation")
+        self.button_leave_hibernation.connect("clicked", self.on_button_leave_hibernation_clicked)
+
+        #Activate Module
+        self.button_activate_module = self.builder.get_object("button_activate_module")
+        self.button_activate_module.connect("clicked", self.on_button_activate_module_clicked)
+    
+        #Deactivate Module
+        self.button_deactivate_module = self.builder.get_object("button_deactivate_module")
+        self.button_deactivate_module.connect("clicked", self.on_button_deactivate_module_clicked)
+
+        #Activate Payload
+        self.button_activate_payload = self.builder.get_object("button_activate_payload")
+        self.button_activate_payload.connect("clicked", self.on_button_activate_payload_clicked)
+
+        #Deactivate Payload
+        self.button_deactivate_payload = self.builder.get_object("button_deactivate_payload")
+        self.button_deactivate_payload.connect("clicked", self.on_button_deactivate_payload_clicked)
+
+        #Get Parameter
+        self.button_get_parameter = self.builder.get_object("button_get_parameter")
+        self.button_get_parameter.connect("clicked", self.on_button_get_parameter_clicked)
+
+        #Get Payload Data
+        self.button_get_payload_data = self.builder.get_object("button_get_payload_data")
+        self.button_get_payload_data.connect("clicked", self.on_button_get_payload_data_clicked)
+
+        #Set Parameter
+        self.button_set_parameter = self.builder.get_object("button_set_parameter")
+        self.button_set_parameter.connect("clicked", self.on_button_set_parameter_clicked)
+
+        #Data Request
+        self.button_data_request = self.builder.get_object("button_data_request")
+        self.button_data_request.connect("clicked", self.on_button_data_request_clicked)
+
+
 
     def run(self):
         self.window.show_all()          
@@ -240,362 +325,354 @@ class SpaceLabTransmitter:
             self.write_log("Error transmitting a ping telecommand!")
 
     def on_button_enter_hibernation_clicked(self, button):
-        callsign = self.entry_preferences_general_callsign.get_text()
-
-        hbn_hours = 0
-        key = "1234567812345678"
-
-        eh = Enter_hibernation()
-
-        pl = eh.generate(callsign, hbn_hours, key)
-
-        pngh = PyNGHam()
-
-        pkt = pngh.encode(pl)
-
-        sat_json = str()
-        if self.combobox_satellite.get_active() == 0:
-            sat_json = 'FloripaSat-1'
-        elif self.combobox_satellite.get_active() == 1:
-            sat_json = 'GOLDS-UFSC'
-
-        carrier_frequency = self.entry_carrier_frequency.get_text()
-        tx_gain = self.spinbutton_tx_gain.get_text()
-
-        mod = GMSK(0.5, 1200)   # BT = 0.5, 1200 bps
-
-        samples, sample_rate, duration_s = mod.modulate(pkt, 1000)
-
-        sdr = USRP(int(self.entry_sample_rate.get_text()), int(tx_gain))
-
-        if sdr.transmit(samples, duration_s, sample_rate, int(carrier_frequency)):
-            self.write_log("Enter Hibernation transmitted to " + sat_json + " from" + callsign + " in " + carrier_frequency + " Hz with a gain of " + tx_gain + " dB")
+        dialog = DialogEnterHibernation(self.window)
+        response = dialog.run()
+        if response == Gtk.ResponseType.OK:
+            dialog_password = DialogPassword(self.window)
+            response_key = dialog_password.run()
+            if response_key == Gtk.ResponseType.OK:
+                callsign = self.entry_preferences_general_callsign.get_text()
+                fr = Enter_hibernation()
+                key = dialog_password.get_key()
+                pl = fr.generate(callsign, dialog.get_hours(),key) 
+                pngh = PyNGHam()
+                self.pkt = pngh.encode(pl)
+                self.label = "Enter Hibernation"
+                self._transmit_tc(self.pkt, self.label)
+                dialog.destroy()
+                dialog_password.destroy()
+            elif response_key == Gtk.ResponseType.CANCEL:
+                dialog_password.destroy()
+            elif response_key == Gtk.ResponseType.DELETE_EVENT:
+                dialog_password.destroy()
+            else:
+                dialog_password.destroy()
+        elif response == Gtk.ResponseType.CANCEL:
+            dialog.destroy()
+        elif response == Gtk.ResponseType.DELETE_EVENT:
+            dialog.destroy()
         else:
-            self.write_log("Error transmitting an Enter Hibernation telecommand!")
+            dialog.destroy()
 
     def on_button_activate_module_clicked(self, button):
-        callsign = self.entry_preferences_general_callsign.get_text()
-
-        key = "1234567812345678"
-        mod_id = 2
-
-        am = ActivateModule()
-
-        pl = am.generate(callsign, mod_id, key)
-
-        pngh = PyNGHam()
-
-        pkt = pngh.encode(pl)
-
-        sat_json = str()
-        if self.combobox_satellite.get_active() == 0:
-            sat_json = 'FloripaSat-1'
-        elif self.combobox_satellite.get_active() == 1:
-            sat_json = 'GOLDS-UFSC'
-
-        carrier_frequency = self.entry_carrier_frequency.get_text()
-        tx_gain = self.spinbutton_tx_gain.get_text()
-
-        mod = GMSK(0.5, 1200)   # BT = 0.5, 1200 bps
-
-        samples, sample_rate, duration_s = mod.modulate(pkt, 1000)
-
-        sdr = USRP(int(self.entry_sample_rate.get_text()), int(tx_gain))
-
-        if sdr.transmit(samples, duration_s, sample_rate, int(carrier_frequency)):
-            self.write_log("Activate Module transmitted to " + sat_json + " from" + callsign + " in " + carrier_frequency + " Hz with a gain of " + tx_gain + " dB")
+        dialog = DialogActivateModule(self.window)
+        response = dialog.run()
+        if response == Gtk.ResponseType.OK:
+            dialog_password = DialogPassword(self.window)
+            response_key = dialog_password.run()
+            if response_key == Gtk.ResponseType.OK:
+                callsign = self.entry_preferences_general_callsign.get_text()
+                fr = ActivateModule()
+                key = dialog_password.get_key()
+                pl = fr.generate(callsign, dialog.get_ac_mod_id(),key) 
+                pngh = PyNGHam()
+                self.pkt = pngh.encode(pl)
+                self.label = "Activate Module"
+                self._transmit_tc(self.pkt, self.label)
+                dialog.destroy()
+                dialog_password.destroy()
+            elif response_key == Gtk.ResponseType.CANCEL:
+                dialog_password.destroy()
+            elif response_key == Gtk.ResponseType.DELETE_EVENT:
+                dialog_password.destroy()
+            else:
+                dialog_password.destroy()
+        elif response == Gtk.ResponseType.CANCEL:
+            dialog.destroy()
+        elif response == Gtk.ResponseType.DELETE_EVENT:
+            dialog.destroy()
         else:
-            self.write_log("Error transmitting a Deactivate Module telecommand!")
+            dialog.destroy()
 
     def on_button_deactivate_module_clicked(self, button):
-        callsign = self.entry_preferences_general_callsign.get_text()
-
-        key = "1234567812345678"
-        mod_id = 2
-
-        dm = DeactivateModule()
-
-        pl = dm.generate(callsign, mod_id, key)
-
-        pngh = PyNGHam()
-
-        pkt = pngh.encode(pl)
-
-        sat_json = str()
-        if self.combobox_satellite.get_active() == 0:
-            sat_json = 'FloripaSat-1'
-        elif self.combobox_satellite.get_active() == 1:
-            sat_json = 'GOLDS-UFSC'
-
-        carrier_frequency = self.entry_carrier_frequency.get_text()
-        tx_gain = self.spinbutton_tx_gain.get_text()
-
-        mod = GMSK(0.5, 1200)   # BT = 0.5, 1200 bps
-
-        samples, sample_rate, duration_s = mod.modulate(pkt, 1000)
-
-        sdr = USRP(int(self.entry_sample_rate.get_text()), int(tx_gain))
-
-        if sdr.transmit(samples, duration_s, sample_rate, int(carrier_frequency)):
-            self.write_log("Activate Module transmitted to " + sat_json + " from" + callsign + " in " + carrier_frequency + " Hz with a gain of " + tx_gain + " dB")
+        dialog = DialogDeactivateModule(self.window)
+        response = dialog.run()
+        if response == Gtk.ResponseType.OK:
+            dialog_password = DialogPassword(self.window)
+            response_key = dialog_password.run()
+            if response_key == Gtk.ResponseType.OK:
+                callsign = self.entry_preferences_general_callsign.get_text()
+                fr = DeactivateModule()
+                key = dialog_password.get_key()
+                pl = fr.generate(callsign, dialog.get_deac_mod_id(),key) 
+                pngh = PyNGHam()
+                self.pkt = pngh.encode(pl)
+                self.label = "Deactivate Module"
+                self._transmit_tc(self.pkt, self.label)
+                dialog.destroy()
+                dialog_password.destroy()
+            elif response_key == Gtk.ResponseType.CANCEL:
+                dialog_password.destroy()
+            elif response_key == Gtk.ResponseType.DELETE_EVENT:
+                dialog_password.destroy()
+            else:
+                dialog_password.destroy()
+        elif response == Gtk.ResponseType.CANCEL:
+            dialog.destroy()
+        elif response == Gtk.ResponseType.DELETE_EVENT:
+            dialog.destroy()
         else:
-            self.write_log("Error transmitting a Activate Module telecommand!")
+            dialog.destroy()
+
+    def on_button_deactivate_payload_clicked(self, button):
+        dialog = DialogDeactivatePayload(self.window)
+        response = dialog.run()
+        if response == Gtk.ResponseType.OK:
+            dialog_password = DialogPassword(self.window)
+            response_key = dialog_password.run()
+            if response_key == Gtk.ResponseType.OK:
+                callsign = self.entry_preferences_general_callsign.get_text()
+                fr = DeactivatePayload()
+                key = dialog_password.get_key()
+                pl = fr.generate(callsign, dialog.get_deac_pl_id(),key) 
+                pngh = PyNGHam()
+                self.pkt = pngh.encode(pl)
+                self.label = "Deactivate Payload"
+                self._transmit_tc(self.pkt, self.label)
+                dialog.destroy()
+                dialog_password.destroy()
+            elif response_key == Gtk.ResponseType.CANCEL:
+                dialog_password.destroy()
+            elif response_key == Gtk.ResponseType.DELETE_EVENT:
+                dialog_password.destroy()
+            else:
+                dialog_password.destroy()
+        elif response == Gtk.ResponseType.CANCEL:
+            dialog.destroy()
+        elif response == Gtk.ResponseType.DELETE_EVENT:
+            dialog.destroy()
+        else:
+            dialog.destroy()
+
+    def on_button_activate_payload_clicked(self, button):
+        dialog = DialogActivatePayload(self.window)
+        response = dialog.run()
+        if response == Gtk.ResponseType.OK:
+            dialog_password = DialogPassword(self.window)
+            response_key = dialog_password.run()
+            if response_key == Gtk.ResponseType.OK:
+                callsign = self.entry_preferences_general_callsign.get_text()
+                fr = ActivatePayload()
+                key = dialog_password.get_key()
+                pl = fr.generate(callsign, dialog.get_ac_pl_id(),key) 
+                pngh = PyNGHam()
+                self.pkt = pngh.encode(pl)
+                self.label = "Activate Payload"
+                self._transmit_tc(self.pkt, self.label)
+                dialog.destroy()
+                dialog_password.destroy()
+            elif response_key == Gtk.ResponseType.CANCEL:
+                dialog_password.destroy()
+            elif response_key == Gtk.ResponseType.DELETE_EVENT:
+                dialog_password.destroy()
+            else:
+                dialog_password.destroy()
+        elif response == Gtk.ResponseType.CANCEL:
+            dialog.destroy()
+        elif response == Gtk.ResponseType.DELETE_EVENT:
+            dialog.destroy()
+        else:
+            dialog.destroy()
 
     def on_button_erase_memory_clicked(self, button):
-        callsign = self.entry_preferences_general_callsign.get_text()
-
-        key = "1234567812345678"
-
-        em = EraseMemory()
-
-        pl = em.generate(callsign, key)
-
-        pngh = PyNGHam()
-
-        pkt = pngh.encode(pl)
-
-        sat_json = str()
-        if self.combobox_satellite.get_active() == 0:
-            sat_json = 'FloripaSat-1'
-        elif self.combobox_satellite.get_active() == 1:
-            sat_json = 'GOLDS-UFSC'
-
-        carrier_frequency = self.entry_carrier_frequency.get_text()
-        tx_gain = self.spinbutton_tx_gain.get_text()
-
-        mod = GMSK(0.5, 1200)   # BT = 0.5, 1200 bps
-
-        samples, sample_rate, duration_s = mod.modulate(pkt, 1000)
-
-        sdr = USRP(int(self.entry_sample_rate.get_text()), int(tx_gain))
-
-        if sdr.transmit(samples, duration_s, sample_rate, int(carrier_frequency)):
-            self.write_log("Erase Memory transmitted to " + sat_json + " from" + callsign + " in " + carrier_frequency + " Hz with a gain of " + tx_gain + " dB")
+        dialog = DialogPassword(self.window)
+        response = dialog.run()
+        if response == Gtk.ResponseType.OK:
+            callsign = self.entry_preferences_general_callsign.get_text()
+            fr = EraseMemory()
+            key = dialog.get_key()
+            pl = fr.generate(callsign, key)
+            pngh = PyNGHam()
+            self.pkt = pngh.encode(pl)
+            self.label = "Erase Memory"
+            self._transmit_tc(self.pkt, self.label)
+        elif response == Gtk.ResponseType.CANCEL:
+            dialog.destroy()
+        elif response == Gtk.ResponseType.DELETE_EVENT:
+            dialog.destroy()
         else:
-            self.write_log("Error transmitting an Erase Memory telecommand!")
+            dialog.destroy()
 
     def on_button_set_parameter_clicked(self, button):
-        callsign = self.entry_preferences_general_callsign.get_text()
-
-        key = "1234567812345678"
-        s_id = 1
-        param_id = 1 
-        param_val = 29
-
-        sp = SetParameter()
-
-        pl = sp.generate(callsign,s_id, param_id, param_val, key)
-
-        pngh = PyNGHam()
-
-        pkt = pngh.encode(pl)
-
-        sat_json = str()
-        if self.combobox_satellite.get_active() == 0:
-            sat_json = 'FloripaSat-1'
-        elif self.combobox_satellite.get_active() == 1:
-            sat_json = 'GOLDS-UFSC'
-
-        carrier_frequency = self.entry_carrier_frequency.get_text()
-        tx_gain = self.spinbutton_tx_gain.get_text()
-
-        mod = GMSK(0.5, 1200)   # BT = 0.5, 1200 bps
-
-        samples, sample_rate, duration_s = mod.modulate(pkt, 1000)
-
-        sdr = USRP(int(self.entry_sample_rate.get_text()), int(tx_gain))
-
-        if sdr.transmit(samples, duration_s, sample_rate, int(carrier_frequency)):
-            self.write_log("Set Parameter transmitted to " + sat_json + " from" + callsign + " in " + carrier_frequency + " Hz with a gain of " + tx_gain + " dB")
+        dialog = DialogSetParameter(self.window)
+        response = dialog.run()
+        if response == Gtk.ResponseType.OK:
+            dialog_password = DialogPassword(self.window)
+            response_key = dialog_password.run()
+            if response_key == Gtk.ResponseType.OK:
+                callsign = self.entry_preferences_general_callsign.get_text()
+                fr = SetParameter()
+                key = dialog_password.get_key()
+                pl = fr.generate(callsign, dialog.get_subsys_id(),dialog.get_param_id(),dialog.get_param_val(), key) 
+                pngh = PyNGHam()
+                self.pkt = pngh.encode(pl)
+                self.label = "Set Parameter"
+                self._transmit_tc(self.pkt, self.label)
+                dialog.destroy()
+                dialog_password.destroy()
+            elif response_key == Gtk.ResponseType.CANCEL:
+                dialog_password.destroy()
+            elif response_key == Gtk.ResponseType.DELETE_EVENT:
+                dialog_password.destroy()
+            else:
+                dialog_password.destroy()
+        elif response == Gtk.ResponseType.CANCEL:
+            dialog.destroy()
+        elif response == Gtk.ResponseType.DELETE_EVENT:
+            dialog.destroy()
         else:
-            self.write_log("Error transmitting a Set Parameter telecommand!")
+            dialog.destroy()
 
     def on_button_data_request_clicked(self, button):
-        callsign = self.entry_preferences_general_callsign.get_text()
-
-        key = "1234567812345678"
-        data_id = 1
-        start_ts = 42
-        end_ts = 42
-
-        dr = DataRequest()
-
-        pl = dr.generate(callsign, data_id, start_ts, end_ts, key)
-
-        pngh = PyNGHam()
-
-        pkt = pngh.encode(pl)
-
-        sat_json = str()
-        if self.combobox_satellite.get_active() == 0:
-            sat_json = 'FloripaSat-1'
-        elif self.combobox_satellite.get_active() == 1:
-            sat_json = 'GOLDS-UFSC'
-
-        carrier_frequency = self.entry_carrier_frequency.get_text()
-        tx_gain = self.spinbutton_tx_gain.get_text()
-
-        mod = GMSK(0.5, 1200)   # BT = 0.5, 1200 bps
-
-        samples, sample_rate, duration_s = mod.modulate(pkt, 1000)
-
-        sdr = USRP(int(self.entry_sample_rate.get_text()), int(tx_gain))
-
-        if sdr.transmit(samples, duration_s, sample_rate, int(carrier_frequency)):
-            self.write_log("Data Request transmitted to " + sat_json + " from" + callsign + " in " + carrier_frequency + " Hz with a gain of " + tx_gain + " dB")
+        dialog = DialogDataRequest(self.window)
+        response = dialog.run()
+        if response == Gtk.ResponseType.OK:
+            dialog_password = DialogPassword(self.window)
+            response_key = dialog_password.run()
+            if response_key == Gtk.ResponseType.OK:
+                callsign = self.entry_preferences_general_callsign.get_text()
+                fr = DataRequest()
+                key = dialog_password.get_key()
+                pl = fr.generate(callsign, dialog.get_data_id(),dialog.get_start_ts(),dialog.get_end_ts(), key) 
+                pngh = PyNGHam()
+                self.pkt = pngh.encode(pl)
+                self.label = "Data Request"
+                self._transmit_tc(self.pkt, self.label)
+                dialog.destroy()
+                dialog_password.destroy()
+            elif response_key == Gtk.ResponseType.CANCEL:
+                dialog_password.destroy()
+            elif response_key == Gtk.ResponseType.DELETE_EVENT:
+                dialog_password.destroy()
+            else:
+                dialog_password.destroy()
+        elif response == Gtk.ResponseType.CANCEL:
+            dialog.destroy()
+        elif response == Gtk.ResponseType.DELETE_EVENT:
+            dialog.destroy()
         else:
-            self.write_log("Error transmitting a Data Request telecommand!")
+            dialog.destroy()
     
     def on_button_leave_hibernation_clicked(self, button):
-        callsign = self.entry_preferences_general_callsign.get_text()
-
-        key = "1234567812345678"
-
-        lh = LeaveHibernation()
-
-        pl = lh.generate(callsign, key)
-
-        pngh = PyNGHam()
-
-        pkt = pngh.encode(pl)
-
-        sat_json = str()
-        if self.combobox_satellite.get_active() == 0:
-            sat_json = 'FloripaSat-1'
-        elif self.combobox_satellite.get_active() == 1:
-            sat_json = 'GOLDS-UFSC'
-
-        carrier_frequency = self.entry_carrier_frequency.get_text()
-        tx_gain = self.spinbutton_tx_gain.get_text()
-
-        mod = GMSK(0.5, 1200)   # BT = 0.5, 1200 bps
-
-        samples, sample_rate, duration_s = mod.modulate(pkt, 1000)
-
-        sdr = USRP(int(self.entry_sample_rate.get_text()), int(tx_gain))
-
-        if sdr.transmit(samples, duration_s, sample_rate, int(carrier_frequency)):
-            self.write_log("Leave Hibernation transmitted to " + sat_json + " from" + callsign + " in " + carrier_frequency + " Hz with a gain of " + tx_gain + " dB")
+        dialog = DialogPassword(self.window)
+        response = dialog.run()
+        if response == Gtk.ResponseType.OK:
+            callsign = self.entry_preferences_general_callsign.get_text()
+            fr = LeaveHibernation()
+            key = dialog.get_key()
+            pl = fr.generate(callsign, key)
+            pngh = PyNGHam()
+            self.pkt = pngh.encode(pl)
+            self.label = "Leave Hibernation"
+            self._transmit_tc(self.pkt, self.label)
+        elif response == Gtk.ResponseType.CANCEL:
+            dialog.destroy()
+        elif response == Gtk.ResponseType.DELETE_EVENT:
+            dialog.destroy()
         else:
-            self.write_log("Error transmitting a Leave Hibernation telecommand!")
+            dialog.destroy()
 
-    def on_button_force_reset_clicked(self, button):
-        callsign = self.entry_preferences_general_callsign.get_text()
-
-        key = "1234567812345678"
-
-        fr = ForceReset()
-
-        pl = fr.generate(callsign, key)
-
-        pngh = PyNGHam()
-
-        pkt = pngh.encode(pl)
-
-        sat_json = str()
-        if self.combobox_satellite.get_active() == 0:
-            sat_json = 'FloripaSat-1'
-        elif self.combobox_satellite.get_active() == 1:
-            sat_json = 'GOLDS-UFSC'
-
-        carrier_frequency = self.entry_carrier_frequency.get_text()
-        tx_gain = self.spinbutton_tx_gain.get_text()
-
-        mod = GMSK(0.5, 1200)   # BT = 0.5, 1200 bps
-
-        samples, sample_rate, duration_s = mod.modulate(pkt, 1000)
-
-        sdr = USRP(int(self.entry_sample_rate.get_text()), int(tx_gain))
-
-        if sdr.transmit(samples, duration_s, sample_rate, int(carrier_frequency)):
-            self.write_log("Force Reset transmitted to " + sat_json + " from" + callsign + " in " + carrier_frequency + " Hz with a gain of " + tx_gain + " dB")
+    def on_button_force_reset_clicked(self, button_password_send):
+        #response = self.dialog_password.run()
+        dialog = DialogPassword(self.window)
+        response = dialog.run()
+        if response == Gtk.ResponseType.OK:
+            callsign = self.entry_preferences_general_callsign.get_text()
+            fr = ForceReset()
+            key = dialog.get_key()
+            pl = fr.generate(callsign, key)
+            pngh = PyNGHam()
+            self.pkt = pngh.encode(pl)
+            self.label = "Force Reset"
+            self._transmit_tc(self.pkt, self.label)
+        elif response == Gtk.ResponseType.CANCEL:
+            dialog.destroy()
+        elif response == Gtk.ResponseType.DELETE_EVENT:
+            dialog.destroy()
         else:
-            self.write_log("Error transmitting a Force Reset telecommand!")
+            dialog.destroy()
 
-    def on_button_activate_module_clicked(self, button):
-        callsign = self.entry_preferences_general_callsign.get_text()
+    def on_button_password_send_clicked(self, dialog_password):
+        #response = dialog_password.run()
+        dialog = DialogPassword(self.window)
+        response = dialog.run()
+        if response == Gtk.ResponseType.OK:
+            print("The OK button was clicked")
+        elif response == Gtk.ResponseType.CANCEL:
+            print("The Cancel button was clicked")
+        print(self.pkt, self.label)
+        self._transmit_tc(self.pkt, self.label)
 
-        mod_id = 1
-        key = "1234567812345678"
-
-        am = ActivateModule()
-
-        pl = am.generate(callsign, mod_id, key)
-
-        pngh = PyNGHam()
-
-        pkt = pngh.encode(pl)
-
-        sat_json = str()
-        if self.combobox_satellite.get_active() == 0:
-            sat_json = 'FloripaSat-1'
-        elif self.combobox_satellite.get_active() == 1:
-            sat_json = 'GOLDS-UFSC'
-
-        carrier_frequency = self.entry_carrier_frequency.get_text()
-        tx_gain = self.spinbutton_tx_gain.get_text()
-
-        mod = GMSK(0.5, 1200)   # BT = 0.5, 1200 bps
-
-        samples, sample_rate, duration_s = mod.modulate(pkt, 1000)
-
-        sdr = USRP(int(self.entry_sample_rate.get_text()), int(tx_gain))
-
-        if sdr.transmit(samples, duration_s, sample_rate, int(carrier_frequency)):
-            self.write_log("Activate Module transmitted to " + sat_json + " from" + callsign + " in " + carrier_frequency + " Hz with a gain of " + tx_gain + " dB")
-        else:
-            self.write_log("Error transmitting an Activate Module telecommand!")
+    def on_button_password_cancel_clicked(self, button):
+        self.dialog_password.destroy()
 
     def on_button_get_parameter_clicked(self, button):
-        callsign = self.entry_preferences_general_callsign.get_text()
-
-        subsys_id = 1
-        param_id = 1
-        key = "1234567812345678"
-
-        gp = GetParameter()
-
-        pl = gp.generate(callsign, subsys_id, param_id, key)
-
-        pngh = PyNGHam()
-
-        pkt = pngh.encode(pl)
-
-        sat_json = str()
-        if self.combobox_satellite.get_active() == 0:
-            sat_json = 'FloripaSat-1'
-        elif self.combobox_satellite.get_active() == 1:
-            sat_json = 'GOLDS-UFSC'
-
-        carrier_frequency = self.entry_carrier_frequency.get_text()
-        tx_gain = self.spinbutton_tx_gain.get_text()
-
-        mod = GMSK(0.5, 1200)   # BT = 0.5, 1200 bps
-
-        samples, sample_rate, duration_s = mod.modulate(pkt, 1000)
-
-        sdr = USRP(int(self.entry_sample_rate.get_text()), int(tx_gain))
-
-        if sdr.transmit(samples, duration_s, sample_rate, int(carrier_frequency)):
-            self.write_log("Get Parameter transmitted to " + sat_json + " from" + callsign + " in " + carrier_frequency + " Hz with a gain of " + tx_gain + " dB")
+        dialog = DialogGetParameter(self.window)
+        response = dialog.run()
+        if response == Gtk.ResponseType.OK:
+            dialog_password = DialogPassword(self.window)
+            response_key = dialog_password.run()
+            if response_key == Gtk.ResponseType.OK:
+                callsign = self.entry_preferences_general_callsign.get_text()
+                fr = GetParameter()
+                key = dialog_password.get_key()
+                pl = fr.generate(callsign, dialog.get_subsys_id(),dialog.get_param_id(), key) 
+                pngh = PyNGHam()
+                self.pkt = pngh.encode(pl)
+                self.label = "Get Parameter"
+                self._transmit_tc(self.pkt, self.label)
+                dialog.destroy()
+                dialog_password.destroy()
+            elif response_key == Gtk.ResponseType.CANCEL:
+                dialog_password.destroy()
+            elif response_key == Gtk.ResponseType.DELETE_EVENT:
+                dialog_password.destroy()
+            else:
+                dialog_password.destroy()
+        elif response == Gtk.ResponseType.CANCEL:
+            dialog.destroy()
+        elif response == Gtk.ResponseType.DELETE_EVENT:
+            dialog.destroy()
         else:
-            self.write_log("Error transmitting a Get Parameter telecommand!")
+            dialog.destroy()
 
     def on_button_get_payload_data_clicked(self, button):
-        callsign = self.entry_preferences_general_callsign.get_text()
+        dialog = DialogGetPayloadData(self.window)
+        response = dialog.run()
+        if response == Gtk.ResponseType.OK:
+            dialog_password = DialogPassword(self.window)
+            response_key = dialog_password.run()
+            if response_key == Gtk.ResponseType.OK:
+                callsign = self.entry_preferences_general_callsign.get_text()
+                fr = GetPayloadData()
+                key = dialog_password.get_key()
+                pl = fr.generate(callsign, dialog.get_pl_id(),dialog.get_pl_args(), key) 
+                pngh = PyNGHam()
+                self.pkt = pngh.encode(pl)
+                self.label = "Get Payload Data"
+                self._transmit_tc(self.pkt, self.label)
+                dialog.destroy()
+                dialog_password.destroy()
+            elif response_key == Gtk.ResponseType.CANCEL:
+                dialog_password.destroy()
+            elif response_key == Gtk.ResponseType.DELETE_EVENT:
+                dialog_password.destroy()
+            else:
+                dialog_password.destroy()
+        elif response == Gtk.ResponseType.CANCEL:
+            dialog.destroy()
+        elif response == Gtk.ResponseType.DELETE_EVENT:
+            dialog.destroy()
+        else:
+            dialog.destroy()
 
-        pl_id = 1
-        pl_args = 1
-        key = "1234567812345678"
+    def on_button_broadcast_message_clicked(self, button): 
+        response = self.dialog_broadcast.run()
 
-        gpd = GetPayloadData()
+        if response == Gtk.ResponseType.DELETE_EVENT:
+            self.dialog_broadcast.hide()
 
-        pl = gpd.generate(callsign, pl_id, pl_args, key)
-
-        pngh = PyNGHam()
-
-        pkt = pngh.encode(pl)
-
+    def _transmit_tc(self, pkt, tc_name):
         sat_json = str()
         if self.combobox_satellite.get_active() == 0:
             sat_json = 'FloripaSat-1'
@@ -604,6 +681,7 @@ class SpaceLabTransmitter:
 
         carrier_frequency = self.entry_carrier_frequency.get_text()
         tx_gain = self.spinbutton_tx_gain.get_text()
+        callsign = self.entry_preferences_general_callsign.get_text()
 
         mod = GMSK(0.5, 1200)   # BT = 0.5, 1200 bps
 
@@ -612,42 +690,29 @@ class SpaceLabTransmitter:
         sdr = USRP(int(self.entry_sample_rate.get_text()), int(tx_gain))
 
         if sdr.transmit(samples, duration_s, sample_rate, int(carrier_frequency)):
-            self.write_log("Get Payload Data transmitted to " + sat_json + " from" + callsign + " in " + carrier_frequency + " Hz with a gain of " + tx_gain + " dB")
+            self.write_log(tc_name + " transmitted to " + sat_json + " from" + callsign + " in " + carrier_frequency + " Hz with a gain of " + tx_gain + " dB")
         else:
-            self.write_log("Error transmitting a Get Payload Data telecommand!")
+            self.write_log("Error transmitting a " + tc_name + " telecommand!")
 
-    def on_button_broadcast_message_clicked(self, button):
-            callsign = self.entry_preferences_general_callsign.get_text()
-            dst_adr = "ABC1234"
-            msg = "testing"
+    def on_button_broadcast_cancel_clicked(self, button):
+        self.dialog_broadcast.hide()
 
-            bm = Broadcast()
+    def on_button_broadcast_send_clicked(self, button):
+        dst_adr = self.entry_dst_callsign.get_text()
+        msg = self.entry_msg.get_text()
 
-            pl = bm.generate(callsign, dst_adr, msg)
+        bm = Broadcast()
 
-            pngh = PyNGHam()
+        pl = bm.generate(self.entry_preferences_general_callsign.get_text(), dst_adr, msg)
 
-            pkt = pngh.encode(pl)
+        pngh = PyNGHam()
 
-            sat_json = str()
-            if self.combobox_satellite.get_active() == 0:
-                sat_json = 'FloripaSat-1'
-            elif self.combobox_satellite.get_active() == 1:
-                sat_json = 'GOLDS-UFSC'
+        pkt = pngh.encode(pl)
 
-            carrier_frequency = self.entry_carrier_frequency.get_text()
-            tx_gain = self.spinbutton_tx_gain.get_text()
+        self._transmit_tc(pkt, "Broadcast Message")
+        self.dialog_broadcast.hide()
 
-            mod = GMSK(0.5, 1200)   # BT = 0.5, 1200 bps
-
-            samples, sample_rate, duration_s = mod.modulate(pkt, 1000)
-
-            sdr = USRP(int(self.entry_sample_rate.get_text()), int(tx_gain))
-
-            if sdr.transmit(samples, duration_s, sample_rate, int(carrier_frequency)):
-                self.write_log("Broadcast Message transmitted to " + sat_json + " from" + callsign + " in " + carrier_frequency + " Hz with a gain of " + tx_gain + " dB")
-            else:
-                self.write_log("Error transmitting a Broadcast Message telecommand!")
+    #CODE REGARDING PREFERENCES 
 
     def on_button_preferences_clicked(self, button):
         response = self.dialog_preferences.run()
