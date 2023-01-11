@@ -70,7 +70,15 @@ class GMSK:
         """
         # Convert to array of bits
         data = self._int_list_to_bit_list(data)
-        data = np.array(data)
+
+        data_buff = list()
+        for i in data:
+            if i == 0:
+                data_buff.append(1)
+            else:
+                data_buff.append(0)
+
+        data = np.array(data_buff)
 
         # Timing parameters
         fc = self._baudrate                         # Carrier frequency = Data transfer rate in bps
@@ -145,6 +153,7 @@ class GMSK:
         :return res: The given integer list as a bit list
         """
         res = list()
+        
         for i in n:
             res = res + [int(digit) for digit in bin(i)[2:].zfill(8)]
 
