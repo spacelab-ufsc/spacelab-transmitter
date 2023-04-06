@@ -70,6 +70,6 @@ setuptools.setup(
         ('share/spacelab_transmitter/', ['spacelab_transmitter/data/ui/spacelab_transmitter.glade']),
         ('share/spacelab_transmitter/', ['spacelab_transmitter/data/img/spacelab-logo-full-400x200.png']),
         ('share/spacelab_transmitter/', ['spacelab_transmitter/data/satellites/floripasat-1.json']),
-        ('share/spacelab_transmitter/', ['spacelab_transmitter/data/satellites/floripasat-2.json']),
+        ('share/spacelab_transmitter/', ['spacelab_transmitter/data/satellites/golds-ufsc.json']),
         ],
 )

@@ -23,7 +23,6 @@
 #
 
 
-#MODULES 
 import os
 import threading
 from datetime import datetime
@@ -63,9 +62,7 @@ from spacelab_transmitter.usrp import USRP
 from spacelab_transmitter.tc_ping import Ping
 from spacelab_transmitter.tc_enter_hibernation import Enter_hibernation
 
-#here's for importing the other files of spacelab-transmitter that are missing or not ready
-
-#CONSTANTS
+# Constants
 _UI_FILE_LOCAL                  = os.path.abspath(os.path.dirname(__file__)) + '/data/ui/spacelab_transmitter.glade'
 _UI_FILE_LINUX_SYSTEM           = '/usr/share/spacelab_transmitter/spacelab_transmitter.glade'
 
@@ -80,16 +77,16 @@ _DIR_CONFIG_WINDOWS             = 'spacelab_transmitter'
 
 _SAT_JSON_FLORIPASAT_1_LOCAL    = os.path.abspath(os.path.dirname(__file__)) + '/data/satellites/floripasat-1.json'
 _SAT_JSON_FLORIPASAT_1_SYSTEM   = '/usr/share/spacelab_transmitter/floripasat-1.json'
-_SAT_JSON_GOLDS_UFSC_LOCAL    = os.path.abspath(os.path.dirname(__file__)) + '/data/satellites/GOLDS_UFSC.json'
-_SAT_JSON_GOLDS_UFSC_SYSTEM   = '/usr/share/spacelab_transmitter/GOLDS_UFSC.json'
+_SAT_JSON_GOLDS_UFSC_LOCAL      = os.path.abspath(os.path.dirname(__file__)) + '/data/satellites/golds-ufsc.json'
+_SAT_JSON_GOLDS_UFSC_SYSTEM     = '/usr/share/spacelab_transmitter/golds-ufsc.json'
 
 _DEFAULT_CALLSIGN               = 'PP5UF'
 _DEFAULT_LOCATION               = 'Florianópolis'
 _DEFAULT_COUNTRY                = 'Brazil'
 
-_DIR_CONFIG_DEFAULTJSON   = 'spacelab_transmitter.json'
+_DIR_CONFIG_DEFAULTJSON         = 'spacelab_transmitter.json'
 
-#Defining logfile default local
+# Defining logfile default local
 _DIR_CONFIG_LOGFILE_LINUX       = 'spacelab_transmitter'
 _DEFAULT_LOGFILE_PATH           = os.path.join(os.path.expanduser('~'), _DIR_CONFIG_LOGFILE_LINUX)
 _DEFAULT_LOGFILE                = 'logfile.csv'
