@@ -91,6 +91,8 @@ _DIR_CONFIG_LOGFILE_LINUX       = 'spacelab_transmitter'
 _DEFAULT_LOGFILE_PATH           = os.path.join(os.path.expanduser('~'), _DIR_CONFIG_LOGFILE_LINUX)
 _DEFAULT_LOGFILE                = 'logfile.csv'
 
+_SDR_MODELS                     = ['USRP', 'Pluto SDR']
+
 class DialogPassword(Gtk.Dialog):
     def __init__(self, parent):
         super().__init__(title="Authentification", transient_for=parent, flags=0)
@@ -188,6 +190,13 @@ class SpaceLabTransmitter:
         self.logfile_chooser_button.set_filename(_DEFAULT_LOGFILE_PATH)
 
         # SDR Parameters
+        self.liststore_sdr = self.builder.get_object("liststore_sdr_devices")
+        for sat in _SDR_MODELS:
+            self.liststore_sdr.append([sat])
+        self.combobox_sdr = self.builder.get_object("combobox_sdr")
+        cell = Gtk.CellRendererText()
+        self.combobox_sdr.pack_start(cell, True)
+        self.combobox_sdr.add_attribute(cell, "text", 0)
         self.entry_carrier_frequency = self.builder.get_object("entry_carrier_frequency")
         self.entry_sample_rate = self.builder.get_object("entry_sample_rate")
         self.spinbutton_tx_gain = self.builder.get_object("spinbutton_tx_gain")
