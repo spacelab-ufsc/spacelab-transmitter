@@ -107,10 +107,8 @@ _SDR_MODELS                     = ['USRP', 'Pluto SDR']
 
 class DialogPassword(Gtk.Dialog):
     def __init__(self, parent):
-        super().__init__(title="Authentification", transient_for=parent, flags=0)
-        self.add_buttons(
-            Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK
-        )
+        super().__init__(title="Authentication", transient_for=parent, flags=0)
+        self.add_buttons(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK)
 
         self.set_default_size(150, 100)
 
@@ -120,13 +118,10 @@ class DialogPassword(Gtk.Dialog):
         grid = Gtk.Grid()
         grid.add(label)
         grid.attach(self.entry_password, 0, 1, 1, 1)
-        
 
         box = self.get_content_area()
         box.add(grid)
 
-        '''box.add(label)
-        box.add(self.entry_password)'''
         self.show_all()
 
     def get_key(self):
@@ -232,11 +227,11 @@ class SpaceLabTransmitter:
         self.entry_preferences_general_location = self.builder.get_object("entry_preferences_general_location")
         self.entry_preferences_general_country = self.builder.get_object("entry_preferences_general_country")
 
-        #Ping Request
+        # Ping Request
         self.button_ping_request = self.builder.get_object("button_ping_request")
         self.button_ping_request.connect("clicked", self.on_button_ping_request_command_clicked)
 
-        #Broadcast Message
+        # Broadcast Message
         self.button_broadcast_message = self.builder.get_object("button_broadcast_message")
         self.button_broadcast_message.connect("clicked", self.on_button_broadcast_message_clicked)
 
@@ -248,51 +243,51 @@ class SpaceLabTransmitter:
         self.button_broadcast_cancel = self.builder.get_object("button_broadcast_cancel")
         self.button_broadcast_cancel.connect("clicked", self.on_button_broadcast_cancel_clicked)
 
-        #Force Reset
+        # Force Reset
         self.button_force_reset = self.builder.get_object("button_force_reset")
         self.button_force_reset.connect("clicked", self.on_button_force_reset_clicked)
         
-        #Erase Memory
+        # Erase Memory
         self.button_erase_memory = self.builder.get_object("button_erase_memory")
         self.button_erase_memory.connect("clicked", self.on_button_erase_memory_clicked)
         
-        #Enter Hibernation
+        # Enter Hibernation
         self.button_enter_hibernation = self.builder.get_object("button_enter_hibernation")
         self.button_enter_hibernation.connect("clicked", self.on_button_enter_hibernation_clicked)
 
-        #Leave Hibernation
+        # Leave Hibernation
         self.button_leave_hibernation = self.builder.get_object("button_leave_hibernation")
         self.button_leave_hibernation.connect("clicked", self.on_button_leave_hibernation_clicked)
 
-        #Activate Module
+        # Activate Module
         self.button_activate_module = self.builder.get_object("button_activate_module")
         self.button_activate_module.connect("clicked", self.on_button_activate_module_clicked)
     
-        #Deactivate Module
+        # Deactivate Module
         self.button_deactivate_module = self.builder.get_object("button_deactivate_module")
         self.button_deactivate_module.connect("clicked", self.on_button_deactivate_module_clicked)
 
-        #Activate Payload
+        # Activate Payload
         self.button_activate_payload = self.builder.get_object("button_activate_payload")
         self.button_activate_payload.connect("clicked", self.on_button_activate_payload_clicked)
 
-        #Deactivate Payload
+        # Deactivate Payload
         self.button_deactivate_payload = self.builder.get_object("button_deactivate_payload")
         self.button_deactivate_payload.connect("clicked", self.on_button_deactivate_payload_clicked)
 
-        #Get Parameter
+        # Get Parameter
         self.button_get_parameter = self.builder.get_object("button_get_parameter")
         self.button_get_parameter.connect("clicked", self.on_button_get_parameter_clicked)
 
-        #Get Payload Data
+        # Get Payload Data
         self.button_get_payload_data = self.builder.get_object("button_get_payload_data")
         self.button_get_payload_data.connect("clicked", self.on_button_get_payload_data_clicked)
 
-        #Set Parameter
+        # Set Parameter
         self.button_set_parameter = self.builder.get_object("button_set_parameter")
         self.button_set_parameter.connect("clicked", self.on_button_set_parameter_clicked)
 
-        #Data Request
+        # Data Request
         self.button_data_request = self.builder.get_object("button_data_request")
         self.button_data_request.connect("clicked", self.on_button_data_request_clicked)
 
