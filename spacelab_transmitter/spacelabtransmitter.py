@@ -75,10 +75,8 @@ _LOGO_FILE_LINUX_SYSTEM         = '/usr/share/spacelab_transmitter/spacelab-logo
 _DIR_CONFIG_LINUX               = '.spacelab_transmitter'
 _DIR_CONFIG_WINDOWS             = 'spacelab_transmitter'
 
-_SAT_JSON_FLORIPASAT_1_LOCAL    = os.path.abspath(os.path.dirname(__file__)) + '/data/satellites/floripasat-1.json'
-_SAT_JSON_FLORIPASAT_1_SYSTEM   = '/usr/share/spacelab_transmitter/floripasat-1.json'
-_SAT_JSON_GOLDS_UFSC_LOCAL      = os.path.abspath(os.path.dirname(__file__)) + '/data/satellites/golds-ufsc.json'
-_SAT_JSON_GOLDS_UFSC_SYSTEM     = '/usr/share/spacelab_transmitter/golds-ufsc.json'
+_SAT_JSON_LOCAL_PATH            = os.path.abspath(os.path.dirname(__file__)) + '/data/satellites/'
+_SAT_JSON_SYSTEM_PATH           = '/usr/share/spacelab_decoder/'
 
 _DEFAULT_CALLSIGN               = 'PP5UF'
 _DEFAULT_LOCATION               = 'Florianópolis'
@@ -91,6 +89,20 @@ _DIR_CONFIG_LOGFILE_LINUX       = 'spacelab_transmitter'
 _DEFAULT_LOGFILE_PATH           = os.path.join(os.path.expanduser('~'), _DIR_CONFIG_LOGFILE_LINUX)
 _DEFAULT_LOGFILE                = 'logfile.csv'
 
+# Satellites
+_SATELLITES                     = [["FloripaSat-1", "floripasat-1.json"],
+                                   ["GOLDS-UFSC", "golds-ufsc.json"],
+                                   ["Aldebaran-1", "aldebaran-1.json"],
+                                   ["Catarina-A1", "catarina-a1.json"],
+                                   ["Catarina-A2", "catarina-a2.json"]]
+
+# Modulations
+_MODULATION_GMSK                = "GMSK"
+
+# Protocols
+_PROTOCOL_NGHAM                 = "NGHam"
+
+# SDRs
 _SDR_MODELS                     = ['USRP', 'Pluto SDR']
 
 class DialogPassword(Gtk.Dialog):
@@ -135,12 +147,6 @@ class SpaceLabTransmitter:
         self._build_widgets()
         self.write_log("SpaceLab Transmitter initialized!")
         self._load_preferences()
-
-        self.pkt = []
-        self.label = ""
-
-        #self.ngham = pyngham.PyNGHam()
-        #self.decoded_packets_index = list()
 
     def _build_widgets(self):
         # Main window
@@ -203,8 +209,8 @@ class SpaceLabTransmitter:
 
         # Satellite combobox
         self.liststore_satellite = self.builder.get_object("liststore_satellite")
-        self.liststore_satellite.append(["FloripaSat-1"])
-        self.liststore_satellite.append(["GOLDS-UFSC"])
+        for sat in _SATELLITES:
+            self.liststore_satellite.append([sat[0]])
         self.combobox_satellite = self.builder.get_object("combobox_satellite")
         cell = Gtk.CellRendererText()
         self.combobox_satellite.pack_start(cell, True)
@@ -290,8 +296,6 @@ class SpaceLabTransmitter:
         self.button_data_request = self.builder.get_object("button_data_request")
         self.button_data_request.connect("clicked", self.on_button_data_request_clicked)
 
-
-
     def run(self):
         self.window.show_all()          
         Gtk.main()
@@ -306,27 +310,41 @@ class SpaceLabTransmitter:
 
         pl = pg.generate(callsign)
 
-        pngh = PyNGHam()
+        mod_name, freq, baud, sync, prot_name = self._get_link_info()
 
-        pkt = pngh.encode(pl)
+        prot = None
+        if _PROTOCOL_NGHAM == prot_name:
+            prot = PyNGHam()
+        else:
+            error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error transmitting a ping request!")
+            error_dialog.format_secondary_text("The" + mod_name + "protocol is not supported yet!")
+            error_dialog.run()
+            error_dialog.destroy()
 
-        sat_json = str()
-        if self.combobox_satellite.get_active() == 0:
-            sat_json = 'FloripaSat-1'
-        elif self.combobox_satellite.get_active() == 1:
-            sat_json = 'GOLDS-UFSC'
+            return
+
+        pkt = prot.encode(pl)
 
         carrier_frequency = self.entry_carrier_frequency.get_text()
         tx_gain = self.spinbutton_tx_gain.get_text()
 
-        mod = GMSK(0.5, 1200)   # BT = 0.5, 1200 bps
+        mod = None
+        if mod_name == _MODULATION_GMSK:
+            mod = GMSK(0.5, baud)   # BT = 0.5
+        else:
+            error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error transmitting a ping request!")
+            error_dialog.format_secondary_text("The" + mod_name + "modulation is not supported yet!")
+            error_dialog.run()
+            error_dialog.destroy()
+
+            return
 
         samples, sample_rate, duration_s = mod.modulate(pkt, 1000)
 
         sdr = USRP(int(self.entry_sample_rate.get_text()), int(tx_gain))
 
         if sdr.transmit(samples, duration_s, sample_rate, int(carrier_frequency)):
-            self.write_log("Ping request transmitted to " + sat_json + " from" + callsign + " in " + carrier_frequency + " Hz with a gain of " + tx_gain + " dB")
+            self.write_log("Ping request transmitted to " + _SATELLITES[self.combobox_satellite.get_active()][0] + " from" + callsign + " in " + carrier_frequency + " Hz with a gain of " + tx_gain + " dB")
         else:
             self.write_log("Error transmitting a ping telecommand!")
 
@@ -339,12 +357,8 @@ class SpaceLabTransmitter:
             if response_key == Gtk.ResponseType.OK:
                 callsign = self.entry_preferences_general_callsign.get_text()
                 fr = Enter_hibernation()
-                key = dialog_password.get_key()
-                pl = fr.generate(callsign, dialog.get_hours(),key) 
-                pngh = PyNGHam()
-                self.pkt = pngh.encode(pl)
-                self.label = "Enter Hibernation"
-                self._transmit_tc(self.pkt, self.label)
+                pl = fr.generate(callsign, dialog.get_hours(), dialog_password.get_key())
+                self._transmit_tc(pl, "Enter Hibernation")
                 dialog.destroy()
                 dialog_password.destroy()
             elif response_key == Gtk.ResponseType.CANCEL:
@@ -369,12 +383,8 @@ class SpaceLabTransmitter:
             if response_key == Gtk.ResponseType.OK:
                 callsign = self.entry_preferences_general_callsign.get_text()
                 fr = ActivateModule()
-                key = dialog_password.get_key()
-                pl = fr.generate(callsign, dialog.get_ac_mod_id(),key) 
-                pngh = PyNGHam()
-                self.pkt = pngh.encode(pl)
-                self.label = "Activate Module"
-                self._transmit_tc(self.pkt, self.label)
+                pl = fr.generate(callsign, dialog.get_ac_mod_id(), dialog_password.get_key())
+                self._transmit_tc(pl, "Activate Module")
                 dialog.destroy()
                 dialog_password.destroy()
             elif response_key == Gtk.ResponseType.CANCEL:
@@ -399,12 +409,8 @@ class SpaceLabTransmitter:
             if response_key == Gtk.ResponseType.OK:
                 callsign = self.entry_preferences_general_callsign.get_text()
                 fr = DeactivateModule()
-                key = dialog_password.get_key()
-                pl = fr.generate(callsign, dialog.get_deac_mod_id(),key) 
-                pngh = PyNGHam()
-                self.pkt = pngh.encode(pl)
-                self.label = "Deactivate Module"
-                self._transmit_tc(self.pkt, self.label)
+                pl = fr.generate(callsign, dialog.get_deac_mod_id(), dialog_password.get_key())
+                self._transmit_tc(pl, "Deactivate Module")
                 dialog.destroy()
                 dialog_password.destroy()
             elif response_key == Gtk.ResponseType.CANCEL:
@@ -429,12 +435,8 @@ class SpaceLabTransmitter:
             if response_key == Gtk.ResponseType.OK:
                 callsign = self.entry_preferences_general_callsign.get_text()
                 fr = DeactivatePayload()
-                key = dialog_password.get_key()
-                pl = fr.generate(callsign, dialog.get_deac_pl_id(),key) 
-                pngh = PyNGHam()
-                self.pkt = pngh.encode(pl)
-                self.label = "Deactivate Payload"
-                self._transmit_tc(self.pkt, self.label)
+                pl = fr.generate(callsign, dialog.get_deac_pl_id(), dialog_password.get_key())
+                self._transmit_tc(pl, "Deactivate Payload")
                 dialog.destroy()
                 dialog_password.destroy()
             elif response_key == Gtk.ResponseType.CANCEL:
@@ -459,12 +461,8 @@ class SpaceLabTransmitter:
             if response_key == Gtk.ResponseType.OK:
                 callsign = self.entry_preferences_general_callsign.get_text()
                 fr = ActivatePayload()
-                key = dialog_password.get_key()
-                pl = fr.generate(callsign, dialog.get_ac_pl_id(),key) 
-                pngh = PyNGHam()
-                self.pkt = pngh.encode(pl)
-                self.label = "Activate Payload"
-                self._transmit_tc(self.pkt, self.label)
+                pl = fr.generate(callsign, dialog.get_ac_pl_id(), dialog_password.get_key())
+                self._transmit_tc(pl, "Activate Payload")
                 dialog.destroy()
                 dialog_password.destroy()
             elif response_key == Gtk.ResponseType.CANCEL:
@@ -486,12 +484,8 @@ class SpaceLabTransmitter:
         if response == Gtk.ResponseType.OK:
             callsign = self.entry_preferences_general_callsign.get_text()
             fr = EraseMemory()
-            key = dialog.get_key()
-            pl = fr.generate(callsign, key)
-            pngh = PyNGHam()
-            self.pkt = pngh.encode(pl)
-            self.label = "Erase Memory"
-            self._transmit_tc(self.pkt, self.label)
+            pl = fr.generate(callsign, dialog.get_key())
+            self._transmit_tc(pl, "Erase Memory")
         elif response == Gtk.ResponseType.CANCEL:
             dialog.destroy()
         elif response == Gtk.ResponseType.DELETE_EVENT:
@@ -508,12 +502,8 @@ class SpaceLabTransmitter:
             if response_key == Gtk.ResponseType.OK:
                 callsign = self.entry_preferences_general_callsign.get_text()
                 fr = SetParameter()
-                key = dialog_password.get_key()
-                pl = fr.generate(callsign, dialog.get_subsys_id(),dialog.get_param_id(),dialog.get_param_val(), key) 
-                pngh = PyNGHam()
-                self.pkt = pngh.encode(pl)
-                self.label = "Set Parameter"
-                self._transmit_tc(self.pkt, self.label)
+                pl = fr.generate(callsign, dialog.get_subsys_id(),dialog.get_param_id(),dialog.get_param_val(), dialog_password.get_key())
+                self._transmit_tc(pl, "Set Parameter")
                 dialog.destroy()
                 dialog_password.destroy()
             elif response_key == Gtk.ResponseType.CANCEL:
@@ -538,12 +528,8 @@ class SpaceLabTransmitter:
             if response_key == Gtk.ResponseType.OK:
                 callsign = self.entry_preferences_general_callsign.get_text()
                 fr = DataRequest()
-                key = dialog_password.get_key()
-                pl = fr.generate(callsign, dialog.get_data_id(),dialog.get_start_ts(),dialog.get_end_ts(), key) 
-                pngh = PyNGHam()
-                self.pkt = pngh.encode(pl)
-                self.label = "Data Request"
-                self._transmit_tc(self.pkt, self.label)
+                pl = fr.generate(callsign, dialog.get_data_id(),dialog.get_start_ts(), dialog.get_end_ts(), dialog_password.get_key())
+                self._transmit_tc(pl, "Data Request")
                 dialog.destroy()
                 dialog_password.destroy()
             elif response_key == Gtk.ResponseType.CANCEL:
@@ -565,12 +551,8 @@ class SpaceLabTransmitter:
         if response == Gtk.ResponseType.OK:
             callsign = self.entry_preferences_general_callsign.get_text()
             fr = LeaveHibernation()
-            key = dialog.get_key()
-            pl = fr.generate(callsign, key)
-            pngh = PyNGHam()
-            self.pkt = pngh.encode(pl)
-            self.label = "Leave Hibernation"
-            self._transmit_tc(self.pkt, self.label)
+            pl = fr.generate(callsign, dialog.get_key())
+            self._transmit_tc(pl, "Leave Hibernation")
         elif response == Gtk.ResponseType.CANCEL:
             dialog.destroy()
         elif response == Gtk.ResponseType.DELETE_EVENT:
@@ -585,12 +567,8 @@ class SpaceLabTransmitter:
         if response == Gtk.ResponseType.OK:
             callsign = self.entry_preferences_general_callsign.get_text()
             fr = ForceReset()
-            key = dialog.get_key()
-            pl = fr.generate(callsign, key)
-            pngh = PyNGHam()
-            self.pkt = pngh.encode(pl)
-            self.label = "Force Reset"
-            self._transmit_tc(self.pkt, self.label)
+            pl = fr.generate(callsign, dialog.get_key())
+            self._transmit_tc(pl, "Force Reset")
         elif response == Gtk.ResponseType.CANCEL:
             dialog.destroy()
         elif response == Gtk.ResponseType.DELETE_EVENT:
@@ -606,8 +584,8 @@ class SpaceLabTransmitter:
             print("The OK button was clicked")
         elif response == Gtk.ResponseType.CANCEL:
             print("The Cancel button was clicked")
-        print(self.pkt, self.label)
-        self._transmit_tc(self.pkt, self.label)
+#        print(self.pkt, self.label)
+#        self._transmit_tc(self.pkt, self.label)
 
     def on_button_password_cancel_clicked(self, button):
         self.dialog_password.destroy()
@@ -621,12 +599,8 @@ class SpaceLabTransmitter:
             if response_key == Gtk.ResponseType.OK:
                 callsign = self.entry_preferences_general_callsign.get_text()
                 fr = GetParameter()
-                key = dialog_password.get_key()
-                pl = fr.generate(callsign, dialog.get_subsys_id(),dialog.get_param_id(), key) 
-                pngh = PyNGHam()
-                self.pkt = pngh.encode(pl)
-                self.label = "Get Parameter"
-                self._transmit_tc(self.pkt, self.label)
+                pl = fr.generate(callsign, dialog.get_subsys_id(), dialog.get_param_id(), dialog_password.get_key())
+                self._transmit_tc(pl, "Get Parameter")
                 dialog.destroy()
                 dialog_password.destroy()
             elif response_key == Gtk.ResponseType.CANCEL:
@@ -651,12 +625,8 @@ class SpaceLabTransmitter:
             if response_key == Gtk.ResponseType.OK:
                 callsign = self.entry_preferences_general_callsign.get_text()
                 fr = GetPayloadData()
-                key = dialog_password.get_key()
-                pl = fr.generate(callsign, dialog.get_pl_id(),dialog.get_pl_args(), key) 
-                pngh = PyNGHam()
-                self.pkt = pngh.encode(pl)
-                self.label = "Get Payload Data"
-                self._transmit_tc(self.pkt, self.label)
+                pl = fr.generate(callsign, dialog.get_pl_id(), dialog.get_pl_args(), dialog_password.get_key())
+                self._transmit_tc(pl, "Get Payload Data")
                 dialog.destroy()
                 dialog_password.destroy()
             elif response_key == Gtk.ResponseType.CANCEL:
@@ -679,24 +649,42 @@ class SpaceLabTransmitter:
             self.dialog_broadcast.hide()
 
     def _transmit_tc(self, pkt, tc_name):
-        sat_json = str()
-        if self.combobox_satellite.get_active() == 0:
-            sat_json = 'FloripaSat-1'
-        elif self.combobox_satellite.get_active() == 1:
-            sat_json = 'GOLDS-UFSC'
-
         carrier_frequency = self.entry_carrier_frequency.get_text()
         tx_gain = self.spinbutton_tx_gain.get_text()
         callsign = self.entry_preferences_general_callsign.get_text()
 
-        mod = GMSK(0.5, 1200)   # BT = 0.5, 1200 bps
+        mod_name, freq, baud, sync, prot_name = self._get_link_info()
 
-        samples, sample_rate, duration_s = mod.modulate(pkt, 1000)
+        prot = None
+        if _PROTOCOL_NGHAM == prot_name:
+            prot = PyNGHam()
+        else:
+            error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error transmitting a ping request!")
+            error_dialog.format_secondary_text("The" + mod_name + "protocol is not supported yet!")
+            error_dialog.run()
+            error_dialog.destroy()
+
+            return
+
+        enc_pkt = prot.encode(pkt)
+
+        mod = None
+        if mod_name == _MODULATION_GMSK:
+            mod = GMSK(0.5, baud)   # BT = 0.5
+        else:
+            error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error transmitting a telecommand!")
+            error_dialog.format_secondary_text("The" + mod_name + "modulation is not supported yet!")
+            error_dialog.run()
+            error_dialog.destroy()
+
+            return
+
+        samples, sample_rate, duration_s = mod.modulate(enc_pkt, 1000)
 
         sdr = USRP(int(self.entry_sample_rate.get_text()), int(tx_gain))
 
         if sdr.transmit(samples, duration_s, sample_rate, int(carrier_frequency)):
-            self.write_log(tc_name + " transmitted to " + sat_json + " from" + callsign + " in " + carrier_frequency + " Hz with a gain of " + tx_gain + " dB")
+            self.write_log(tc_name + " transmitted to " + _SATELLITES[self.combobox_satellite.get_active()][0] + " from" + callsign + " in " + carrier_frequency + " Hz with a gain of " + tx_gain + " dB")
         else:
             self.write_log("Error transmitting a " + tc_name + " telecommand!")
 
@@ -711,11 +699,7 @@ class SpaceLabTransmitter:
 
         pl = bm.generate(self.entry_preferences_general_callsign.get_text(), dst_adr, msg)
 
-        pngh = PyNGHam()
-
-        pkt = pngh.encode(pl)
-
-        self._transmit_tc(pkt, "Broadcast Message")
+        self._transmit_tc(pl, "Broadcast Message")
         self.dialog_broadcast.hide()
 
     #CODE REGARDING PREFERENCES 
@@ -823,3 +807,23 @@ class SpaceLabTransmitter:
             self.button_activate_module.set_sensitive(True)
             self.button_deactivate_payload.set_sensitive(True)
             self.button_get_payload_data.set_sensitive(True)
+
+    def _get_link_info(self):
+        sat_config_file = str()
+
+        for i in range(len(_SATELLITES)):
+            if self.combobox_satellite.get_active() == i:
+                if os.path.isfile(_SAT_JSON_LOCAL_PATH + _SATELLITES[i][1]):
+                    sat_config_file = _SAT_JSON_LOCAL_PATH + _SATELLITES[i][1]
+                else:
+                    sat_config_file = _SAT_JSON_SYSTEM_PATH + _SATELLITES[i][1]
+
+        with open(sat_config_file) as f:
+            sat_info = json.load(f)
+            modulation  = sat_info['modulation']
+            frequency   = sat_info['frequency']
+            baudrate    = sat_info['baudrate']
+            sync_word   = sat_info['sync_word']
+            protocol    = sat_info['protocol']
+
+            return modulation, frequency, baudrate, sync_word, protocol
