@@ -522,7 +522,6 @@ class SpaceLabTransmitter:
             dialog.destroy()
 
     def on_button_force_reset_clicked(self, button_password_send):
-        #response = self.dialog_password.run()
         dialog = DialogPassword(self.window)
         response = dialog.run()
         if response == Gtk.ResponseType.OK:
@@ -536,20 +535,6 @@ class SpaceLabTransmitter:
             dialog.destroy()
         else:
             dialog.destroy()
-
-    def on_button_password_send_clicked(self, dialog_password):
-        #response = dialog_password.run()
-        dialog = DialogPassword(self.window)
-        response = dialog.run()
-        if response == Gtk.ResponseType.OK:
-            print("The OK button was clicked")
-        elif response == Gtk.ResponseType.CANCEL:
-            print("The Cancel button was clicked")
-#        print(self.pkt, self.label)
-#        self._transmit_tc(self.pkt, self.label)
-
-    def on_button_password_cancel_clicked(self, button):
-        self.dialog_password.destroy()
 
     def on_button_get_parameter_clicked(self, button):
         dialog = DialogGetParameter(self.window)
@@ -662,8 +647,6 @@ class SpaceLabTransmitter:
 
         self._transmit_tc(pl, "Broadcast Message")
         self.dialog_broadcast.hide()
-
-    #CODE REGARDING PREFERENCES 
 
     def on_button_preferences_clicked(self, button):
         response = self.dialog_preferences.run()
