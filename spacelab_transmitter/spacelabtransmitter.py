@@ -59,6 +59,7 @@ from pyngham import PyNGHam
 import spacelab_transmitter.version
 from spacelab_transmitter.gmsk import GMSK
 from spacelab_transmitter.usrp import USRP
+from spacelab_transmitter.pluto import Pluto
 from spacelab_transmitter.tc_ping import Ping
 from spacelab_transmitter.tc_enter_hibernation import Enter_hibernation
 
@@ -622,7 +623,18 @@ class SpaceLabTransmitter:
 
         samples, sample_rate, duration_s = mod.modulate(enc_pkt, 1000)
 
-        sdr = USRP(int(self.entry_sample_rate.get_text()), int(tx_gain))
+        sdr = None
+        if self.combobox_sdr.get_active() == 0:   # USRP
+            sdr = USRP(int(self.entry_sample_rate.get_text()), int(tx_gain))
+        elif self.combobox_sdr.get_active() == 1: # Pluto SDR
+            sdr = Pluto(int(self.entry_sample_rate.get_text()), int(tx_gain))
+        else:
+            error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error transmitting a" + tc_name + "telecommand!")
+            error_dialog.format_secondary_text("SDR device not supported yet!")
+            error_dialog.run()
+            error_dialog.destroy()
+
+            return
 
         if sdr.transmit(samples, duration_s, sample_rate, int(carrier_frequency)):
             self.write_log(tc_name + " transmitted to " + _SATELLITES[self.combobox_satellite.get_active()][0] + " from" + callsign + " in " + carrier_frequency + " Hz with a gain of " + tx_gain + " dB")
