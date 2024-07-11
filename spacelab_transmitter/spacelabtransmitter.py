@@ -305,48 +305,9 @@ class SpaceLabTransmitter:
 
     def on_button_ping_request_command_clicked(self, button):
         callsign = self.entry_preferences_general_callsign.get_text()
-
-        pg = Ping()
-
-        pl = pg.generate(callsign)
-
-        mod_name, freq, baud, sync, prot_name = self._get_link_info()
-
-        prot = None
-        if _PROTOCOL_NGHAM == prot_name:
-            prot = PyNGHam()
-        else:
-            error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error transmitting a ping request!")
-            error_dialog.format_secondary_text("The" + mod_name + "protocol is not supported yet!")
-            error_dialog.run()
-            error_dialog.destroy()
-
-            return
-
-        pkt = prot.encode(pl)
-
-        carrier_frequency = self.entry_carrier_frequency.get_text()
-        tx_gain = self.spinbutton_tx_gain.get_text()
-
-        mod = None
-        if mod_name == _MODULATION_GMSK:
-            mod = GMSK(0.5, baud)   # BT = 0.5
-        else:
-            error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error transmitting a ping request!")
-            error_dialog.format_secondary_text("The" + mod_name + "modulation is not supported yet!")
-            error_dialog.run()
-            error_dialog.destroy()
-
-            return
-
-        samples, sample_rate, duration_s = mod.modulate(pkt, 1000)
-
-        sdr = USRP(int(self.entry_sample_rate.get_text()), int(tx_gain))
-
-        if sdr.transmit(samples, duration_s, sample_rate, int(carrier_frequency)):
-            self.write_log("Ping request transmitted to " + _SATELLITES[self.combobox_satellite.get_active()][0] + " from" + callsign + " in " + carrier_frequency + " Hz with a gain of " + tx_gain + " dB")
-        else:
-            self.write_log("Error transmitting a ping telecommand!")
+        fr = Ping()
+        pl = fr.generate(callsign)
+        self._transmit_tc(pl, "Ping")
 
     def on_button_enter_hibernation_clicked(self, button):
         dialog = DialogEnterHibernation(self.window)
@@ -659,7 +620,7 @@ class SpaceLabTransmitter:
         if _PROTOCOL_NGHAM == prot_name:
             prot = PyNGHam()
         else:
-            error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error transmitting a ping request!")
+            error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error transmitting a" + tc_name + "telecommand!")
             error_dialog.format_secondary_text("The" + mod_name + "protocol is not supported yet!")
             error_dialog.run()
             error_dialog.destroy()
@@ -672,7 +633,7 @@ class SpaceLabTransmitter:
         if mod_name == _MODULATION_GMSK:
             mod = GMSK(0.5, baud)   # BT = 0.5
         else:
-            error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error transmitting a telecommand!")
+            error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error transmitting a" + tc_name + "telecommand!")
             error_dialog.format_secondary_text("The" + mod_name + "modulation is not supported yet!")
             error_dialog.run()
             error_dialog.destroy()
