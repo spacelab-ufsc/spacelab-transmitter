@@ -43,6 +43,7 @@ def test_log():
     x = SpaceLabTransmitter()
 
     logs = list()
+    logs.append("SpaceLab Transmitter initialized!")
 
     n = random.randint(2, 10)
     for i in range(n):
