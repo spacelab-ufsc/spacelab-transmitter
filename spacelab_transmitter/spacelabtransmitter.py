@@ -292,6 +292,10 @@ class SpaceLabTransmitter:
         self.button_data_request = self.builder.get_object("button_data_request")
         self.button_data_request.connect("clicked", self.on_button_data_request_clicked)
 
+        # Transmit Packet
+        self.button_tx_pkt = self.builder.get_object("button_tx_pkt")
+        self.button_tx_pkt.connect("clicked", self.on_button_tx_pkt_clicked)
+
     def run(self):
         self.window.show_all()          
         Gtk.main()
@@ -584,11 +588,14 @@ class SpaceLabTransmitter:
         else:
             dialog.destroy()
 
-    def on_button_broadcast_message_clicked(self, button): 
+    def on_button_broadcast_message_clicked(self, button):
         response = self.dialog_broadcast.run()
 
         if response == Gtk.ResponseType.DELETE_EVENT:
             self.dialog_broadcast.hide()
+
+    def on_button_tx_pkt_clicked(self, button):
+        pass
 
     def _transmit_tc(self, pkt, tc_name):
         carrier_frequency = self.entry_carrier_frequency.get_text()
