@@ -1,9 +1,10 @@
 {
     "satellite": "GOLDS-UFSC",
-    "modulation": "gmsk",
-    "frequency": 450e6,
+    "modulation": "GMSK",
+    "frequency": 401e6,
     "baudrate": 4800,
-    "protocol": "ngham",
+    "sync_word": [93, 230, 42, 126],
+    "protocol": "NGHam",
     "telecommands": [
         {
             "name": "Ping request",
