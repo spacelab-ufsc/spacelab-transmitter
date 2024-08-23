@@ -37,17 +37,20 @@ class Pluto:
         self._pluto = adi.Pluto("ip:192.168.2.1")
         self._pluto.sample_rate = int(sample_rate)
         self._pluto.tx_rf_bandwidth = int(sample_rate)
-        self._pluto.tx_hardwaregain_chan0 = gain
+        self._pluto.tx_hardwaregain_chan0 = int(gain)
 
-    def transmit(self, samples, freq):
+    def transmit(self, samples, dur, rate, freq):
         """
         Function to transmit IQ samples through the SDR device.
 
         :param: samples: A NumPy array with the IQ data (complex).
+        :param: dur: is the time duration of the transmission (in seconds).
+        :param: rate: is the samples rate of the input samples.
         :param: freq: is the frequency in Hz.
 
         :return: None.
         """
+        samples *= 2**14    # The PlutoSDR expects samples to be between -2^14 and +2^14, not -1 and +1 like some SDRs
         self._pluto.tx_lo = int(freq)
 
         self._pluto.tx(samples)
