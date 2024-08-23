@@ -82,6 +82,12 @@ _SAT_JSON_SYSTEM_PATH           = '/usr/share/spacelab_decoder/'
 _DEFAULT_CALLSIGN               = 'PP5UF'
 _DEFAULT_LOCATION               = 'Florianópolis'
 _DEFAULT_COUNTRY                = 'Brazil'
+_DEFAULT_DOPPLER_ADDRESS        = '127.0.0.1'
+_DEFAULT_DOPPLER_PORT           = 7356
+_DEFAULT_FREQUENCY              = 437000000
+_DEFAULT_SAMPLE_RATE            = 1000000
+_DEFAULT_GAIN_USRP              = 40
+_DEFAULT_GAIN_PLUTO             = -30
 
 _DIR_CONFIG_DEFAULTJSON         = 'spacelab_transmitter.json'
 
@@ -152,7 +158,7 @@ class SpaceLabTransmitter:
         else:
             self.window.set_icon_from_file(_ICON_FILE_LINUX_SYSTEM)
         self.window.set_wmclass(self.window.get_title(), self.window.get_title())
-        self.window.connect("destroy", Gtk.main_quit)
+        self.window.connect("destroy", self.on_main_window_destroy)
 
         # Entry_preferences_general_callsign builder
         self.entry_preferences_general_callsign = self.builder.get_object("entry_preferences_general_callsign")
@@ -186,10 +192,6 @@ class SpaceLabTransmitter:
 
         # Switch button Doppler correction
         self.switch_doppler = self.builder.get_object("switch_doppler")
-
-        # Logfile chooser button
-        self.logfile_chooser_button = self.builder.get_object("logfile_chooser_button")
-        self.logfile_chooser_button.set_filename(_DEFAULT_LOGFILE_PATH)
 
         # SDR Parameters
         self.liststore_sdr = self.builder.get_object("liststore_sdr_devices")
@@ -228,6 +230,15 @@ class SpaceLabTransmitter:
         self.entry_preferences_general_callsign = self.builder.get_object("entry_preferences_general_callsign")
         self.entry_preferences_general_location = self.builder.get_object("entry_preferences_general_location")
         self.entry_preferences_general_country = self.builder.get_object("entry_preferences_general_country")
+
+        self.radiobutton_doppler_tle_file = self.builder.get_object("radiobutton_doppler_tle_file")
+        self.filechooser_doppler_tle_file = self.builder.get_object("filechooser_doppler_tle_file")
+        self.radiobutton_doppler_network = self.builder.get_object("radiobutton_doppler_network")
+        self.entry_doppler_address = self.builder.get_object("entry_doppler_address")
+        self.entry_doppler_port = self.builder.get_object("entry_doppler_port")
+
+        self.logfile_chooser_button = self.builder.get_object("logfile_chooser_button")
+        self.logfile_chooser_button.set_filename(_DEFAULT_LOGFILE_PATH)
 
         # Ping Request
         self.button_ping_request = self.builder.get_object("button_ping_request")
@@ -301,7 +312,8 @@ class SpaceLabTransmitter:
         self.window.show_all()          
         Gtk.main()
 
-    def destroy(window, self):
+    def on_main_window_destroy(self, window):
+        self._save_preferences()
         Gtk.main_quit()
 
     def on_button_ping_request_command_clicked(self, button):
@@ -693,17 +705,41 @@ class SpaceLabTransmitter:
         config = json.loads(f.read())
         f.close()
 
-        self.entry_preferences_general_callsign.set_text(config["callsign"])
-        self.entry_preferences_general_location.set_text(config["location"])
-        self.entry_preferences_general_country.set_text(config["country"])
-        self.logfile_chooser_button.set_filename(config["logfile_path"])
+        try:
+            self.entry_preferences_general_callsign.set_text(config["callsign"])
+            self.entry_preferences_general_location.set_text(config["location"])
+            self.entry_preferences_general_country.set_text(config["country"])
+            if config["doppler_from_network"]:
+                self.radiobutton_doppler_network.set_active(True)
+            else:
+                self.radiobutton_doppler_tle_file.set_active(True)
+            self.filechooser_doppler_tle_file.set_filename(config["tle_file"] if config["tle_file"] != None else "")
+            self.entry_doppler_address.set_text(config["doppler_address"])
+            self.entry_doppler_port.set_text(config["doppler_port"])
+            self.logfile_chooser_button.set_filename(config["logfile_path"])
+            self.combobox_sdr.set_active(config["sdr_dev"])
+            self.entry_carrier_frequency.set_text(config["sdr_freq"])
+            self.entry_sample_rate.set_text(config["sdr_sample_rate"])
+        except:
+            self._load_default_preferences()
+            self._save_preferences()
 
     def _load_default_preferences(self):
         self.entry_preferences_general_callsign.set_text(_DEFAULT_CALLSIGN)
         self.entry_preferences_general_location.set_text(_DEFAULT_LOCATION)
         self.entry_preferences_general_country.set_text(_DEFAULT_COUNTRY)
+
+        self.filechooser_doppler_tle_file.set_filename("")
+        self.radiobutton_doppler_network.set_active(True)
+        self.entry_doppler_address.set_text(_DEFAULT_DOPPLER_ADDRESS)
+        self.entry_doppler_port.set_text(str(_DEFAULT_DOPPLER_PORT))
+
         self.logfile_chooser_button.set_filename(_DEFAULT_LOGFILE_PATH)
-        
+
+        self.combobox_sdr.set_active(-1)
+        self.entry_carrier_frequency.set_text(str(_DEFAULT_FREQUENCY))
+        self.entry_sample_rate.set_text(str(_DEFAULT_SAMPLE_RATE))
+
     def _save_preferences(self):
         home = os.path.expanduser('~')
         location = os.path.join(home, _DIR_CONFIG_LINUX)
@@ -713,9 +749,16 @@ class SpaceLabTransmitter:
 
         with open(location + '/' + _DIR_CONFIG_DEFAULTJSON, 'w', encoding='utf-8') as f:
             json.dump({"callsign": self.entry_preferences_general_callsign.get_text(),
-                    "location": self.entry_preferences_general_location.get_text(),
-                    "country": self.entry_preferences_general_country.get_text(),
-                    "logfile_path": self.logfile_chooser_button.get_filename()}, f, ensure_ascii=False, indent=4)
+                       "location": self.entry_preferences_general_location.get_text(),
+                       "country": self.entry_preferences_general_country.get_text(),
+                       "doppler_from_network": self.radiobutton_doppler_network.get_active(),
+                       "tle_file": self.filechooser_doppler_tle_file.get_filename(),
+                       "doppler_address": self.entry_doppler_address.get_text(),
+                       "doppler_port": self.entry_doppler_port.get_text(),
+                       "logfile_path": self.logfile_chooser_button.get_filename(),
+                       "sdr_dev": self.combobox_sdr.get_active(),
+                       "sdr_freq": self.entry_carrier_frequency.get_text(),
+                       "sdr_sample_rate": self.entry_sample_rate.get_text()}, f, ensure_ascii=False, indent=4)
 
     def on_toolbutton_about_clicked(self, toolbutton):
         response = self.aboutdialog.run()
@@ -770,8 +813,13 @@ class SpaceLabTransmitter:
     def on_combobox_sdr_changed(self, combobox):
         if self.combobox_sdr.get_active() == 0:   # USRP
             self.spinbutton_tx_gain.set_range(0, 90)
+            self.spinbutton_tx_gain.set_value(_DEFAULT_GAIN_USRP)
         elif self.combobox_sdr.get_active() == 1: # Pluto SDR
             self.spinbutton_tx_gain.set_range(-90, 0)
+            self.spinbutton_tx_gain.set_value(_DEFAULT_GAIN_PLUTO)
+        else:
+            self.spinbutton_tx_gain.set_range(0, 90)
+            self.spinbutton_tx_gain.set_value(_DEFAULT_GAIN_USRP)
 
     def _get_link_info(self):
         sat_config_file = str()
