@@ -199,6 +199,7 @@ class SpaceLabTransmitter:
         cell = Gtk.CellRendererText()
         self.combobox_sdr.pack_start(cell, True)
         self.combobox_sdr.add_attribute(cell, "text", 0)
+        self.combobox_sdr.connect("changed", self.on_combobox_sdr_changed)
         self.entry_carrier_frequency = self.builder.get_object("entry_carrier_frequency")
         self.entry_sample_rate = self.builder.get_object("entry_sample_rate")
         self.spinbutton_tx_gain = self.builder.get_object("spinbutton_tx_gain")
@@ -765,6 +766,12 @@ class SpaceLabTransmitter:
             self.button_activate_module.set_sensitive(True)
             self.button_deactivate_payload.set_sensitive(True)
             self.button_get_payload_data.set_sensitive(True)
+
+    def on_combobox_sdr_changed(self, combobox):
+        if self.combobox_sdr.get_active() == 0:   # USRP
+            self.spinbutton_tx_gain.set_range(0, 90)
+        elif self.combobox_sdr.get_active() == 1: # Pluto SDR
+            self.spinbutton_tx_gain.set_range(-90, 0)
 
     def _get_link_info(self):
         sat_config_file = str()
