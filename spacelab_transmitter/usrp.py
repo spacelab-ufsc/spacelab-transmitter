@@ -51,6 +51,7 @@ class USRP:
 
         :return: True/False if successful or not.
         """
+        samples = samples.astype(np.complex64)
         samples = signal.resample_poly(samples, self._sample_rate, rate)
 
         if self._usrp.send_waveform(samples, dur, freq, self._sample_rate, [0], self._gain):

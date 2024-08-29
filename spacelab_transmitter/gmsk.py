@@ -52,7 +52,7 @@ class GMSK:
         :return: dur: Signal duration in seconds
         """
         I, Q, fs, dur = self.get_iq(data, L)
-        s_complex = np.complex64(I) - np.complex64(1j)*np.complex64(Q)  # Complex baseband representation
+        s_complex = I + 1j*Q    # Complex baseband representation
 
         return s_complex, fs, dur
 
@@ -71,14 +71,7 @@ class GMSK:
         # Convert to array of bits
         data = self._int_list_to_bit_list(data)
 
-        data_buff = list()
-        for i in data:
-            if i == 0:
-                data_buff.append(1)
-            else:
-                data_buff.append(0)
-
-        data = np.array(data_buff)
+        data = np.array(data)
 
         # Timing parameters
         fc = self._baudrate                         # Carrier frequency = Data transfer rate in bps
@@ -90,7 +83,7 @@ class GMSK:
         k = 1                                       # Truncation length for Gaussian LPF
         h_t = self._gaussian_lpf(Tb, L, k)          # Gaussian LPF with BT=0.25
         b_t = np.convolve(h_t, c_t, 'full')         # Convolve c(t) with Gaussian LPF to get b(t)
-        bnorm_t = b_t/max(abs(b_t))                 # Normalize the output of Gaussian LPF to +/-1
+        bnorm_t = b_t/np.max(np.abs(b_t))           # Normalize the output of Gaussian LPF to +/-1
 
         # Integrate to get phase information
         h = 0.5                                     # Modulation index (GMSK = 0.5)
