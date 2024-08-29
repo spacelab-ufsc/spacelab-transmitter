@@ -22,6 +22,9 @@
 
 
 import adi
+import numpy as np
+from scipy import signal
+import time
 
 class Pluto:
     """
@@ -34,10 +37,11 @@ class Pluto:
         :param sample_rate: Sample rate in S/s
         :param gain: gain in dB (valid range is -90 to 0 dB)
         """
+        self._sample_rate = sample_rate
         self._pluto = adi.Pluto("ip:192.168.2.1")
+        self._pluto.tx_hardwaregain_chan0 = int(gain)
         self._pluto.sample_rate = int(sample_rate)
         self._pluto.tx_rf_bandwidth = int(sample_rate)
-        self._pluto.tx_hardwaregain_chan0 = int(gain)
 
     def transmit(self, samples, dur, rate, freq):
         """
@@ -50,7 +54,15 @@ class Pluto:
 
         :return: None.
         """
+        samples = samples / np.max(np.abs(samples))
+        samples = samples.astype(np.complex64)
+        samples = signal.resample_poly(samples, self._sample_rate, rate)
         samples *= 2**14    # The PlutoSDR expects samples to be between -2^14 and +2^14, not -1 and +1 like some SDRs
+
         self._pluto.tx_lo = int(freq)
 
         self._pluto.tx(samples)
+
+        time.sleep(dur)
+
+        return True
