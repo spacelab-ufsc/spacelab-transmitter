@@ -214,6 +214,7 @@ class SpaceLabTransmitter:
         cell = Gtk.CellRendererText()
         self.combobox_satellite.pack_start(cell, True)
         self.combobox_satellite.add_attribute(cell, "text", 0)
+        self.combobox_satellite.connect("changed", self.on_combobox_satellite_changed)
 
         # Preferences dialog
         self.button_preferences = self.builder.get_object("button_preferences")
@@ -809,6 +810,10 @@ class SpaceLabTransmitter:
             self.button_activate_module.set_sensitive(True)
             self.button_deactivate_payload.set_sensitive(True)
             self.button_get_payload_data.set_sensitive(True)
+
+    def on_combobox_satellite_changed(self, combobox):
+        modulation, frequency, baudrate, sync_word, protocol = self._get_link_info()
+        self.entry_carrier_frequency.set_text(str(int(frequency)))
 
     def on_combobox_sdr_changed(self, combobox):
         if self.combobox_sdr.get_active() == 0:   # USRP
