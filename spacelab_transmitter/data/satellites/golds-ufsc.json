@@ -1,8 +1,8 @@
 {
     "satellite": "GOLDS-UFSC",
     "modulation": "GMSK",
-    "frequency": 401e6,
-    "baudrate": 4800,
+    "frequency": 145.9e6,
+    "baudrate": 1200,
     "sync_word": [93, 230, 42, 126],
     "protocol": "NGHam",
     "telecommands": [
