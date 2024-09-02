@@ -23,6 +23,7 @@
 
 import uhd
 from scipy import signal
+import numpy as np
 
 class USRP:
     """
