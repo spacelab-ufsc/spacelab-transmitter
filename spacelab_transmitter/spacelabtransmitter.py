@@ -31,11 +31,15 @@ import json
 import csv
 
 import gi
-from numpy import broadcast
+gi.require_version('Gtk', '3.0')
+from gi.repository import Gtk
+from gi.repository import GdkPixbuf
+
+import spacelab_transmitter.version
+
 from spacelab_transmitter.tc_activate_module import ActivateModule
 from spacelab_transmitter.tc_broadcast import Broadcast
 from spacelab_transmitter.tc_data_request import DataRequest
-
 from spacelab_transmitter.tc_deactivate_module import DeactivateModule
 from spacelab_transmitter.tc_activate_payload import ActivatePayload
 from spacelab_transmitter.tc_deactivate_payload import DeactivatePayload
@@ -45,23 +49,17 @@ from spacelab_transmitter.tc_get_parameter import GetParameter
 from spacelab_transmitter.tc_get_payload_data import GetPayloadData
 from spacelab_transmitter.tc_leave_hibernation import LeaveHibernation
 from spacelab_transmitter.tc_set_parameter import SetParameter
-from spacelab_transmitter.telecommands_transmission import DialogDataRequest, DialogDeactivatePayload, DialogEnterHibernation, DialogActivatePayload, DialogGetPayloadData, DialogSetParameter
-from spacelab_transmitter.telecommands_transmission import DialogDeactivateModule, DialogDeactivatePayload
-from spacelab_transmitter.telecommands_transmission import DialogActivateModule, DialogGetParameter
+from spacelab_transmitter.tc_transmit_packet import TransmitPacket
+from spacelab_transmitter.tc_ping import Ping
+from spacelab_transmitter.tc_enter_hibernation import Enter_hibernation
 
+from spacelab_transmitter.telecommands_transmission import DialogDataRequest, DialogDeactivatePayload, DialogEnterHibernation, DialogActivatePayload, DialogGetPayloadData, DialogSetParameter, DialogDeactivateModule, DialogActivateModule, DialogGetParameter, DialogTransmitPacket
 
-gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk
-from gi.repository import GdkPixbuf
-
-from pyngham import PyNGHam
-
-import spacelab_transmitter.version
 from spacelab_transmitter.gmsk import GMSK
 from spacelab_transmitter.usrp import USRP
 from spacelab_transmitter.pluto import Pluto
-from spacelab_transmitter.tc_ping import Ping
-from spacelab_transmitter.tc_enter_hibernation import Enter_hibernation
+
+from pyngham import PyNGHam
 
 # Constants
 _UI_FILE_LOCAL                  = os.path.abspath(os.path.dirname(__file__)) + '/data/ui/spacelab_transmitter.glade'
@@ -609,7 +607,10 @@ class SpaceLabTransmitter:
             self.dialog_broadcast.hide()
 
     def on_button_tx_pkt_clicked(self, button):
-        pass
+        response = self.dialog_transmit_packet.run()
+
+        if response == Gtk.ResponseType.DELETE_EVENT:
+            self.dialog_transmit_packet.hide()
 
     def _transmit_tc(self, pkt, tc_name):
         carrier_frequency = self.entry_carrier_frequency.get_text()
