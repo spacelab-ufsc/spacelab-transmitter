@@ -29,6 +29,7 @@ from datetime import datetime
 import pathlib
 import json
 import csv
+import socket
 
 import gi
 gi.require_version('Gtk', '3.0')
@@ -142,6 +143,8 @@ class SpaceLabTransmitter:
         else:
             self.builder.add_from_file(_UI_FILE_LINUX_SYSTEM)
 
+        self._client_socket = None
+
         self.builder.connect_signals(self)
 
         self._build_widgets()
@@ -213,6 +216,14 @@ class SpaceLabTransmitter:
         self.combobox_satellite.pack_start(cell, True)
         self.combobox_satellite.add_attribute(cell, "text", 0)
         self.combobox_satellite.connect("changed", self.on_combobox_satellite_changed)
+
+        # TCP socket
+        self.entry_tcp_address = self.builder.get_object("entry_tcp_address")
+        self.entry_tcp_port = self.builder.get_object("entry_tcp_port")
+        self.button_tcp_connect = self.builder.get_object("button_tcp_connect")
+        self.button_tcp_connect.connect("clicked", self.on_button_tcp_connect_clicked)
+        self.button_tcp_disconnect = self.builder.get_object("button_tcp_disconnect")
+        self.button_tcp_disconnect.connect("clicked", self.on_button_tcp_disconnect_clicked)
 
         # Preferences dialog
         self.button_preferences = self.builder.get_object("button_preferences")
@@ -313,6 +324,10 @@ class SpaceLabTransmitter:
 
     def on_main_window_destroy(self, window):
         self._save_preferences()
+
+        if self._client_socket:
+            self._client_socket.close()
+
         Gtk.main_quit()
 
     def on_button_ping_request_command_clicked(self, button):
@@ -632,36 +647,47 @@ class SpaceLabTransmitter:
 
         enc_pkt = prot.encode(pkt)
 
-        mod = None
-        if mod_name == _MODULATION_GMSK:
-            mod = GMSK(0.5, baud)   # BT = 0.5
+        if self.button_tcp_connect.get_sensitive():
+            mod = None
+            if mod_name == _MODULATION_GMSK:
+                mod = GMSK(0.5, baud)   # BT = 0.5
+            else:
+                error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error transmitting a" + tc_name + "telecommand!")
+                error_dialog.format_secondary_text("The" + mod_name + "modulation is not supported yet!")
+                error_dialog.run()
+                error_dialog.destroy()
+
+                return
+
+            samples, sample_rate, duration_s = mod.modulate(enc_pkt, 1000)
+
+            sdr = None
+            if self.combobox_sdr.get_active() == 0:   # USRP
+                sdr = USRP(int(self.entry_sample_rate.get_text()), int(tx_gain))
+            elif self.combobox_sdr.get_active() == 1: # Pluto SDR
+                sdr = Pluto(int(self.entry_sample_rate.get_text()), int(tx_gain))
+            else:
+                error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error transmitting a" + tc_name + "telecommand!")
+                error_dialog.format_secondary_text("SDR device not supported yet!")
+                error_dialog.run()
+                error_dialog.destroy()
+
+                return
+
+            if sdr.transmit(samples, duration_s, sample_rate, int(carrier_frequency)):
+                self.write_log(tc_name + " transmitted to " + _SATELLITES[self.combobox_satellite.get_active()][0] + " from" + callsign + " in " + carrier_frequency + " Hz with a gain of " + tx_gain + " dB")
+            else:
+                self.write_log("Error transmitting a " + tc_name + " telecommand!")
         else:
-            error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error transmitting a" + tc_name + "telecommand!")
-            error_dialog.format_secondary_text("The" + mod_name + "modulation is not supported yet!")
-            error_dialog.run()
-            error_dialog.destroy()
-
-            return
-
-        samples, sample_rate, duration_s = mod.modulate(enc_pkt, 1000)
-
-        sdr = None
-        if self.combobox_sdr.get_active() == 0:   # USRP
-            sdr = USRP(int(self.entry_sample_rate.get_text()), int(tx_gain))
-        elif self.combobox_sdr.get_active() == 1: # Pluto SDR
-            sdr = Pluto(int(self.entry_sample_rate.get_text()), int(tx_gain))
-        else:
-            error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error transmitting a" + tc_name + "telecommand!")
-            error_dialog.format_secondary_text("SDR device not supported yet!")
-            error_dialog.run()
-            error_dialog.destroy()
-
-            return
-
-        if sdr.transmit(samples, duration_s, sample_rate, int(carrier_frequency)):
-            self.write_log(tc_name + " transmitted to " + _SATELLITES[self.combobox_satellite.get_active()][0] + " from" + callsign + " in " + carrier_frequency + " Hz with a gain of " + tx_gain + " dB")
-        else:
-            self.write_log("Error transmitting a " + tc_name + " telecommand!")
+            if self._client_socket:
+                try:
+                    self._client_socket.send(bytearray(enc_pkt))  # Send message to server
+                    self.write_log(tc_name + " transmitted to " + _SATELLITES[self.combobox_satellite.get_active()][0] + " from" + callsign + " via " + self.entry_tcp_address.get_text() + ":" + self.entry_tcp_port.get_text())
+                except socket.error as e:
+                    error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error transmitting a" + tc_name + "telecommand!")
+                    error_dialog.format_secondary_text(str(e))
+                    error_dialog.run()
+                    error_dialog.destroy()
 
     def on_button_broadcast_cancel_clicked(self, button):
         self.dialog_broadcast.hide()
@@ -826,6 +852,43 @@ class SpaceLabTransmitter:
         else:
             self.spinbutton_tx_gain.set_range(0, 90)
             self.spinbutton_tx_gain.set_value(_DEFAULT_GAIN_USRP)
+
+    def on_button_tcp_connect_clicked(self, button):
+        try:
+            adr = self.entry_tcp_address.get_text()
+            port = int(self.entry_tcp_port.get_text())
+            self._client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            self._client_socket.connect((adr, port))
+            self.write_log("Connected to " + adr + ":" + str(port))
+
+            self.combobox_sdr.set_sensitive(False)
+            self.entry_carrier_frequency.set_sensitive(False)
+            self.entry_sample_rate.set_sensitive(False)
+            self.spinbutton_tx_gain.set_sensitive(False)
+            self.entry_tcp_address.set_sensitive(False)
+            self.entry_tcp_port.set_sensitive(False)
+            self.button_tcp_connect.set_sensitive(False)
+            self.button_tcp_disconnect.set_sensitive(True)
+        except socket.error as e:
+            error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error connecting to server!")
+            error_dialog.format_secondary_text(str(e))
+            error_dialog.run()
+            error_dialog.destroy()
+
+    def on_button_tcp_disconnect_clicked(self, button):
+        self._client_socket.shutdown(socket.SHUT_RDWR)
+        self._client_socket.close()
+
+        self.write_log("Disconnected from " + self.entry_tcp_address.get_text() + ":" + self.entry_tcp_port.get_text())
+
+        self.combobox_sdr.set_sensitive(True)
+        self.entry_carrier_frequency.set_sensitive(True)
+        self.entry_sample_rate.set_sensitive(True)
+        self.spinbutton_tx_gain.set_sensitive(True)
+        self.entry_tcp_address.set_sensitive(True)
+        self.entry_tcp_port.set_sensitive(True)
+        self.button_tcp_connect.set_sensitive(True)
+        self.button_tcp_disconnect.set_sensitive(False)
 
     def _get_link_info(self):
         sat_config_file = str()

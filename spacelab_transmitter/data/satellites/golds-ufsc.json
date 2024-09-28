@@ -59,7 +59,7 @@
                     "end_pos": 16
                 },
                 {
-                    "name": "HMAC_hash",
+                    "name": "hmac_hash",
                     "value": null,
                     "start_pos": 17,
                     "end_pos": 36
@@ -119,7 +119,7 @@
                     "end_pos": 9
                 },
                 {
-                    "name": "HMAC_hash",
+                    "name": "hmac_hash",
                     "value": null,
                     "start_pos": 10,
                     "end_pos": 29
@@ -143,7 +143,7 @@
                     "end_pos": 7
                 },
                 {
-                    "name": "HMAC_hash",
+                    "name": "hmac_hash",
                     "value": null,
                     "start_pos": 8,
                     "end_pos": 27
@@ -173,7 +173,7 @@
                     "end_pos": 8
                 },
                 {
-                    "name": "HMAC_hash",
+                    "name": "hmac_hash",
                     "value": null,
                     "start_pos": 9,
                     "end_pos": 28
@@ -203,7 +203,7 @@
                     "end_pos": 8
                 },
                 {
-                    "name": "HMAC_hash",
+                    "name": "hmac_hash",
                     "value": null,
                     "start_pos": 9,
                     "end_pos": 28
@@ -233,7 +233,7 @@
                     "end_pos": 8
                 },
                 {
-                    "name": "HMAC_hash",
+                    "name": "hmac_hash",
                     "value": null,
                     "start_pos": 9,
                     "end_pos": 28
@@ -263,7 +263,7 @@
                     "end_pos": 8
                 },
                 {
-                    "name": "HMAC_hash",
+                    "name": "hmac_hash",
                     "value": null,
                     "start_pos": 9,
                     "end_pos": 28
@@ -287,7 +287,7 @@
                     "end_pos": 7
                 },
                 {
-                    "name": "HMAC_hash",
+                    "name": "hmac_hash",
                     "value": null,
                     "start_pos": 8,
                     "end_pos": 27
@@ -311,7 +311,7 @@
                     "end_pos": 7
                 },
                 {
-                    "name": "HMAC_hash",
+                    "name": "hmac_hash",
                     "value": null,
                     "start_pos": 8,
                     "end_pos": 27
@@ -347,7 +347,7 @@
                     "end_pos": 20 
                 },
                 {
-                    "name": "HMAC_hash",
+                    "name": "hmac_hash",
                     "value": null,
                     "start_pos": 21,
                     "end_pos": 40
@@ -389,7 +389,7 @@
                     "end_pos": 13
                 },
                 {
-                    "name": "HMAC_hash",
+                    "name": "hmac_hash",
                     "value": null,
                     "start_pos": 14,
                     "end_pos": 33
@@ -425,10 +425,76 @@
                     "end_pos": 9
                 },
                 {
-                    "name": "HMAC_hash",
+                    "name": "hmac_hash",
                     "value": null,
                     "start_pos": 14,
                     "end_pos": 33
+                }
+            ]
+        },
+        {
+            "name": "Transmit packet",
+            "authentication": true,
+            "fields": [
+                {
+                    "name": "id",
+                    "value": 78,
+                    "start_pos": 0,
+                    "end_pos": 0
+                },
+                {
+                    "name": "source_callsign",
+                    "value": null,
+                    "start_pos": 1,
+                    "end_pos": 7
+                },
+                {
+                    "name": "byte_sequence",
+                    "value": null,
+                    "start_pos": 8,
+                    "end_pos": 39
+                },
+                {
+                    "name": "hmac_hash",
+                    "value": null,
+                    "start_pos": 40,
+                    "end_pos": 59
+                }
+            ]
+        },
+        {
+            "name": "Update TLE",
+            "authentication": true,
+            "fields": [
+                {
+                    "name": "id",
+                    "value": 79,
+                    "start_pos": 0,
+                    "end_pos": 0
+                },
+                {
+                    "name": "source_callsign",
+                    "value": null,
+                    "start_pos": 1,
+                    "end_pos": 7
+                },
+                {
+                    "name": "line",
+                    "value": null,
+                    "start_pos": 8,
+                    "end_pos": 8
+                },
+                {
+                    "name": "tle_line",
+                    "value": null,
+                    "start_pos": 9,
+                    "end_pos": 77
+                },
+                {
+                    "name": "hmac_hash",
+                    "value": null,
+                    "start_pos": 78,
+                    "end_pos": 97
                 }
             ]
         }
