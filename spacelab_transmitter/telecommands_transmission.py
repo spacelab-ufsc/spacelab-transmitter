@@ -1,3 +1,28 @@
+#
+#  telecommands_transmission.py
+#  
+#  Copyright The SpaceLab-Transmitter Contributors.
+#  
+#  This file is part of SpaceLab-Transmitter.
+#
+#  SpaceLab-Transmitter is free software; you can redistribute it
+#  and/or modify it under the terms of the GNU General Public License as
+#  published by the Free Software Foundation, either version 3 of the
+#  License, or (at your option) any later version.
+#  
+#  SpaceLab-Transmitter is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#  
+#  You should have received a copy of the GNU General Public
+#  License along with SpaceLab-Transmitter; if not, see <http://www.gnu.org/licenses/>.
+#  
+#
+
+
+import ast
+
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
@@ -6,9 +31,8 @@ from gi.repository import GdkPixbuf
 class DialogEnterHibernation(Gtk.Dialog):
     def __init__(self, parent):
         super().__init__(title="Enter Hibernation", transient_for=parent, flags=0)
-        self.add_buttons(
-            Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK
-        )
+
+        self.add_buttons(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK)
 
         self.set_default_size(150, 100)
 
@@ -27,12 +51,12 @@ class DialogEnterHibernation(Gtk.Dialog):
     def get_hours(self):
         return int(self.entry_hours.get_text())
 
+
 class DialogDeactivateModule(Gtk.Dialog):
     def __init__(self, parent):
         super().__init__(title="Deactivate Module", transient_for=parent, flags=0)
-        self.add_buttons(
-            Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK
-        )
+
+        self.add_buttons(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK)
 
         self.set_default_size(150, 100)
 
@@ -51,12 +75,12 @@ class DialogDeactivateModule(Gtk.Dialog):
     def get_deac_mod_id(self):
         return int(self.entry_deactivate_mod_id.get_text())
 
+
 class DialogActivateModule(Gtk.Dialog):
     def __init__(self, parent):
         super().__init__(title="Activate Module", transient_for=parent, flags=0)
-        self.add_buttons(
-            Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK
-        )
+
+        self.add_buttons(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK)
 
         self.set_default_size(150, 100)
 
@@ -75,12 +99,12 @@ class DialogActivateModule(Gtk.Dialog):
     def get_ac_mod_id(self):
         return int(self.entry_activate_mod_id.get_text())
 
+
 class DialogDeactivatePayload(Gtk.Dialog):
     def __init__(self, parent):
         super().__init__(title="Deactivate Payload", transient_for=parent, flags=0)
-        self.add_buttons(
-            Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK
-        )
+
+        self.add_buttons(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK)
 
         self.set_default_size(150, 100)
 
@@ -99,12 +123,12 @@ class DialogDeactivatePayload(Gtk.Dialog):
     def get_deac_pl_id(self):
         return int(self.entry_deactivate_pl_id.get_text())
 
+
 class DialogActivatePayload(Gtk.Dialog):
     def __init__(self, parent):
         super().__init__(title="Activate Payload", transient_for=parent, flags=0)
-        self.add_buttons(
-            Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK
-        )
+
+        self.add_buttons(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK)
 
         self.set_default_size(150, 100)
 
@@ -127,9 +151,8 @@ class DialogActivatePayload(Gtk.Dialog):
 class DialogGetParameter(Gtk.Dialog):
     def __init__(self, parent):
         super().__init__(title="Get Parameter", transient_for=parent, flags=0)
-        self.add_buttons(
-            Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK
-        )
+
+        self.add_buttons(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK)
 
         self.set_default_size(150, 100)
 
@@ -160,9 +183,8 @@ class DialogGetParameter(Gtk.Dialog):
 class DialogSetParameter(Gtk.Dialog):
     def __init__(self, parent):
         super().__init__(title="Set Parameter", transient_for=parent, flags=0)
-        self.add_buttons(
-            Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK
-        )
+
+        self.add_buttons(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK)
 
         self.set_default_size(150, 100)
 
@@ -197,12 +219,12 @@ class DialogSetParameter(Gtk.Dialog):
     def get_param_val(self):
         return int(self.entry_param_val.get_text())
 
+
 class DialogDataRequest(Gtk.Dialog):
     def __init__(self, parent):
         super().__init__(title="Data Request", transient_for=parent, flags=0)
-        self.add_buttons(
-            Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK
-        )
+
+        self.add_buttons(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK)
 
         self.set_default_size(150, 100)
 
@@ -237,12 +259,12 @@ class DialogDataRequest(Gtk.Dialog):
     def get_end_ts(self):
         return int(self.entry_end_ts.get_text())
 
+
 class DialogGetPayloadData(Gtk.Dialog):
     def __init__(self, parent):
         super().__init__(title="Get Payload Data", transient_for=parent, flags=0)
-        self.add_buttons(
-            Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK
-        )
+
+        self.add_buttons(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK)
 
         self.set_default_size(150, 100)
 
@@ -268,3 +290,27 @@ class DialogGetPayloadData(Gtk.Dialog):
 
     def get_pl_args(self):
         return eval(self.entry_pl_args.get_text())
+
+
+class DialogTransmitPacket(Gtk.Dialog):
+    def __init__(self, parent):
+        super().__init__(title="Transmit Packet", transient_for=parent, flags=0)
+
+        self.add_buttons(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK)
+
+        self.set_default_size(150, 100)
+
+        label = Gtk.Label(label="Data:")
+        self.entry_data = Gtk.Entry()
+
+        grid = Gtk.Grid()
+        grid.add(label)
+        grid.attach(self.entry_deactivate_mod_id, 0, 1, 1, 1)
+
+        box = self.get_content_area()
+        box.add(grid)
+
+        self.show_all()
+
+    def get_data(self):
+        return ast.literal_eval(self.entry_data.get_text())
