@@ -49,17 +49,9 @@ Author: Vitória Beatriz Bianchin <vitoriabbianchin@gmail.com>
   </object>
   <object class="GtkListStore" id="liststore_packet_type">
     <columns>
-      <!-- column-name gchararray1 -->
+      <!-- column-name link -->
       <column type="gchararray"/>
     </columns>
-    <data>
-      <row>
-        <col id="0">Beacon</col>
-      </row>
-      <row>
-        <col id="0">Downlink</col>
-      </row>
-    </data>
   </object>
   <object class="GtkListStore" id="liststore_satellite">
     <columns>

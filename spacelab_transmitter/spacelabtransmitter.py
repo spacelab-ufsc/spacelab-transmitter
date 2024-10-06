@@ -217,6 +217,12 @@ class SpaceLabTransmitter:
         self.combobox_satellite.add_attribute(cell, "text", 0)
         self.combobox_satellite.connect("changed", self.on_combobox_satellite_changed)
 
+        # Packet type combobox
+        self.liststore_packet_type = self.builder.get_object("liststore_packet_type")
+        self.combobox_packet_type = self.builder.get_object("combobox_packet_type")
+        self.combobox_packet_type.pack_start(cell, True)
+        self.combobox_packet_type.add_attribute(cell, "text", 0)
+
         # TCP socket
         self.entry_tcp_address = self.builder.get_object("entry_tcp_address")
         self.entry_tcp_port = self.builder.get_object("entry_tcp_port")
@@ -839,8 +845,44 @@ class SpaceLabTransmitter:
             self.button_get_payload_data.set_sensitive(True)
 
     def on_combobox_satellite_changed(self, combobox):
-        modulation, frequency, baudrate, sync_word, protocol = self._get_link_info()
-        self.entry_carrier_frequency.set_text(str(int(frequency)))
+        # Clear the list of packet types
+        self.liststore_packet_type.clear()
+
+        sat_filename = _SATELLITES[self.combobox_satellite.get_active()][1]
+        sat_config_file = str()
+
+        if os.path.isfile(_SAT_JSON_LOCAL_PATH + sat_filename):
+            sat_config_file = _SAT_JSON_LOCAL_PATH + sat_filename
+        else:
+            sat_config_file = _SAT_JSON_SYSTEM_PATH + sat_filename
+
+        try:
+            with open(sat_config_file) as f:
+                sat_info = json.load(f)
+
+                if 'links' in sat_info:
+                    for i in range(len(sat_info['links'])):
+                        self.liststore_packet_type.append([sat_info['links'][i]['name']])
+                else:
+                    self.liststore_packet_type.append(['Uplink'])
+
+            modulation, frequency, baudrate, sync_word, protocol = self._get_link_info()
+            self.entry_carrier_frequency.set_text(str(int(frequency)))
+        except FileNotFoundError as e:
+            error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error opening the satellite configuration file!")
+            error_dialog.format_secondary_text(str(e))
+            error_dialog.run()
+            error_dialog.destroy()
+
+            self.combobox_packet_type.set_active(-1)
+        except:
+            error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error opening the satellite configuration file!")
+            error_dialog.format_secondary_text("Is the configuration file correct?")
+            error_dialog.run()
+            error_dialog.destroy()
+        else:
+            # Sets the first packet type as the active packet type
+            self.combobox_packet_type.set_active(0)
 
     def on_combobox_sdr_changed(self, combobox):
         if self.combobox_sdr.get_active() == 0:   # USRP
