@@ -28,7 +28,7 @@ sys.path.append(".")
 from spacelab_transmitter.gmsk import GMSK
 
 def test_modulator_demodulator():
-    data = [random.randint(0, 255) for _ in range(5)]
+    data = [random.randint(0, 255) for _ in range(1000)]
 
     gmsk = GMSK(0.5, 4800)
 
