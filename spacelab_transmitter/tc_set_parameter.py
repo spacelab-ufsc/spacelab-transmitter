@@ -20,7 +20,6 @@
 #
 #
 
-
 import hashlib
 import hmac
 
@@ -48,8 +47,11 @@ class SetParameter(Telecommand):
 
         :return The generated payload as list of integers (bytes).
         """
-        if (s_id > 255) or (param_id > 255):
-            return list()
+        if s_id > 255:
+            s_id = 255
+
+        if param_id > 255:
+            param_id = 255
 
         pl = [self.get_id()] + self._prepare_callsign(src_adr) + [s_id] + [param_id]
 
