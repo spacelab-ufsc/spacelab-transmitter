@@ -53,8 +53,9 @@ from spacelab_transmitter.tc_set_parameter import SetParameter
 from spacelab_transmitter.tc_transmit_packet import TransmitPacket
 from spacelab_transmitter.tc_ping import Ping
 from spacelab_transmitter.tc_enter_hibernation import Enter_hibernation
+from spacelab_transmitter.tc_update_tle import UpdateTLE
 
-from spacelab_transmitter.telecommands_transmission import DialogDataRequest, DialogDeactivatePayload, DialogEnterHibernation, DialogActivatePayload, DialogGetPayloadData, DialogSetParameter, DialogDeactivateModule, DialogActivateModule, DialogGetParameter, DialogBroadcastMessage, DialogTransmitPacket, DialogEraseMemory
+from spacelab_transmitter.telecommands_transmission import DialogDataRequest, DialogDeactivatePayload, DialogEnterHibernation, DialogActivatePayload, DialogGetPayloadData, DialogSetParameter, DialogDeactivateModule, DialogActivateModule, DialogGetParameter, DialogBroadcastMessage, DialogTransmitPacket, DialogEraseMemory, DialogUpdateTLE
 
 from spacelab_transmitter.gmsk import GMSK
 from spacelab_transmitter.usrp import USRP
@@ -325,6 +326,14 @@ class SpaceLabTransmitter:
         # Transmit Packet
         self.button_tx_pkt = self.builder.get_object("button_tx_pkt")
         self.button_tx_pkt.connect("clicked", self.on_button_tx_pkt_clicked)
+
+        # Update TLE
+        self.button_update_tle = self.builder.get_object("button_update_tle")
+        self.button_update_tle.connect("clicked", self.on_button_update_tle_clicked)
+
+        # CSP Services
+        self.button_csp_services = self.builder.get_object("button_csp_services")
+        self.button_csp_services.connect("clicked", self.on_button_csp_services_clicked)
 
     def run(self):
         self.window.show_all()          
@@ -812,6 +821,50 @@ class SpaceLabTransmitter:
         if response == Gtk.ResponseType.DELETE_EVENT:
             self.dialog_transmit_packet.hide()
 
+    def on_button_update_tle_clicked(self, button):
+        dialog = DialogUpdateTLE(self.window)
+
+        response = dialog.run()
+        if response == Gtk.ResponseType.OK:
+            try:
+                if dialog.get_tle_line_num() < 0 or dialog.get_tle_line_num() > 2:
+                    raise ValueError("The TLE line number must be between 0 and 2!")
+
+                if len(dialog.get_tle_line()) != 69:
+                    raise ValueError("The TLE line must be 69 characters long!")
+
+                dialog_pw = DialogPassword(self.window)
+
+                response_key = dialog_pw.run()
+                if response_key == Gtk.ResponseType.OK:
+                    callsign = self.entry_preferences_general_callsign.get_text()
+                    fr = UpdateTLE()
+                    pl = fr.generate(callsign, dialog.get_tle_line_num(), dialog.get_tle_line(), dialog_pw.get_key())
+                    self._transmit_tc(pl, "Update TLE")
+                    dialog_pw.destroy()
+                elif response_key == Gtk.ResponseType.CANCEL:
+                    dialog_pw.destroy()
+                elif response_key == Gtk.ResponseType.DELETE_EVENT:
+                    dialog_pw.destroy()
+                else:
+                    dialog_pw.destroy()
+            except ValueError as err:
+                error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error generating the \"Update TLE\" telecommand!")
+                error_dialog.format_secondary_text(str(err))
+                error_dialog.run()
+                error_dialog.destroy()
+            finally:
+                dialog.destroy()
+        elif response == Gtk.ResponseType.CANCEL:
+            dialog.destroy()
+        elif response == Gtk.ResponseType.DELETE_EVENT:
+            dialog.destroy()
+        else:
+            dialog.destroy()
+
+    def on_button_csp_services_clicked(self, button):
+        pass
+
     def _transmit_tc(self, pkt, tc_name):
         carrier_frequency = self.entry_carrier_frequency.get_text()
         tx_gain = self.spinbutton_tx_gain.get_text()
@@ -993,6 +1046,7 @@ class SpaceLabTransmitter:
             self.button_activate_module.set_sensitive(False)
             self.button_deactivate_payload.set_sensitive(False)
             self.button_get_payload_data.set_sensitive(False)
+            self.button_update_tle.set_sensitive(False)
         elif self.switch_button.get_active() == True:
             self.button_ping_request.set_sensitive(True)
             self.button_enter_hibernation.set_sensitive(True)
@@ -1008,6 +1062,7 @@ class SpaceLabTransmitter:
             self.button_activate_module.set_sensitive(True)
             self.button_deactivate_payload.set_sensitive(True)
             self.button_get_payload_data.set_sensitive(True)
+            self.button_update_tle.set_sensitive(True)
 
     def on_combobox_satellite_changed(self, combobox):
         # Clear the list of packet types
