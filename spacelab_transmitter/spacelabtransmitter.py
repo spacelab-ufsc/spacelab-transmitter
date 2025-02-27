@@ -54,7 +54,7 @@ from spacelab_transmitter.tc_transmit_packet import TransmitPacket
 from spacelab_transmitter.tc_ping import Ping
 from spacelab_transmitter.tc_enter_hibernation import Enter_hibernation
 
-from spacelab_transmitter.telecommands_transmission import DialogDataRequest, DialogDeactivatePayload, DialogEnterHibernation, DialogActivatePayload, DialogGetPayloadData, DialogSetParameter, DialogDeactivateModule, DialogActivateModule, DialogGetParameter, DialogBroadcastMessage, DialogTransmitPacket
+from spacelab_transmitter.telecommands_transmission import DialogDataRequest, DialogDeactivatePayload, DialogEnterHibernation, DialogActivatePayload, DialogGetPayloadData, DialogSetParameter, DialogDeactivateModule, DialogActivateModule, DialogGetParameter, DialogBroadcastMessage, DialogTransmitPacket, DialogEraseMemory
 
 from spacelab_transmitter.gmsk import GMSK
 from spacelab_transmitter.usrp import USRP
@@ -545,14 +545,37 @@ class SpaceLabTransmitter:
             dialog.destroy()
 
     def on_button_erase_memory_clicked(self, button):
-        dialog = DialogPassword(self.window)
+        dialog = DialogEraseMemory(self.window)
 
         response = dialog.run()
         if response == Gtk.ResponseType.OK:
-            callsign = self.entry_preferences_general_callsign.get_text()
-            fr = EraseMemory()
-            pl = fr.generate(callsign, dialog.get_key())
-            self._transmit_tc(pl, "Erase Memory")
+            try:
+                if dialog.get_mem_id() <= 0 or dialog.get_mem_id() > 255:
+                    raise ValueError()
+
+                dialog_pw = DialogPassword(self.window)
+
+                response_key = dialog_pw.run()
+                if response_key == Gtk.ResponseType.OK:
+                    callsign = self.entry_preferences_general_callsign.get_text()
+                    fr = EraseMemory()
+                    pl = fr.generate(callsign, dialog.get_mem_id(), dialog_pw.get_key())
+                    self._transmit_tc(pl, "Erase Memory")
+                    dialog_pw.destroy()
+                    dialog.destroy()
+                elif response_key == Gtk.ResponseType.CANCEL:
+                    dialog_pw.destroy()
+                elif response_key == Gtk.ResponseType.DELETE_EVENT:
+                    dialog_pw.destroy()
+                else:
+                    dialog_pw.destroy()
+            except ValueError:
+                error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error generating the \"Erase Memory\" telecommand!")
+                error_dialog.format_secondary_text("The memory ID must be between 0 and 255!")
+                error_dialog.run()
+                error_dialog.destroy()
+            finally:
+                dialog.destroy()
         elif response == Gtk.ResponseType.CANCEL:
             dialog.destroy()
         elif response == Gtk.ResponseType.DELETE_EVENT:

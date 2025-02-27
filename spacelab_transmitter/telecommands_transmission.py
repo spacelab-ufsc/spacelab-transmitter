@@ -467,3 +467,37 @@ class DialogTransmitPacket(Gtk.Dialog):
 
     def get_data(self):
         return ast.literal_eval(self.entry_data.get_text())
+
+class DialogEraseMemory(Gtk.Dialog):
+    def __init__(self, parent):
+        super().__init__(title="Erase Memory", transient_for=parent, flags=0)
+
+        self.add_buttons(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK)
+
+        label = Gtk.Label(label="Memory ID:")
+        label.set_halign(Gtk.Align.START)
+        self.entry_mem_id = Gtk.Entry()
+
+        grid = Gtk.Grid()
+        grid.set_column_spacing(10)
+        grid.set_margin_start(10)
+        grid.set_margin_end(10)
+        grid.set_margin_top(5)
+        grid.set_margin_bottom(5)
+
+        grid.add(label)
+        grid.attach(self.entry_mem_id, 1, 0, 1, 1)
+
+        box_content = self.get_content_area()
+        box_content.add(grid)
+
+        box_buttons = self.get_action_area()
+        grid.set_column_spacing(10)
+        box_buttons.set_margin_start(10)
+        box_buttons.set_margin_end(10)
+        box_buttons.set_margin_bottom(5)
+
+        self.show_all()
+
+    def get_mem_id(self):
+        return int(self.entry_mem_id.get_text())
