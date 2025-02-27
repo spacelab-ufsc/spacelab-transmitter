@@ -72,7 +72,7 @@ _ICON_FILE_LINUX_SYSTEM         = '/usr/share/icons/spacelab_transmitter_256x256
 _LOGO_FILE_LOCAL                = os.path.abspath(os.path.dirname(__file__)) + '/data/img/spacelab-logo-full-400x200.png'
 _LOGO_FILE_LINUX_SYSTEM         = '/usr/share/spacelab_transmitter/spacelab-logo-full-400x200.png' 
 
-_DIR_CONFIG_LINUX               = '.spacelab_transmitter'
+_DIR_CONFIG_LINUX               = '.config/spacelab_transmitter'
 _DIR_CONFIG_WINDOWS             = 'spacelab_transmitter'
 
 _SAT_JSON_LOCAL_PATH            = os.path.abspath(os.path.dirname(__file__)) + '/data/satellites/'
