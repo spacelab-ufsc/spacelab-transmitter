@@ -54,7 +54,7 @@ from spacelab_transmitter.tc_transmit_packet import TransmitPacket
 from spacelab_transmitter.tc_ping import Ping
 from spacelab_transmitter.tc_enter_hibernation import Enter_hibernation
 
-from spacelab_transmitter.telecommands_transmission import DialogDataRequest, DialogDeactivatePayload, DialogEnterHibernation, DialogActivatePayload, DialogGetPayloadData, DialogSetParameter, DialogDeactivateModule, DialogActivateModule, DialogGetParameter, DialogTransmitPacket
+from spacelab_transmitter.telecommands_transmission import DialogDataRequest, DialogDeactivatePayload, DialogEnterHibernation, DialogActivatePayload, DialogGetPayloadData, DialogSetParameter, DialogDeactivateModule, DialogActivateModule, DialogGetParameter, DialogBroadcastMessage, DialogTransmitPacket
 
 from spacelab_transmitter.gmsk import GMSK
 from spacelab_transmitter.usrp import USRP
@@ -263,14 +263,6 @@ class SpaceLabTransmitter:
         # Broadcast Message
         self.button_broadcast_message = self.builder.get_object("button_broadcast_message")
         self.button_broadcast_message.connect("clicked", self.on_button_broadcast_message_clicked)
-
-        self.dialog_broadcast = self.builder.get_object("dialog_broadcast")
-        self.entry_msg = self.builder.get_object("entry_msg")
-        self.entry_dst_callsign = self.builder.get_object("entry_dst_callsign")
-        self.button_broadcast_send = self.builder.get_object("button_broadcast_send")
-        self.button_broadcast_send.connect("clicked", self.on_button_broadcast_send_clicked)
-        self.button_broadcast_cancel = self.builder.get_object("button_broadcast_cancel")
-        self.button_broadcast_cancel.connect("clicked", self.on_button_broadcast_cancel_clicked)
 
         # Force Reset
         self.button_force_reset = self.builder.get_object("button_force_reset")
@@ -622,10 +614,21 @@ class SpaceLabTransmitter:
             dialog.destroy()
 
     def on_button_broadcast_message_clicked(self, button):
-        response = self.dialog_broadcast.run()
+        dialog = DialogBroadcastMessage(self.window)
+        response = dialog.run()
 
-        if response == Gtk.ResponseType.DELETE_EVENT:
-            self.dialog_broadcast.hide()
+        if response == Gtk.ResponseType.OK:
+            callsign = self.entry_preferences_general_callsign.get_text()
+            fr = Broadcast()
+            pl = fr.generate(callsign, dialog.get_dst_callsign(), dialog.get_message())
+            self._transmit_tc(pl, "Broadcast Message")
+            dialog.destroy()
+        elif response == Gtk.ResponseType.CANCEL:
+            dialog.destroy()
+        elif response == Gtk.ResponseType.DELETE_EVENT:
+            dialog.destroy()
+        else:
+            dialog.destroy()
 
     def on_button_tx_pkt_clicked(self, button):
         response = self.dialog_transmit_packet.run()
@@ -694,20 +697,6 @@ class SpaceLabTransmitter:
                     error_dialog.format_secondary_text(str(e))
                     error_dialog.run()
                     error_dialog.destroy()
-
-    def on_button_broadcast_cancel_clicked(self, button):
-        self.dialog_broadcast.hide()
-
-    def on_button_broadcast_send_clicked(self, button):
-        dst_adr = self.entry_dst_callsign.get_text()
-        msg = self.entry_msg.get_text()
-
-        bm = Broadcast()
-
-        pl = bm.generate(self.entry_preferences_general_callsign.get_text(), dst_adr, msg)
-
-        self._transmit_tc(pl, "Broadcast Message")
-        self.dialog_broadcast.hide()
 
     def on_button_preferences_clicked(self, button):
         response = self.dialog_preferences.run()

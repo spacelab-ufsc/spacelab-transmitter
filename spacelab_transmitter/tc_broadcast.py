@@ -20,7 +20,6 @@
 #
 #
 
-
 from spacelab_transmitter.telecommand import Telecommand
 
 class Broadcast(Telecommand):
@@ -35,17 +34,14 @@ class Broadcast(Telecommand):
 
     def generate(self, src_adr, dst_adr, msg):
         """
-    This telecommand is composed by four fields:
+        This telecommand is composed by four fields:
 
-    Packet ID (1 byte = 0x42)
-    Source callsign (7 bytes ASCII)
-    Destination callsign (7 bytes ASCII)
-    Message (string, up to 38 characters)
+        - Packet ID (1 byte = 0x42)
+        - Source callsign (7 bytes ASCII)
+        - Destination callsign (7 bytes ASCII)
+        - Message (string, up to 38 characters)
 
-    The inputs of the "generate" method will be 
-        the source callsign (ASCII string), 
-        the destination callsign (ASCII string) and 
-        the message to broadcast (ASCII string).
-
+        The inputs of the "generate" method will be the source callsign (ASCII string), the destination callsign
+        (ASCII string) and the message to broadcast (ASCII string).
         """
         return [self.get_id()] + self._prepare_callsign(src_adr) + self._prepare_callsign(dst_adr) + [ord(i) for i in msg]
