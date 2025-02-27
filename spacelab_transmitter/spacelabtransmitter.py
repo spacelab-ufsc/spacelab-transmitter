@@ -346,23 +346,37 @@ class SpaceLabTransmitter:
 
     def on_button_enter_hibernation_clicked(self, button):
         dialog = DialogEnterHibernation(self.window)
+
         response = dialog.run()
         if response == Gtk.ResponseType.OK:
-            dialog_password = DialogPassword(self.window)
-            response_key = dialog_password.run()
-            if response_key == Gtk.ResponseType.OK:
-                callsign = self.entry_preferences_general_callsign.get_text()
-                fr = Enter_hibernation()
-                pl = fr.generate(callsign, dialog.get_hours(), dialog_password.get_key())
-                self._transmit_tc(pl, "Enter Hibernation")
+            try:
+                if dialog.get_hours() <= 0:
+                    raise RuntimeError()
+
+                dialog_password = DialogPassword(self.window)
+
+                response_key = dialog_password.run()
+                if response_key == Gtk.ResponseType.OK:
+                    callsign = self.entry_preferences_general_callsign.get_text()
+                    fr = Enter_hibernation()
+                    pl = fr.generate(callsign, dialog.get_hours(), dialog_password.get_key())
+                    self._transmit_tc(pl, "Enter Hibernation")
+                    dialog.destroy()
+                    dialog_password.destroy()
+                elif response_key == Gtk.ResponseType.CANCEL:
+                    dialog_password.destroy()
+                elif response_key == Gtk.ResponseType.DELETE_EVENT:
+                    dialog_password.destroy()
+                else:
+                    dialog_password.destroy()
+            except Exception:
+                error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error generating the \"Enter Hibernation\" telecommand!")
+                error_dialog.format_secondary_text("The hibernation duration must be greater than zero!")
+                error_dialog.run()
+                error_dialog.destroy()
                 dialog.destroy()
-                dialog_password.destroy()
-            elif response_key == Gtk.ResponseType.CANCEL:
-                dialog_password.destroy()
-            elif response_key == Gtk.ResponseType.DELETE_EVENT:
-                dialog_password.destroy()
             else:
-                dialog_password.destroy()
+                dialog.destroy()
         elif response == Gtk.ResponseType.CANCEL:
             dialog.destroy()
         elif response == Gtk.ResponseType.DELETE_EVENT:
@@ -372,23 +386,37 @@ class SpaceLabTransmitter:
 
     def on_button_activate_module_clicked(self, button):
         dialog = DialogActivateModule(self.window)
+
         response = dialog.run()
         if response == Gtk.ResponseType.OK:
-            dialog_password = DialogPassword(self.window)
-            response_key = dialog_password.run()
-            if response_key == Gtk.ResponseType.OK:
-                callsign = self.entry_preferences_general_callsign.get_text()
-                fr = ActivateModule()
-                pl = fr.generate(callsign, dialog.get_ac_mod_id(), dialog_password.get_key())
-                self._transmit_tc(pl, "Activate Module")
+            try:
+                if dialog.get_ac_mod_id() <= 0 or dialog.get_ac_mod_id() > 255:
+                    raise RuntimeError()
+
+                dialog_password = DialogPassword(self.window)
+
+                response_key = dialog_password.run()
+                if response_key == Gtk.ResponseType.OK:
+                    callsign = self.entry_preferences_general_callsign.get_text()
+                    fr = ActivateModule()
+                    pl = fr.generate(callsign, dialog.get_ac_mod_id(), dialog_password.get_key())
+                    self._transmit_tc(pl, "Activate Module")
+                    dialog.destroy()
+                    dialog_password.destroy()
+                elif response_key == Gtk.ResponseType.CANCEL:
+                    dialog_password.destroy()
+                elif response_key == Gtk.ResponseType.DELETE_EVENT:
+                    dialog_password.destroy()
+                else:
+                    dialog_password.destroy()
+            except Exception:
+                error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error generating the \"Activate Module\" telecommand!")
+                error_dialog.format_secondary_text("The module ID must be between 0 and 255!")
+                error_dialog.run()
+                error_dialog.destroy()
                 dialog.destroy()
-                dialog_password.destroy()
-            elif response_key == Gtk.ResponseType.CANCEL:
-                dialog_password.destroy()
-            elif response_key == Gtk.ResponseType.DELETE_EVENT:
-                dialog_password.destroy()
             else:
-                dialog_password.destroy()
+                dialog.destroy()
         elif response == Gtk.ResponseType.CANCEL:
             dialog.destroy()
         elif response == Gtk.ResponseType.DELETE_EVENT:
@@ -398,23 +426,37 @@ class SpaceLabTransmitter:
 
     def on_button_deactivate_module_clicked(self, button):
         dialog = DialogDeactivateModule(self.window)
+
         response = dialog.run()
         if response == Gtk.ResponseType.OK:
-            dialog_password = DialogPassword(self.window)
-            response_key = dialog_password.run()
-            if response_key == Gtk.ResponseType.OK:
-                callsign = self.entry_preferences_general_callsign.get_text()
-                fr = DeactivateModule()
-                pl = fr.generate(callsign, dialog.get_deac_mod_id(), dialog_password.get_key())
-                self._transmit_tc(pl, "Deactivate Module")
+            try:
+                if dialog.get_deac_mod_id() <= 0 or dialog.get_deac_mod_id() > 255:
+                    raise RuntimeError()
+
+                dialog_password = DialogPassword(self.window)
+
+                response_key = dialog_password.run()
+                if response_key == Gtk.ResponseType.OK:
+                    callsign = self.entry_preferences_general_callsign.get_text()
+                    fr = DeactivateModule()
+                    pl = fr.generate(callsign, dialog.get_deac_mod_id(), dialog_password.get_key())
+                    self._transmit_tc(pl, "Deactivate Module")
+                    dialog.destroy()
+                    dialog_password.destroy()
+                elif response_key == Gtk.ResponseType.CANCEL:
+                    dialog_password.destroy()
+                elif response_key == Gtk.ResponseType.DELETE_EVENT:
+                    dialog_password.destroy()
+                else:
+                    dialog_password.destroy()
+            except Exception:
+                error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error generating the \"Deactivate Module\" telecommand!")
+                error_dialog.format_secondary_text("The module ID must be between 0 and 255!")
+                error_dialog.run()
+                error_dialog.destroy()
                 dialog.destroy()
-                dialog_password.destroy()
-            elif response_key == Gtk.ResponseType.CANCEL:
-                dialog_password.destroy()
-            elif response_key == Gtk.ResponseType.DELETE_EVENT:
-                dialog_password.destroy()
             else:
-                dialog_password.destroy()
+                dialog.destroy()
         elif response == Gtk.ResponseType.CANCEL:
             dialog.destroy()
         elif response == Gtk.ResponseType.DELETE_EVENT:
@@ -424,23 +466,37 @@ class SpaceLabTransmitter:
 
     def on_button_deactivate_payload_clicked(self, button):
         dialog = DialogDeactivatePayload(self.window)
+
         response = dialog.run()
         if response == Gtk.ResponseType.OK:
-            dialog_password = DialogPassword(self.window)
-            response_key = dialog_password.run()
-            if response_key == Gtk.ResponseType.OK:
-                callsign = self.entry_preferences_general_callsign.get_text()
-                fr = DeactivatePayload()
-                pl = fr.generate(callsign, dialog.get_deac_pl_id(), dialog_password.get_key())
-                self._transmit_tc(pl, "Deactivate Payload")
+            try:
+                if dialog.get_deac_pl_id() <= 0 or dialog.get_deac_pl_id() > 255:
+                    raise RuntimeError()
+
+                dialog_password = DialogPassword(self.window)
+
+                response_key = dialog_password.run()
+                if response_key == Gtk.ResponseType.OK:
+                    callsign = self.entry_preferences_general_callsign.get_text()
+                    fr = DeactivatePayload()
+                    pl = fr.generate(callsign, dialog.get_deac_pl_id(), dialog_password.get_key())
+                    self._transmit_tc(pl, "Deactivate Payload")
+                    dialog.destroy()
+                    dialog_password.destroy()
+                elif response_key == Gtk.ResponseType.CANCEL:
+                    dialog_password.destroy()
+                elif response_key == Gtk.ResponseType.DELETE_EVENT:
+                    dialog_password.destroy()
+                else:
+                    dialog_password.destroy()
+            except Exception:
+                error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error generating the \"Deactivate Payload\" telecommand!")
+                error_dialog.format_secondary_text("The payload ID must be between 0 and 255!")
+                error_dialog.run()
+                error_dialog.destroy()
                 dialog.destroy()
-                dialog_password.destroy()
-            elif response_key == Gtk.ResponseType.CANCEL:
-                dialog_password.destroy()
-            elif response_key == Gtk.ResponseType.DELETE_EVENT:
-                dialog_password.destroy()
             else:
-                dialog_password.destroy()
+                dialog.destroy()
         elif response == Gtk.ResponseType.CANCEL:
             dialog.destroy()
         elif response == Gtk.ResponseType.DELETE_EVENT:
@@ -450,23 +506,37 @@ class SpaceLabTransmitter:
 
     def on_button_activate_payload_clicked(self, button):
         dialog = DialogActivatePayload(self.window)
+
         response = dialog.run()
         if response == Gtk.ResponseType.OK:
-            dialog_password = DialogPassword(self.window)
-            response_key = dialog_password.run()
-            if response_key == Gtk.ResponseType.OK:
-                callsign = self.entry_preferences_general_callsign.get_text()
-                fr = ActivatePayload()
-                pl = fr.generate(callsign, dialog.get_ac_pl_id(), dialog_password.get_key())
-                self._transmit_tc(pl, "Activate Payload")
+            try:
+                if dialog.get_ac_pl_id() <= 0 or dialog.get_ac_pl_id() > 255:
+                    raise RuntimeError()
+
+                dialog_password = DialogPassword(self.window)
+
+                response_key = dialog_password.run()
+                if response_key == Gtk.ResponseType.OK:
+                    callsign = self.entry_preferences_general_callsign.get_text()
+                    fr = ActivatePayload()
+                    pl = fr.generate(callsign, dialog.get_ac_pl_id(), dialog_password.get_key())
+                    self._transmit_tc(pl, "Activate Payload")
+                    dialog.destroy()
+                    dialog_password.destroy()
+                elif response_key == Gtk.ResponseType.CANCEL:
+                    dialog_password.destroy()
+                elif response_key == Gtk.ResponseType.DELETE_EVENT:
+                    dialog_password.destroy()
+                else:
+                    dialog_password.destroy()
+            except Exception:
+                error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error generating the \"Activate Module\" telecommand!")
+                error_dialog.format_secondary_text("The payload ID must be between 0 and 255!")
+                error_dialog.run()
+                error_dialog.destroy()
                 dialog.destroy()
-                dialog_password.destroy()
-            elif response_key == Gtk.ResponseType.CANCEL:
-                dialog_password.destroy()
-            elif response_key == Gtk.ResponseType.DELETE_EVENT:
-                dialog_password.destroy()
             else:
-                dialog_password.destroy()
+                dialog.destroy()
         elif response == Gtk.ResponseType.CANCEL:
             dialog.destroy()
         elif response == Gtk.ResponseType.DELETE_EVENT:
@@ -476,6 +546,7 @@ class SpaceLabTransmitter:
 
     def on_button_erase_memory_clicked(self, button):
         dialog = DialogPassword(self.window)
+
         response = dialog.run()
         if response == Gtk.ResponseType.OK:
             callsign = self.entry_preferences_general_callsign.get_text()
@@ -491,23 +562,43 @@ class SpaceLabTransmitter:
 
     def on_button_set_parameter_clicked(self, button):
         dialog = DialogSetParameter(self.window)
+
         response = dialog.run()
         if response == Gtk.ResponseType.OK:
-            dialog_password = DialogPassword(self.window)
-            response_key = dialog_password.run()
-            if response_key == Gtk.ResponseType.OK:
-                callsign = self.entry_preferences_general_callsign.get_text()
-                fr = SetParameter()
-                pl = fr.generate(callsign, dialog.get_subsys_id(),dialog.get_param_id(),dialog.get_param_val(), dialog_password.get_key())
-                self._transmit_tc(pl, "Set Parameter")
+            try:
+                if dialog.get_subsys_id() <= 0 or dialog.get_subsys_id() > 255:
+                    raise RuntimeError("The subsystem ID must be between 0 and 255!")
+
+                if dialog.get_param_id() <= 0 or dialog.get_param_id() > 255:
+                    raise RuntimeError("The parameter ID must be between 0 and 255!")
+
+                if dialog.get_param_val() <= 0 or dialog.get_param_val() > 2**32-1:
+                    raise RuntimeError("The payload value must be between 0 and 4294967295!")
+
+                dialog_password = DialogPassword(self.window)
+
+                response_key = dialog_password.run()
+                if response_key == Gtk.ResponseType.OK:
+                    callsign = self.entry_preferences_general_callsign.get_text()
+                    fr = SetParameter()
+                    pl = fr.generate(callsign, dialog.get_subsys_id(), dialog.get_param_id(), dialog.get_param_val(), dialog_password.get_key())
+                    self._transmit_tc(pl, "Set Parameter")
+                    dialog.destroy()
+                    dialog_password.destroy()
+                elif response_key == Gtk.ResponseType.CANCEL:
+                    dialog_password.destroy()
+                elif response_key == Gtk.ResponseType.DELETE_EVENT:
+                    dialog_password.destroy()
+                else:
+                    dialog_password.destroy()
+            except Exception as err:
+                error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error generating the \"Set Parameter\" telecommand!")
+                error_dialog.format_secondary_text(str(err))
+                error_dialog.run()
+                error_dialog.destroy()
                 dialog.destroy()
-                dialog_password.destroy()
-            elif response_key == Gtk.ResponseType.CANCEL:
-                dialog_password.destroy()
-            elif response_key == Gtk.ResponseType.DELETE_EVENT:
-                dialog_password.destroy()
             else:
-                dialog_password.destroy()
+                dialog.destroy()
         elif response == Gtk.ResponseType.CANCEL:
             dialog.destroy()
         elif response == Gtk.ResponseType.DELETE_EVENT:
@@ -517,23 +608,43 @@ class SpaceLabTransmitter:
 
     def on_button_data_request_clicked(self, button):
         dialog = DialogDataRequest(self.window)
+
         response = dialog.run()
         if response == Gtk.ResponseType.OK:
-            dialog_password = DialogPassword(self.window)
-            response_key = dialog_password.run()
-            if response_key == Gtk.ResponseType.OK:
-                callsign = self.entry_preferences_general_callsign.get_text()
-                fr = DataRequest()
-                pl = fr.generate(callsign, dialog.get_data_id(),dialog.get_start_ts(), dialog.get_end_ts(), dialog_password.get_key())
-                self._transmit_tc(pl, "Data Request")
+            try:
+                if dialog.get_data_id() <= 0 or dialog.get_data_id() > 255:
+                    raise RuntimeError("The data ID must be between 0 and 255!")
+
+                if dialog.get_start_ts() <= 0 or dialog.get_start_ts() > 2**32-1:
+                    raise RuntimeError("The start timestamp must be between 0 and 4294967295!")
+
+                if dialog.get_end_ts() <= 0 or dialog.get_end_ts() > 2**32-1:
+                    raise RuntimeError("The end timestamp must be between 0 and 4294967295!")
+
+                dialog_password = DialogPassword(self.window)
+
+                response_key = dialog_password.run()
+                if response_key == Gtk.ResponseType.OK:
+                    callsign = self.entry_preferences_general_callsign.get_text()
+                    fr = DataRequest()
+                    pl = fr.generate(callsign, dialog.get_data_id(), dialog.get_start_ts(), dialog.get_end_ts(), dialog_password.get_key())
+                    self._transmit_tc(pl, "Data Request")
+                    dialog.destroy()
+                    dialog_password.destroy()
+                elif response_key == Gtk.ResponseType.CANCEL:
+                    dialog_password.destroy()
+                elif response_key == Gtk.ResponseType.DELETE_EVENT:
+                    dialog_password.destroy()
+                else:
+                    dialog_password.destroy()
+            except Exception as err:
+                error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error generating the \"Data Request\" telecommand!")
+                error_dialog.format_secondary_text(str(err))
+                error_dialog.run()
+                error_dialog.destroy()
                 dialog.destroy()
-                dialog_password.destroy()
-            elif response_key == Gtk.ResponseType.CANCEL:
-                dialog_password.destroy()
-            elif response_key == Gtk.ResponseType.DELETE_EVENT:
-                dialog_password.destroy()
             else:
-                dialog_password.destroy()
+                dialog.destroy()
         elif response == Gtk.ResponseType.CANCEL:
             dialog.destroy()
         elif response == Gtk.ResponseType.DELETE_EVENT:
@@ -543,6 +654,7 @@ class SpaceLabTransmitter:
     
     def on_button_leave_hibernation_clicked(self, button):
         dialog = DialogPassword(self.window)
+
         response = dialog.run()
         if response == Gtk.ResponseType.OK:
             callsign = self.entry_preferences_general_callsign.get_text()
@@ -556,8 +668,9 @@ class SpaceLabTransmitter:
         else:
             dialog.destroy()
 
-    def on_button_force_reset_clicked(self, button_password_send):
+    def on_button_force_reset_clicked(self, button):
         dialog = DialogPassword(self.window)
+
         response = dialog.run()
         if response == Gtk.ResponseType.OK:
             callsign = self.entry_preferences_general_callsign.get_text()
@@ -573,23 +686,40 @@ class SpaceLabTransmitter:
 
     def on_button_get_parameter_clicked(self, button):
         dialog = DialogGetParameter(self.window)
+
         response = dialog.run()
         if response == Gtk.ResponseType.OK:
-            dialog_password = DialogPassword(self.window)
-            response_key = dialog_password.run()
-            if response_key == Gtk.ResponseType.OK:
-                callsign = self.entry_preferences_general_callsign.get_text()
-                fr = GetParameter()
-                pl = fr.generate(callsign, dialog.get_subsys_id(), dialog.get_param_id(), dialog_password.get_key())
-                self._transmit_tc(pl, "Get Parameter")
+            try:
+                if dialog.get_subsys_id() <= 0 or dialog.get_subsys_id() > 255:
+                    raise RuntimeError("The subsystem ID must be between 0 and 255!")
+
+                if dialog.get_param_id() <= 0 or dialog.get_param_id() > 255:
+                    raise RuntimeError("The parameter ID must be between 0 and 255!")
+
+                dialog_password = DialogPassword(self.window)
+
+                response_key = dialog_password.run()
+                if response_key == Gtk.ResponseType.OK:
+                    callsign = self.entry_preferences_general_callsign.get_text()
+                    fr = GetParameter()
+                    pl = fr.generate(callsign, dialog.get_subsys_id(), dialog.get_param_id(), dialog_password.get_key())
+                    self._transmit_tc(pl, "Get Parameter")
+                    dialog.destroy()
+                    dialog_password.destroy()
+                elif response_key == Gtk.ResponseType.CANCEL:
+                    dialog_password.destroy()
+                elif response_key == Gtk.ResponseType.DELETE_EVENT:
+                    dialog_password.destroy()
+                else:
+                    dialog_password.destroy()
+            except Exception as err:
+                error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error generating the \"Get Parameter\" telecommand!")
+                error_dialog.format_secondary_text(str(err))
+                error_dialog.run()
+                error_dialog.destroy()
                 dialog.destroy()
-                dialog_password.destroy()
-            elif response_key == Gtk.ResponseType.CANCEL:
-                dialog_password.destroy()
-            elif response_key == Gtk.ResponseType.DELETE_EVENT:
-                dialog_password.destroy()
             else:
-                dialog_password.destroy()
+                dialog.destroy()
         elif response == Gtk.ResponseType.CANCEL:
             dialog.destroy()
         elif response == Gtk.ResponseType.DELETE_EVENT:
@@ -599,23 +729,40 @@ class SpaceLabTransmitter:
 
     def on_button_get_payload_data_clicked(self, button):
         dialog = DialogGetPayloadData(self.window)
+
         response = dialog.run()
         if response == Gtk.ResponseType.OK:
-            dialog_password = DialogPassword(self.window)
-            response_key = dialog_password.run()
-            if response_key == Gtk.ResponseType.OK:
-                callsign = self.entry_preferences_general_callsign.get_text()
-                fr = GetPayloadData()
-                pl = fr.generate(callsign, dialog.get_pl_id(), dialog.get_pl_args(), dialog_password.get_key())
-                self._transmit_tc(pl, "Get Payload Data")
+            try:
+                if dialog.get_pl_id() <= 0 or dialog.get_pl_id() > 255:
+                    raise RuntimeError("The payload ID must be between 0 and 255!")
+
+                if len(dialog.get_pl_args()) == 0:
+                    raise RuntimeError("The payload arguments cannot be empty!")
+
+                dialog_password = DialogPassword(self.window)
+
+                response_key = dialog_password.run()
+                if response_key == Gtk.ResponseType.OK:
+                    callsign = self.entry_preferences_general_callsign.get_text()
+                    fr = GetPayloadData()
+                    pl = fr.generate(callsign, dialog.get_pl_id(), dialog.get_pl_args(), dialog_password.get_key())
+                    self._transmit_tc(pl, "Get Payload Data")
+                    dialog.destroy()
+                    dialog_password.destroy()
+                elif response_key == Gtk.ResponseType.CANCEL:
+                    dialog_password.destroy()
+                elif response_key == Gtk.ResponseType.DELETE_EVENT:
+                    dialog_password.destroy()
+                else:
+                    dialog_password.destroy()
+            except Exception as err:
+                error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error generating the \"Get Payload\" telecommand!")
+                error_dialog.format_secondary_text(str(err))
+                error_dialog.run()
+                error_dialog.destroy()
                 dialog.destroy()
-                dialog_password.destroy()
-            elif response_key == Gtk.ResponseType.CANCEL:
-                dialog_password.destroy()
-            elif response_key == Gtk.ResponseType.DELETE_EVENT:
-                dialog_password.destroy()
             else:
-                dialog_password.destroy()
+                dialog.destroy()
         elif response == Gtk.ResponseType.CANCEL:
             dialog.destroy()
         elif response == Gtk.ResponseType.DELETE_EVENT:
@@ -625,14 +772,29 @@ class SpaceLabTransmitter:
 
     def on_button_broadcast_message_clicked(self, button):
         dialog = DialogBroadcastMessage(self.window)
-        response = dialog.run()
 
+        response = dialog.run()
         if response == Gtk.ResponseType.OK:
-            callsign = self.entry_preferences_general_callsign.get_text()
-            fr = Broadcast()
-            pl = fr.generate(callsign, dialog.get_dst_callsign(), dialog.get_message())
-            self._transmit_tc(pl, "Broadcast Message")
-            dialog.destroy()
+            try:
+                if len(dialog.get_dst_callsign()) == 0 or len(dialog.get_dst_callsign()) > 7:
+                    raise RuntimeError("The destination callsign must be between 0 and 7 characters long!")
+
+                if len(dialog.get_message()) == 0 or len(dialog.get_message()) > 38:
+                    raise RuntimeError("The message must be between 0 and 38 characters long!")
+
+                callsign = self.entry_preferences_general_callsign.get_text()
+                fr = Broadcast()
+                pl = fr.generate(callsign, dialog.get_dst_callsign(), dialog.get_message())
+                self._transmit_tc(pl, "Broadcast Message")
+                dialog.destroy()
+            except Exception as err:
+                error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error generating the \"Broadcast Message\" telecommand!")
+                error_dialog.format_secondary_text(str(err))
+                error_dialog.run()
+                error_dialog.destroy()
+                dialog.destroy()
+            else:
+                dialog.destroy()
         elif response == Gtk.ResponseType.CANCEL:
             dialog.destroy()
         elif response == Gtk.ResponseType.DELETE_EVENT:
