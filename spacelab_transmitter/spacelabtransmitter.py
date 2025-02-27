@@ -116,17 +116,27 @@ class DialogPassword(Gtk.Dialog):
         super().__init__(title="Authentication", transient_for=parent, flags=0)
         self.add_buttons(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK)
 
-        self.set_default_size(150, 100)
-
-        label = Gtk.Label(label="Enter the key")
+        label = Gtk.Label(label="Key:")
         self.entry_password = Gtk.Entry()
 
         grid = Gtk.Grid()
-        grid.add(label)
-        grid.attach(self.entry_password, 0, 1, 1, 1)
+        grid.set_column_spacing(10)
+        grid.set_margin_start(10)
+        grid.set_margin_end(10)
+        grid.set_margin_top(5)
+        grid.set_margin_bottom(5)
 
-        box = self.get_content_area()
-        box.add(grid)
+        grid.add(label)
+        grid.attach(self.entry_password, 1, 0, 1, 1)
+
+        box_content = self.get_content_area()
+        box_content.add(grid)
+
+        box_buttons = self.get_action_area()
+        grid.set_column_spacing(10)
+        box_buttons.set_margin_start(10)
+        box_buttons.set_margin_end(10)
+        box_buttons.set_margin_bottom(5)
 
         self.show_all()
 
