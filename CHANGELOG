@@ -1,5 +1,17 @@
 ===========================================
 
+v0.5 - 2025/03/01
+
+- Adding support for Adalm Pluto SDR
+- Loading the satellite configuration from the JSON files
+- Adding the option of transmitting the packet over a TCP socket
+- Updating the telecommands
+- UI improvements
+- General improments and fixes
+
+===========================================
+===========================================
+
 v0.4 - 2022/11/01
 
 - Telecommands integration with interface
