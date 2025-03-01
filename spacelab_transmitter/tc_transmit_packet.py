@@ -1,5 +1,5 @@
 #
-#  tc_broadcast.py
+#  tc_transmit_packet.py
 #
 #  Copyright The SpaceLab-Transmitter Contributors.
 #
@@ -20,28 +20,29 @@
 #
 #
 
+
 from spacelab_transmitter.telecommand import Telecommand
 
-class Broadcast(Telecommand):
+class TransmitPacket(Telecommand):
     """
-    Broadcast Message
+    Transmit packet
     """
     def __init__(self):
         """
         Constructor.
         """
-        super().__init__(0x42, "broadcast")
+        super().__init__(0x4F, "transmit_packet")
 
-    def generate(self, src_adr, dst_adr, msg):
+    def generate(self, src_adr, data):
         """
-        This telecommand is composed by four fields:
+        This telecommand is composed by three fields:
 
-        - Packet ID (1 byte = 0x42)
-        - Source callsign (7 bytes ASCII)
-        - Destination callsign (7 bytes ASCII)
-        - Message (string, up to 38 characters)
+        Packet ID (1 byte = 0x4F)
+        Source callsign (7 bytes ASCII)
+        Data (sequence of bytes, up to 52)
 
-        The inputs of the "generate" method will be the source callsign (ASCII string), the destination callsign
-        (ASCII string) and the message to broadcast (ASCII string).
+        The inputs of the "generate" method will be 
+        the source callsign (ASCII string), 
+        the data to transmit (list of integers).
         """
-        return [self.get_id()] + self._prepare_callsign(src_adr) + self._prepare_callsign(dst_adr) + [ord(i) for i in msg]
+        return [self.get_id()] + self._prepare_callsign(src_adr) + data

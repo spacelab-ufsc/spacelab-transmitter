@@ -44,6 +44,7 @@ from spacelab_transmitter.tc_get_parameter import GetParameter
 from spacelab_transmitter.tc_get_parameter import GetParameter
 from spacelab_transmitter.tc_activate_payload import ActivatePayload
 from spacelab_transmitter.tc_deactivate_payload import DeactivatePayload
+from spacelab_transmitter.tc_update_tle import UpdateTLE
 
 def test_tc_ping():
     x = Ping()
@@ -241,20 +242,23 @@ def test_tc_erase_memory():
     x = EraseMemory()
 
     for i in range(100):
-        #Callsign and conversion
+        # Callsign and conversion
         src_adr = ''.join(random.choice(string.ascii_uppercase) for j in range(random.randint(1, 7)))
         src_adr_as_list = [ord(j) for j in src_adr]
         spaces = (7 - len(src_adr)) * [ord(" ")]
 
+        # Random Memory ID
+        mem_id = random.randint(0, 255)
+
         # Random key
         key = ''.join(random.choice(string.ascii_uppercase) for j in range(16))
-        exp_pl = [0x49] + spaces + src_adr_as_list
+        exp_pl = [0x49] + spaces + src_adr_as_list + [mem_id]
 
-        #hash
+        # Hash
         hashed = hmac.new(key.encode('utf-8'), bytes(exp_pl), hashlib.sha1)
 
-        #generate 
-        res = x.generate(src_adr, key)
+        # Generate
+        res = x.generate(src_adr, mem_id, key)
         assert res == exp_pl + list(hashed.digest())
 
 def test_tc_force_reset():
@@ -415,4 +419,31 @@ def test_tc_dactivate_payload():
 
         #generate 
         res = x.generate(src_adr, pl_id, key)
+        assert res == exp_pl + list(hashed.digest())
+
+def test_tc_update_tle():
+    x = UpdateTLE()
+
+    for i in range(100):
+        # Callsign and conversion
+        src_adr = ''.join(random.choice(string.ascii_uppercase) for j in range(random.randint(1, 7)))
+        src_adr_as_list = [ord(j) for j in src_adr]
+        spaces = (7 - len(src_adr)) * [ord(" ")]
+
+        # Random TLE Line Number
+        tle_line_num = random.randint(0, 2)
+
+        # TLE Line
+        tle_line = ''.join(random.choice(string.ascii_uppercase) for j in range(69))
+        tle_line_list = [ord(j) for j in tle_line]
+
+        # Random key
+        key = ''.join(random.choice(string.ascii_uppercase) for j in range(16))
+        exp_pl = [0x4F] + spaces + src_adr_as_list + [tle_line_num] + tle_line_list
+
+        # Hash
+        hashed = hmac.new(key.encode('utf-8'), bytes(exp_pl), hashlib.sha1)
+
+        # Generate
+        res = x.generate(src_adr, tle_line_num, tle_line, key)
         assert res == exp_pl + list(hashed.digest())

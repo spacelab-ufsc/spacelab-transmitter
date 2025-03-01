@@ -3,3 +3,4 @@ pyngham
 numpy
 scipy
 ephem
+pyadi-iio

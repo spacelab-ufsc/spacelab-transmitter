@@ -1,4 +1,3 @@
-
 <h1 align="center">
     SPACELAB TRANSMITTER
     <br>
@@ -20,16 +19,14 @@
 
 <p align="center">
     <a href="#overview">Overview</a> •
-    <a href="#satellites">Satellites</a> •
     <a href="#dependencies">Dependencies</a> •
+    <a href="#documentation">Documentation</a> •
     <a href="#license">License</a>
 </p>
 
 # Overview
 
 SpaceLab Packet Transmitter is a software to transmit audio records to the satellites of SpaceLab.
-
-It is still under construction and the following information is what is expected by the final product.
 
 Below, there is an image of the main window of the software:
 
@@ -40,8 +37,9 @@ Below, there is an image of the main window of the software:
 This program will support the satellites below:
 
 * FloripaSat-1 (launched in December 2019)
-* GOLDS-UFSC (to be launched on 2022)
-* Catarina-A1 
+* GOLDS-UFSC (to be launched on 2025)
+* Catarina-A1
+* Catarina-A2
 
 # Dependencies
 
@@ -51,18 +49,19 @@ This program will support the satellites below:
 * [SciPy](https://pypi.org/project/scipy/)
 * [PyEphem](https://pypi.org/project/ephem/)
 * [UHD](https://github.com/EttusResearch/uhd)
+* [PyADI-IIO](https://github.com/analogdevicesinc/pyadi-iio)
 
 ## Installation on Ubuntu
 
 ```sudo apt install python3 python3-gi python3-numpy python3-scipy python3-ephem python3-uhd```
 
-```pip install pyngham```
+```pip install pyngham pyadi-iio```
 
 ## Installation on Fedora
 
 ```sudo dnf install python3 python3-gobject python3-numpy python3-scipy python3-ephem uhd uhd-devel```
 
-```pip install pyngham```
+```pip install pyngham pyadi-iio```
 
 ## Installing
 

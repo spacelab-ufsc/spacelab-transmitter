@@ -1,5 +1,5 @@
 #
-#  tc_erase_memory.py
+#  tc_update_tle.py
 #
 #  Copyright The SpaceLab-Transmitter Contributors.
 #
@@ -24,33 +24,35 @@ import hashlib
 import hmac
 from spacelab_transmitter.telecommand import Telecommand
 
-class EraseMemory(Telecommand):
+class UpdateTLE(Telecommand):
     """
-    Erase Memory
+    Update TLE
     """
     def __init__(self):
         """
         Constructor
         """
-        super().__init__(0x49, "erase_memory")
+        super().__init__(0x4F, "update_tle")
     
-    def generate(self, src_adr, mem_id, key):
-        """
-        This telecommand is composed by four fields:
+    def generate(self, src_adr, line_num, tle_line, key):
 
-        - Packet ID (1 byte = 0x49)
-        - Source callsign (7 bytes ASCII)
-        - Memory ID (1 byte)
-        - HMAC hash (20 bytes)
+        """This telecommand is composed by five fields:
 
-        :param src_adr: is the callsign of the source (ASCII string).
-        :param mem_id: is the ID of the memory to be erased.
-        :param key: is the telecommand key (ASCII string).
+        Packet ID (1 byte = 0x4D)
+        Source callsign (7 bytes ASCII)
+        TLE Line Number (1 byte)
+        TLE Line (69 bytes ASCII)
+        HMAC hash (20 bytes)
 
+        :param: src_adr: is the callsign of the source (ASCII string).
+        :param: line_num: is the TLE line number to update (0, 1 or 2).
+        :param: tle_line: is the TLE line content (ASCII string).
+        :param: key: is the telecommand key (ASCII string).
         :return: The generated payload as list of integers.
-        :rtype: [Int]
+
         """
-        pl = [self.get_id()] + self._prepare_callsign(src_adr) + [mem_id]
+
+        pl = [self.get_id()] + self._prepare_callsign(src_adr) + [line_num] + [ord(i) for i in tle_line]
 
         hashed = hmac.new(key.encode('utf-8'), bytes(pl), hashlib.sha1)
 

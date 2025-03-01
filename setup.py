@@ -58,7 +58,7 @@ setuptools.setup(
         ],
     download_url                    = "https://github.com/spacelab-ufsc/spacelab-transmitter/releases",
     packages                        = setuptools.find_packages(),
-    install_requires                = ['PyGObject','pyngham','numpy','scipy','ephem'],
+    install_requires                = ['PyGObject','pyngham','numpy','scipy','ephem', 'pyadi-iio'],
     entry_points                    = { 
         'gui_scripts': [
             'spacelab-transmitter = spacelab_transmitter.__main__:main'
@@ -70,6 +70,6 @@ setuptools.setup(
         ('share/spacelab_transmitter/', ['spacelab_transmitter/data/ui/spacelab_transmitter.glade']),
         ('share/spacelab_transmitter/', ['spacelab_transmitter/data/img/spacelab-logo-full-400x200.png']),
         ('share/spacelab_transmitter/', ['spacelab_transmitter/data/satellites/floripasat-1.json']),
-        ('share/spacelab_transmitter/', ['spacelab_transmitter/data/satellites/floripasat-2.json']),
+        ('share/spacelab_transmitter/', ['spacelab_transmitter/data/satellites/golds-ufsc.json']),
         ],
 )

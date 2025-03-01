@@ -1,5 +1,5 @@
 #
-#  sphinx-build.yml
+#  test_gmsk.py
 #  
 #  Copyright The SpaceLab-Transmitter Contributors.
 #  
@@ -20,27 +20,30 @@
 #  
 #
 
-name: Documentation build
+import sys
+import random
 
-on:
-  push:
-    branches: [dev,main]
-  pull_request:
-    branches: [dev,main]
+sys.path.append(".")
 
-jobs:
-  build:
+from spacelab_transmitter.gmsk import GMSK
 
-    runs-on: ubuntu-latest
+def test_modulator_demodulator():
+    data = [random.randint(0, 255) for _ in range(1000)]
 
-    steps:
-    - uses: actions/checkout@v1
-    # Standard drop-in approach that should work for most people.
-    - uses: ammaraskar/sphinx-action@master
-      with:
-        docs-folder: "docs/"
-    # Create an artifact of the html output.
-    - uses: actions/upload-artifact@v4
-      with:
-        name: documentation_html
-        path: docs/_build/html/
+    gmsk = GMSK(0.5, 4800)
+
+    samples, fs, dur = gmsk.modulate(data)
+
+    demod_bits, signal = gmsk.demodulate(fs, samples)
+
+    data_res = list()
+
+    for i in range(1, len(demod_bits) - 1, 8):
+        result = int()
+        pos = 8 - 1
+        for j in range(8):
+            result = result | (demod_bits[i + j] << pos)
+            pos -= 1
+        data_res.append(result)
+
+    assert data == data_res
