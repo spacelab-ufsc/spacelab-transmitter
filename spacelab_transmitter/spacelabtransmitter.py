@@ -359,7 +359,7 @@ class SpaceLabTransmitter:
         response = dialog.run()
         if response == Gtk.ResponseType.OK:
             try:
-                if dialog.get_hours() <= 0:
+                if dialog.get_hours() <= 0 or dialog.get_hours() > 2**16-1:
                     raise ValueError()
 
                 dialog_pw = DialogPassword(self.window)
@@ -379,7 +379,7 @@ class SpaceLabTransmitter:
                     dialog_pw.destroy()
             except ValueError:
                 error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error generating the \"Enter Hibernation\" telecommand!")
-                error_dialog.format_secondary_text("The hibernation duration must be greater than zero!")
+                error_dialog.format_secondary_text("The hibernation duration must be greater than zero and lesser than 65536!")
                 error_dialog.run()
                 error_dialog.destroy()
             finally:
@@ -397,7 +397,7 @@ class SpaceLabTransmitter:
         response = dialog.run()
         if response == Gtk.ResponseType.OK:
             try:
-                if dialog.get_ac_mod_id() <= 0 or dialog.get_ac_mod_id() > 255:
+                if dialog.get_ac_mod_id() < 0 or dialog.get_ac_mod_id() > 255:
                     raise ValueError()
 
                 dialog_pw = DialogPassword(self.window)
@@ -435,7 +435,7 @@ class SpaceLabTransmitter:
         response = dialog.run()
         if response == Gtk.ResponseType.OK:
             try:
-                if dialog.get_deac_mod_id() <= 0 or dialog.get_deac_mod_id() > 255:
+                if dialog.get_deac_mod_id() < 0 or dialog.get_deac_mod_id() > 255:
                     raise ValueError()
 
                 dialog_pw = DialogPassword(self.window)
@@ -473,7 +473,7 @@ class SpaceLabTransmitter:
         response = dialog.run()
         if response == Gtk.ResponseType.OK:
             try:
-                if dialog.get_deac_pl_id() <= 0 or dialog.get_deac_pl_id() > 255:
+                if dialog.get_deac_pl_id() < 0 or dialog.get_deac_pl_id() > 255:
                     raise ValueError()
 
                 dialog_pw = DialogPassword(self.window)
@@ -511,7 +511,7 @@ class SpaceLabTransmitter:
         response = dialog.run()
         if response == Gtk.ResponseType.OK:
             try:
-                if dialog.get_ac_pl_id() <= 0 or dialog.get_ac_pl_id() > 255:
+                if dialog.get_ac_pl_id() < 0 or dialog.get_ac_pl_id() > 255:
                     raise ValueError()
 
                 dialog_pw = DialogPassword(self.window)
@@ -549,7 +549,7 @@ class SpaceLabTransmitter:
         response = dialog.run()
         if response == Gtk.ResponseType.OK:
             try:
-                if dialog.get_mem_id() <= 0 or dialog.get_mem_id() > 255:
+                if dialog.get_mem_id() < 0 or dialog.get_mem_id() > 255:
                     raise ValueError()
 
                 dialog_pw = DialogPassword(self.window)
@@ -588,13 +588,13 @@ class SpaceLabTransmitter:
         response = dialog.run()
         if response == Gtk.ResponseType.OK:
             try:
-                if dialog.get_subsys_id() <= 0 or dialog.get_subsys_id() > 255:
+                if dialog.get_subsys_id() < 0 or dialog.get_subsys_id() > 255:
                     raise ValueError("The subsystem ID must be between 0 and 255!")
 
-                if dialog.get_param_id() <= 0 or dialog.get_param_id() > 255:
+                if dialog.get_param_id() < 0 or dialog.get_param_id() > 255:
                     raise ValueError("The parameter ID must be between 0 and 255!")
 
-                if dialog.get_param_val() <= 0 or dialog.get_param_val() > 2**32-1:
+                if dialog.get_param_val() < 0 or dialog.get_param_val() > 2**32-1:
                     raise ValueError("The payload value must be between 0 and 4294967295!")
 
                 dialog_pw = DialogPassword(self.window)
@@ -632,13 +632,13 @@ class SpaceLabTransmitter:
         response = dialog.run()
         if response == Gtk.ResponseType.OK:
             try:
-                if dialog.get_data_id() <= 0 or dialog.get_data_id() > 255:
+                if dialog.get_data_id() < 0 or dialog.get_data_id() > 255:
                     raise ValueError("The data ID must be between 0 and 255!")
 
-                if dialog.get_start_ts() <= 0 or dialog.get_start_ts() > 2**32-1:
+                if dialog.get_start_ts() < 0 or dialog.get_start_ts() > 2**32-1:
                     raise ValueError("The start timestamp must be between 0 and 4294967295!")
 
-                if dialog.get_end_ts() <= 0 or dialog.get_end_ts() > 2**32-1:
+                if dialog.get_end_ts() < 0 or dialog.get_end_ts() > 2**32-1:
                     raise ValueError("The end timestamp must be between 0 and 4294967295!")
 
                 dialog_pw = DialogPassword(self.window)
@@ -708,10 +708,10 @@ class SpaceLabTransmitter:
         response = dialog.run()
         if response == Gtk.ResponseType.OK:
             try:
-                if dialog.get_subsys_id() <= 0 or dialog.get_subsys_id() > 255:
+                if dialog.get_subsys_id() < 0 or dialog.get_subsys_id() > 255:
                     raise ValueError("The subsystem ID must be between 0 and 255!")
 
-                if dialog.get_param_id() <= 0 or dialog.get_param_id() > 255:
+                if dialog.get_param_id() < 0 or dialog.get_param_id() > 255:
                     raise ValueError("The parameter ID must be between 0 and 255!")
 
                 dialog_pw = DialogPassword(self.window)
@@ -749,7 +749,7 @@ class SpaceLabTransmitter:
         response = dialog.run()
         if response == Gtk.ResponseType.OK:
             try:
-                if dialog.get_pl_id() <= 0 or dialog.get_pl_id() > 255:
+                if dialog.get_pl_id() < 0 or dialog.get_pl_id() > 255:
                     raise ValueError("The payload ID must be between 0 and 255!")
 
                 if len(dialog.get_pl_args()) == 0:
