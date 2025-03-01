@@ -17,8 +17,8 @@
 
 # -- Project information -----------------------------------------------------
 
-project = 'Spacelab Transmitter'
-copyright = '2022, Vitoria Beatriz Bianchin'
+project = 'spacelab-transmitter'
+copyright = 'The SpaceLab-Transmitter Contributors'
 author = 'Vitoria Beatriz Bianchin'
 
 
