@@ -55,7 +55,7 @@ from spacelab_transmitter.tc_ping import Ping
 from spacelab_transmitter.tc_enter_hibernation import Enter_hibernation
 from spacelab_transmitter.tc_update_tle import UpdateTLE
 
-from spacelab_transmitter.telecommands_transmission import DialogDataRequest, DialogDeactivatePayload, DialogEnterHibernation, DialogActivatePayload, DialogGetPayloadData, DialogSetParameter, DialogDeactivateModule, DialogActivateModule, DialogGetParameter, DialogBroadcastMessage, DialogTransmitPacket, DialogEraseMemory, DialogUpdateTLE
+from spacelab_transmitter.telecommands_transmission import DialogDataRequest, DialogDeactivatePayload, DialogEnterHibernation, DialogActivatePayload, DialogGetPayloadData, DialogSetParameter, DialogDeactivateModule, DialogActivateModule, DialogGetParameter, DialogBroadcastMessage, DialogTransmitPacket, DialogEraseMemory, DialogUpdateTLE, DialogCSPPeek, DialogCSPPoke
 
 from spacelab_transmitter.gmsk import GMSK
 from spacelab_transmitter.usrp import USRP
@@ -892,37 +892,122 @@ class SpaceLabTransmitter:
             self.dialog_csp_services.hide()
 
     def on_button_csp_ping_clicked(self, button):
-        pass
+        error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error generating the \"CSP Ping\" telecommand!")
+        error_dialog.format_secondary_text("Not implemented yet!")
+        error_dialog.run()
+        error_dialog.destroy()
 
     def on_button_csp_ps_clicked(self, button):
-        pass
+        error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error generating the \"CSP PS\" telecommand!")
+        error_dialog.format_secondary_text("Not implemented yet!")
+        error_dialog.run()
+        error_dialog.destroy()
 
     def on_button_csp_memfree_clicked(self, button):
-        pass
+        error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error generating the \"CSP Mem. Free\" telecommand!")
+        error_dialog.format_secondary_text("Not implemented yet!")
+        error_dialog.run()
+        error_dialog.destroy()
 
     def on_button_csp_bufferfree_clicked(self, button):
-        pass
+        error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error generating the \"CSP Buffer Free\" telecommand!")
+        error_dialog.format_secondary_text("Not implemented yet!")
+        error_dialog.run()
+        error_dialog.destroy()
 
     def on_button_csp_uptime_clicked(self, button):
-        pass
+        error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error generating the \"CSP Uptime\" telecommand!")
+        error_dialog.format_secondary_text("Not implemented yet!")
+        error_dialog.run()
+        error_dialog.destroy()
 
     def on_button_csp_cmp_ident_clicked(self, button):
-        pass
+        error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error generating the \"CSP CMP Ident\" telecommand!")
+        error_dialog.format_secondary_text("Not implemented yet!")
+        error_dialog.run()
+        error_dialog.destroy()
 
     def on_button_csp_route_set_clicked(self, button):
-        pass
+        error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error generating the \"CSP CMP Route Set\" telecommand!")
+        error_dialog.format_secondary_text("Not implemented yet!")
+        error_dialog.run()
+        error_dialog.destroy()
 
     def on_button_csp_cmp_if_stat_clicked(self, button):
-        pass
+        error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error generating the \"CSP CMP IF Stat\" telecommand!")
+        error_dialog.format_secondary_text("Not implemented yet!")
+        error_dialog.run()
+        error_dialog.destroy()
 
     def on_button_csp_cmp_peek_clicked(self, button):
-        pass
+        dialog = DialogCSPPeek(self.window)
+
+        response = dialog.run()
+        if response == Gtk.ResponseType.OK:
+            try:
+                if dialog.get_csp_mem_adr() < 0 or dialog.get_csp_mem_adr() > 2**32-1:
+                    raise ValueError("The memory address must be between 0 and 4294967295!")
+
+                if dialog.get_csp_mem_len() < 0 or dialog.get_csp_mem_len() > 2**32-1:
+                    raise ValueError("The memory length must be between 0 and 4294967295!")
+
+                error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error generating the \"CSP CMP Peek\" telecommand!")
+                error_dialog.format_secondary_text("Not implemented yet!")
+                error_dialog.run()
+                error_dialog.destroy()
+#                TODO
+#                self._transmit_tc(pl, "CSP Peek")
+            except ValueError as err:
+                error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error generating the \"CSP Peek\" telecommand!")
+                error_dialog.format_secondary_text(str(err))
+                error_dialog.run()
+                error_dialog.destroy()
+            finally:
+                dialog.destroy()
+        elif response == Gtk.ResponseType.CANCEL:
+            dialog.destroy()
+        elif response == Gtk.ResponseType.DELETE_EVENT:
+            dialog.destroy()
+        else:
+            dialog.destroy()
 
     def on_button_csp_cmp_poke_clicked(self, button):
-        pass
+        dialog = DialogCSPPoke(self.window)
+
+        response = dialog.run()
+        if response == Gtk.ResponseType.OK:
+            try:
+                if dialog.get_csp_mem_adr() < 0 or dialog.get_csp_mem_adr() > 2**32-1:
+                    raise ValueError("The memory address must be between 0 and 4294967295!")
+
+                if dialog.get_csp_mem_len() < 0 or dialog.get_csp_mem_len() > 2**32-1:
+                    raise ValueError("The memory length must be between 0 and 4294967295!")
+
+                error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error generating the \"CSP CMP Poke\" telecommand!")
+                error_dialog.format_secondary_text("Not implemented yet!")
+                error_dialog.run()
+                error_dialog.destroy()
+#                TODO
+#                self._transmit_tc(pl, "CSP Poke")
+            except ValueError as err:
+                error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error generating the \"CSP Poke\" telecommand!")
+                error_dialog.format_secondary_text(str(err))
+                error_dialog.run()
+                error_dialog.destroy()
+            finally:
+                dialog.destroy()
+        elif response == Gtk.ResponseType.CANCEL:
+            dialog.destroy()
+        elif response == Gtk.ResponseType.DELETE_EVENT:
+            dialog.destroy()
+        else:
+            dialog.destroy()
 
     def on_button_csp_cmp_clock_clicked(self, button):
-        pass
+        error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error generating the \"CSP CMP Get Clock\" telecommand!")
+        error_dialog.format_secondary_text("Not implemented yet!")
+        error_dialog.run()
+        error_dialog.destroy()
 
     def _transmit_tc(self, pkt, tc_name):
         carrier_frequency = self.entry_carrier_frequency.get_text()
