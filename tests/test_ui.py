@@ -20,7 +20,6 @@
 #  
 #
 
-
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
@@ -54,11 +53,16 @@ def test_ui():
     button_deactivate_payload       = builder.get_object("button_deactivate_payload")
     button_get_payload_data         = builder.get_object("button_get_payload_data")
     button_tx_pkt                   = builder.get_object("button_tx_pkt")
+    button_update_tle               = builder.get_object("button_update_tle")
     combobox_sdr                    = builder.get_object("combobox_sdr")
     liststore_sdr_devices           = builder.get_object("liststore_sdr_devices")
     entry_carrier_frequency         = builder.get_object("entry_carrier_frequency")
     entry_sample_rate               = builder.get_object("entry_sample_rate")
     spinbutton_tx_gain              = builder.get_object("spinbutton_tx_gain")
+    entry_tcp_address               = builder.get_object("entry_tcp_address")
+    entry_tcp_port                  = builder.get_object("entry_tcp_port")
+    button_tcp_connect              = builder.get_object("button_tcp_connect")
+    button_tcp_disconnect           = builder.get_object("button_tcp_disconnect")
     treeview_events                 = builder.get_object("treeview_events")
 
     assert window                           != None
@@ -85,11 +89,16 @@ def test_ui():
     assert button_deactivate_payload        != None
     assert button_get_payload_data          != None
     assert button_tx_pkt                    != None
+    assert button_update_tle                != None
     assert combobox_sdr                     != None
     assert liststore_sdr_devices            != None
     assert entry_carrier_frequency          != None
     assert entry_sample_rate                != None
     assert spinbutton_tx_gain               != None
+    assert entry_tcp_address                != None
+    assert entry_tcp_port                   != None
+    assert button_tcp_connect               != None
+    assert button_tcp_disconnect            != None
     assert treeview_events                  != None
 
     # About dialog
@@ -125,3 +134,32 @@ def test_ui():
     assert entry_doppler_address                != None
     assert entry_doppler_port                   != None
     assert filechooserbutton_logfile            != None
+
+    # CSP Services Dialog
+    button_csp_services             = builder.get_object("button_csp_services")
+    dialog_csp_services             = builder.get_object("dialog_csp_services")
+    button_csp_ping                 = builder.get_object("button_csp_ping")
+    button_csp_ps                   = builder.get_object("button_csp_ps")
+    button_csp_memfree              = builder.get_object("button_csp_memfree")
+    button_csp_bufferfree           = builder.get_object("button_csp_bufferfree")
+    button_csp_uptime               = builder.get_object("button_csp_uptime")
+    button_csp_cmp_ident            = builder.get_object("button_csp_cmp_ident")
+    button_csp_route_set            = builder.get_object("button_csp_route_set")
+    button_csp_cmp_if_stat          = builder.get_object("button_csp_cmp_if_stat")
+    button_csp_cmp_peek             = builder.get_object("button_csp_cmp_peek")
+    button_csp_cmp_poke             = builder.get_object("button_csp_cmp_poke")
+    button_csp_cmp_clock            = builder.get_object("button_csp_cmp_clock")
+
+    assert button_csp_services              != None
+    assert dialog_csp_services              != None
+    assert button_csp_ping                  != None
+    assert button_csp_ps                    != None
+    assert button_csp_memfree               != None
+    assert button_csp_bufferfree            != None
+    assert button_csp_uptime                != None
+    assert button_csp_cmp_ident             != None
+    assert button_csp_route_set             != None
+    assert button_csp_cmp_if_stat           != None
+    assert button_csp_cmp_peek              != None
+    assert button_csp_cmp_poke              != None
+    assert button_csp_cmp_clock             != None
