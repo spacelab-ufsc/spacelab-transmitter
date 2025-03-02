@@ -334,6 +334,29 @@ class SpaceLabTransmitter:
         # CSP Services
         self.button_csp_services = self.builder.get_object("button_csp_services")
         self.button_csp_services.connect("clicked", self.on_button_csp_services_clicked)
+        self.dialog_csp_services = self.builder.get_object("dialog_csp_services")
+        self.button_csp_ping = self.builder.get_object("button_csp_ping")
+        self.button_csp_ping.connect("clicked", self.on_button_csp_ping_clicked)
+        self.button_csp_ps = self.builder.get_object("button_csp_ps")
+        self.button_csp_ps.connect("clicked", self.on_button_csp_ps_clicked)
+        self.button_csp_memfree = self.builder.get_object("button_csp_memfree")
+        self.button_csp_memfree.connect("clicked", self.on_button_csp_memfree_clicked)
+        self.button_csp_bufferfree = self.builder.get_object("button_csp_bufferfree")
+        self.button_csp_bufferfree.connect("clicked", self.on_button_csp_bufferfree_clicked)
+        self.button_csp_uptime = self.builder.get_object("button_csp_uptime")
+        self.button_csp_uptime.connect("clicked", self.on_button_csp_uptime_clicked)
+        self.button_csp_cmp_ident = self.builder.get_object("button_csp_cmp_ident")
+        self.button_csp_cmp_ident.connect("clicked", self.on_button_csp_cmp_ident_clicked)
+        self.button_csp_route_set = self.builder.get_object("button_csp_route_set")
+        self.button_csp_route_set.connect("clicked", self.on_button_csp_route_set_clicked)
+        self.button_csp_cmp_if_stat = self.builder.get_object("button_csp_cmp_if_stat")
+        self.button_csp_cmp_if_stat.connect("clicked", self.on_button_csp_cmp_if_stat_clicked)
+        self.button_csp_cmp_peek = self.builder.get_object("button_csp_cmp_peek")
+        self.button_csp_cmp_peek.connect("clicked", self.on_button_csp_cmp_peek_clicked)
+        self.button_csp_cmp_poke = self.builder.get_object("button_csp_cmp_poke")
+        self.button_csp_cmp_poke.connect("clicked", self.on_button_csp_cmp_poke_clicked)
+        self.button_csp_cmp_clock = self.builder.get_object("button_csp_cmp_clock")
+        self.button_csp_cmp_clock.connect("clicked", self.on_button_csp_cmp_clock_clicked)
 
     def run(self):
         self.window.show_all()          
@@ -863,6 +886,42 @@ class SpaceLabTransmitter:
             dialog.destroy()
 
     def on_button_csp_services_clicked(self, button):
+        response = self.dialog_csp_services.run()
+
+        if response == Gtk.ResponseType.DELETE_EVENT:
+            self.dialog_csp_services.hide()
+
+    def on_button_csp_ping_clicked(self, button):
+        pass
+
+    def on_button_csp_ps_clicked(self, button):
+        pass
+
+    def on_button_csp_memfree_clicked(self, button):
+        pass
+
+    def on_button_csp_bufferfree_clicked(self, button):
+        pass
+
+    def on_button_csp_uptime_clicked(self, button):
+        pass
+
+    def on_button_csp_cmp_ident_clicked(self, button):
+        pass
+
+    def on_button_csp_route_set_clicked(self, button):
+        pass
+
+    def on_button_csp_cmp_if_stat_clicked(self, button):
+        pass
+
+    def on_button_csp_cmp_peek_clicked(self, button):
+        pass
+
+    def on_button_csp_cmp_poke_clicked(self, button):
+        pass
+
+    def on_button_csp_cmp_clock_clicked(self, button):
         pass
 
     def _transmit_tc(self, pkt, tc_name):
@@ -1047,6 +1106,18 @@ class SpaceLabTransmitter:
             self.button_deactivate_payload.set_sensitive(False)
             self.button_get_payload_data.set_sensitive(False)
             self.button_update_tle.set_sensitive(False)
+            self.button_csp_services.set_sensitive(False)
+            self.button_csp_ping.set_sensitive(False)
+            self.button_csp_ps.set_sensitive(False)
+            self.button_csp_memfree.set_sensitive(False)
+            self.button_csp_bufferfree.set_sensitive(False)
+            self.button_csp_uptime.set_sensitive(False)
+            self.button_csp_cmp_ident.set_sensitive(False)
+            self.button_csp_route_set.set_sensitive(False)
+            self.button_csp_cmp_if_stat.set_sensitive(False)
+            self.button_csp_cmp_peek.set_sensitive(False)
+            self.button_csp_cmp_poke.set_sensitive(False)
+            self.button_csp_cmp_clock.set_sensitive(False)
         elif self.switch_button.get_active() == True:
             self.button_ping_request.set_sensitive(True)
             self.button_enter_hibernation.set_sensitive(True)
@@ -1063,6 +1134,18 @@ class SpaceLabTransmitter:
             self.button_deactivate_payload.set_sensitive(True)
             self.button_get_payload_data.set_sensitive(True)
             self.button_update_tle.set_sensitive(True)
+            self.button_csp_services.set_sensitive(True)
+            self.button_csp_ping.set_sensitive(True)
+            self.button_csp_ps.set_sensitive(True)
+            self.button_csp_memfree.set_sensitive(True)
+            self.button_csp_bufferfree.set_sensitive(True)
+            self.button_csp_uptime.set_sensitive(True)
+            self.button_csp_cmp_ident.set_sensitive(True)
+            self.button_csp_route_set.set_sensitive(True)
+            self.button_csp_cmp_if_stat.set_sensitive(True)
+            self.button_csp_cmp_peek.set_sensitive(True)
+            self.button_csp_cmp_poke.set_sensitive(True)
+            self.button_csp_cmp_clock.set_sensitive(True)
 
     def on_combobox_satellite_changed(self, combobox):
         # Clear the list of packet types
