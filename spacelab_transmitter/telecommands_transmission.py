@@ -20,8 +20,6 @@
 #  
 #
 
-import ast
-
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
@@ -452,7 +450,7 @@ class DialogTransmitPacket(Gtk.Dialog):
         grid.set_margin_bottom(5)
 
         grid.add(label)
-        grid.attach(self.entry_deactivate_mod_id, 1, 0, 1, 1)
+        grid.attach(self.entry_data, 1, 0, 1, 1)
 
         box_content = self.get_content_area()
         box_content.add(grid)
@@ -466,7 +464,7 @@ class DialogTransmitPacket(Gtk.Dialog):
         self.show_all()
 
     def get_data(self):
-        return ast.literal_eval(self.entry_data.get_text())
+        return eval(self.entry_data.get_text())
 
 class DialogEraseMemory(Gtk.Dialog):
     def __init__(self, parent):

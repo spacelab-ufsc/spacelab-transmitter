@@ -839,10 +839,28 @@ class SpaceLabTransmitter:
             dialog.destroy()
 
     def on_button_tx_pkt_clicked(self, button):
-        response = self.dialog_transmit_packet.run()
+        dialog = DialogTransmitPacket(self.window)
 
-        if response == Gtk.ResponseType.DELETE_EVENT:
-            self.dialog_transmit_packet.hide()
+        response = dialog.run()
+        if response == Gtk.ResponseType.OK:
+            try:
+                callsign = self.entry_preferences_general_callsign.get_text()
+                fr = TransmitPacket()
+                pl = fr.generate(callsign, dialog.get_data())
+                self._transmit_tc(pl, "Transmit Packet")
+            except Exception as err:
+                error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error generating the \"Transmit Packet\" telecommand!")
+                error_dialog.format_secondary_text(str(err))
+                error_dialog.run()
+                error_dialog.destroy()
+            finally:
+                dialog.destroy()
+        elif response == Gtk.ResponseType.CANCEL:
+            dialog.destroy()
+        elif response == Gtk.ResponseType.DELETE_EVENT:
+            dialog.destroy()
+        else:
+            dialog.destroy()
 
     def on_button_update_tle_clicked(self, button):
         dialog = DialogUpdateTLE(self.window)
@@ -1191,6 +1209,7 @@ class SpaceLabTransmitter:
             self.button_deactivate_payload.set_sensitive(False)
             self.button_get_payload_data.set_sensitive(False)
             self.button_update_tle.set_sensitive(False)
+            self.button_tx_pkt.set_sensitive(False)
             self.button_csp_services.set_sensitive(False)
             self.button_csp_ping.set_sensitive(False)
             self.button_csp_ps.set_sensitive(False)
@@ -1219,6 +1238,7 @@ class SpaceLabTransmitter:
             self.button_deactivate_payload.set_sensitive(True)
             self.button_get_payload_data.set_sensitive(True)
             self.button_update_tle.set_sensitive(True)
+            self.button_tx_pkt.set_sensitive(True)
             self.button_csp_services.set_sensitive(True)
             self.button_csp_ping.set_sensitive(True)
             self.button_csp_ps.set_sensitive(True)
