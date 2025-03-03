@@ -112,6 +112,13 @@ _MODULATION_GMSK                = "GMSK"
 _PROTOCOL_NGHAM                 = "NGHam"
 _PROTOCOL_AX100MODE5            = "AX100-Mode5"
 
+# Available telecommands
+_TELECOMMANDS                   = ["ping", "data_request", "broadcast_msg", "enter_hibernation",
+                                   "leave_hibernation", "activate_module", "deactivate_module",
+                                   "activate_payload", "deactivate_payload", "erase_memory", "force_reset",
+                                   "get_payload_data", "set_param", "get_param", "transmit_pkt", "update_tle",
+                                   "csp_services"]
+
 # SDRs
 _SDR_MODELS                     = ['USRP', 'Pluto SDR']
 
@@ -166,6 +173,7 @@ class SpaceLabTransmitter:
         self._build_widgets()
         self.write_log("SpaceLab Transmitter initialized!")
         self._load_preferences()
+        self._active_tcs = list()
 
     def _build_widgets(self):
         # Main window
@@ -1266,67 +1274,73 @@ class SpaceLabTransmitter:
 
     def on_switch_button_clicked(self, false, button):
         if self.switch_button.get_active() == False:
-            self.button_ping_request.set_sensitive(False)
-            self.button_enter_hibernation.set_sensitive(False)
-            self.button_deactivate_module.set_sensitive(False)
-            self.button_erase_memory.set_sensitive(False)
-            self.button_set_parameter.set_sensitive(False)
-            self.button_data_request.set_sensitive(False)
-            self.button_leave_hibernation.set_sensitive(False)
-            self.button_activate_payload.set_sensitive(False)
-            self.button_force_reset.set_sensitive(False)
-            self.button_get_parameter.set_sensitive(False)
-            self.button_broadcast_message.set_sensitive(False)
-            self.button_activate_module.set_sensitive(False)
-            self.button_deactivate_payload.set_sensitive(False)
-            self.button_get_payload_data.set_sensitive(False)
-            self.button_update_tle.set_sensitive(False)
-            self.button_tx_pkt.set_sensitive(False)
-            self.button_csp_services.set_sensitive(False)
-            self.button_csp_ping.set_sensitive(False)
-            self.button_csp_ps.set_sensitive(False)
-            self.button_csp_memfree.set_sensitive(False)
-            self.button_csp_bufferfree.set_sensitive(False)
-            self.button_csp_uptime.set_sensitive(False)
-            self.button_csp_cmp_ident.set_sensitive(False)
-            self.button_csp_route_set.set_sensitive(False)
-            self.button_csp_cmp_if_stat.set_sensitive(False)
-            self.button_csp_cmp_peek.set_sensitive(False)
-            self.button_csp_cmp_poke.set_sensitive(False)
-            self.button_csp_cmp_clock.set_sensitive(False)
-            self.button_csp_reboot.set_sensitive(False)
-            self.button_csp_shutdown.set_sensitive(False)
+            self._update_tc_buttons(False)
         elif self.switch_button.get_active() == True:
-            self.button_ping_request.set_sensitive(True)
-            self.button_enter_hibernation.set_sensitive(True)
-            self.button_deactivate_module.set_sensitive(True)
-            self.button_erase_memory.set_sensitive(True)
-            self.button_set_parameter.set_sensitive(True)
-            self.button_data_request.set_sensitive(True)
-            self.button_leave_hibernation.set_sensitive(True)
-            self.button_activate_payload.set_sensitive(True)
-            self.button_force_reset.set_sensitive(True)
-            self.button_get_parameter.set_sensitive(True)
-            self.button_broadcast_message.set_sensitive(True)
-            self.button_activate_module.set_sensitive(True)
-            self.button_deactivate_payload.set_sensitive(True)
-            self.button_get_payload_data.set_sensitive(True)
-            self.button_update_tle.set_sensitive(True)
-            self.button_tx_pkt.set_sensitive(True)
-            self.button_csp_services.set_sensitive(True)
-            self.button_csp_ping.set_sensitive(True)
-            self.button_csp_ps.set_sensitive(True)
-            self.button_csp_memfree.set_sensitive(True)
-            self.button_csp_bufferfree.set_sensitive(True)
-            self.button_csp_uptime.set_sensitive(True)
-            self.button_csp_cmp_ident.set_sensitive(True)
-            self.button_csp_route_set.set_sensitive(True)
-            self.button_csp_cmp_if_stat.set_sensitive(True)
-            self.button_csp_cmp_peek.set_sensitive(True)
-            self.button_csp_cmp_poke.set_sensitive(True)
-            self.button_csp_cmp_clock.set_sensitive(True)
-            self.button_csp_reboot.set_sensitive(True)
-            self.button_csp_shutdown.set_sensitive(True)
+            self._update_tc_buttons(True)
+
+    def _update_tc_buttons(self, state):
+        self.button_ping_request.set_sensitive(False)
+        self.button_enter_hibernation.set_sensitive(False)
+        self.button_deactivate_module.set_sensitive(False)
+        self.button_erase_memory.set_sensitive(False)
+        self.button_set_parameter.set_sensitive(False)
+        self.button_data_request.set_sensitive(False)
+        self.button_leave_hibernation.set_sensitive(False)
+        self.button_activate_payload.set_sensitive(False)
+        self.button_force_reset.set_sensitive(False)
+        self.button_get_parameter.set_sensitive(False)
+        self.button_broadcast_message.set_sensitive(False)
+        self.button_activate_module.set_sensitive(False)
+        self.button_deactivate_payload.set_sensitive(False)
+        self.button_get_payload_data.set_sensitive(False)
+        self.button_update_tle.set_sensitive(False)
+        self.button_tx_pkt.set_sensitive(False)
+        self.button_csp_services.set_sensitive(False)
+        self.button_csp_ping.set_sensitive(False)
+        self.button_csp_ps.set_sensitive(False)
+        self.button_csp_memfree.set_sensitive(False)
+        self.button_csp_bufferfree.set_sensitive(False)
+        self.button_csp_uptime.set_sensitive(False)
+        self.button_csp_cmp_ident.set_sensitive(False)
+        self.button_csp_route_set.set_sensitive(False)
+        self.button_csp_cmp_if_stat.set_sensitive(False)
+        self.button_csp_cmp_peek.set_sensitive(False)
+        self.button_csp_cmp_poke.set_sensitive(False)
+        self.button_csp_cmp_clock.set_sensitive(False)
+        self.button_csp_reboot.set_sensitive(False)
+        self.button_csp_shutdown.set_sensitive(False)
+
+        if "ping" in self._active_tcs: self.button_ping_request.set_sensitive(state)
+        if "enter_hibernation" in self._active_tcs: self.button_enter_hibernation.set_sensitive(state)
+        if "deactivate_module" in self._active_tcs: self.button_deactivate_module.set_sensitive(state)
+        if "erase_memory" in self._active_tcs: self.button_erase_memory.set_sensitive(state)
+        if "set_param" in self._active_tcs: self.button_set_parameter.set_sensitive(state)
+        if "data_request" in self._active_tcs: self.button_data_request.set_sensitive(state)
+        if "leave_hibernation" in self._active_tcs: self.button_leave_hibernation.set_sensitive(state)
+        if "activate_payload" in self._active_tcs: self.button_activate_payload.set_sensitive(state)
+        if "force_reset" in self._active_tcs: self.button_force_reset.set_sensitive(state)
+        if "get_param" in self._active_tcs: self.button_get_parameter.set_sensitive(state)
+        if "broadcast_msg" in self._active_tcs: self.button_broadcast_message.set_sensitive(state)
+        if "activate_module" in self._active_tcs: self.button_activate_module.set_sensitive(state)
+        if "deactivate_payload" in self._active_tcs: self.button_deactivate_payload.set_sensitive(state)
+        if "get_payload_data" in self._active_tcs: self.button_get_payload_data.set_sensitive(state)
+        if "update_tle" in self._active_tcs: self.button_update_tle.set_sensitive(state)
+        if "transmit_pkt" in self._active_tcs: self.button_tx_pkt.set_sensitive(state)
+        if "csp_services" in self._active_tcs:
+            self.button_csp_services.set_sensitive(state)
+            self.button_csp_ping.set_sensitive(state)
+            self.button_csp_ps.set_sensitive(state)
+            self.button_csp_memfree.set_sensitive(state)
+            self.button_csp_bufferfree.set_sensitive(state)
+            self.button_csp_uptime.set_sensitive(state)
+            self.button_csp_cmp_ident.set_sensitive(state)
+            self.button_csp_route_set.set_sensitive(state)
+            self.button_csp_cmp_if_stat.set_sensitive(state)
+            self.button_csp_cmp_peek.set_sensitive(state)
+            self.button_csp_cmp_poke.set_sensitive(state)
+            self.button_csp_cmp_clock.set_sensitive(state)
+            self.button_csp_reboot.set_sensitive(state)
+            self.button_csp_shutdown.set_sensitive(state)
 
     def on_combobox_satellite_changed(self, combobox):
         # Clear the list of packet types
@@ -1349,6 +1363,20 @@ class SpaceLabTransmitter:
                         self.liststore_packet_type.append([sat_info['links'][i]['name']])
                 else:
                     self.liststore_packet_type.append(['Uplink'])
+
+            self._active_tcs = list()
+            if 'telecommands' in sat_info:
+                for tc in sat_info["telecommands"]:
+                    for tc_avail in _TELECOMMANDS:
+                        if tc == tc_avail:
+                            self._active_tcs.append(tc)
+            else:
+                self._active_tcs = _TELECOMMANDS.copy()
+
+            if self.switch_button.get_active() == False:
+                self._update_tc_buttons(False)
+            elif self.switch_button.get_active() == True:
+                self._update_tc_buttons(True)
 
             modulation, frequency, baudrate, sync_word, protocol = self._get_link_info()
             self.entry_carrier_frequency.set_text(str(int(frequency)))
