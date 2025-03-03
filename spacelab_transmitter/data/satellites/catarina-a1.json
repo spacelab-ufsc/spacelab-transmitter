@@ -1,0 +1,502 @@
+{
+    "satellite": "Catarina-A1",
+    "modulation": "GMSK",
+    "frequency": 402e6,
+    "baudrate": 4800,
+    "sync_word": [93, 230, 42, 126],
+    "protocol": "NGHam",
+    "telecommands": [
+        {
+            "name": "Ping request",
+            "authentication": false,
+            "fields": [
+                {
+                    "name": "id",
+                    "value": 64,
+                    "start_pos": 0,
+                    "end_pos": 0
+                },
+                {
+                    "name": "source_callsign",
+                    "value": null,
+                    "start_pos": 1,
+                    "end_pos": 7
+                }
+            ]
+        },
+        {
+            "name": "Data request",
+            "authentication": true,
+            "fields": [
+                {
+                    "name": "id",
+                    "value": 65,
+                    "start_pos": 0,
+                    "end_pos": 0
+                },
+                {
+                    "name": "source_callsign",
+                    "value": null,
+                    "start_pos": 1,
+                    "end_pos": 7
+                },
+                {
+                    "name": "data_type_id",
+                    "value": null,
+                    "start_pos": 8,
+                    "end_pos": 8
+                },
+                {
+                    "name": "start_timestamp",
+                    "value": null,
+                    "start_pos": 9,
+                    "end_pos": 12
+                },
+                {
+                    "name": "end_timestamp",
+                    "value": null,
+                    "start_pos": 13,
+                    "end_pos": 16
+                },
+                {
+                    "name": "hmac_hash",
+                    "value": null,
+                    "start_pos": 17,
+                    "end_pos": 36
+                }
+            ]
+        },
+        {
+            "name": "Broadcast message",
+            "authentication": false,
+            "fields": [
+                {
+                    "name": "id",
+                    "value": 66,
+                    "start_pos": 0,
+                    "end_pos": 0
+                },
+                {
+                    "name": "source_callsign",
+                    "value": null,
+                    "start_pos": 1,
+                    "end_pos": 7
+                },
+                {
+                    "name": "destination_callsign",
+                    "value": null,
+                    "start_pos": 8,
+                    "end_pos": 14
+                },
+                {
+                    "name": "message",
+                    "value": null,
+                    "start_pos": 15,
+                    "end_pos": 52
+                }
+            ]
+        },
+        {
+            "name": "Enter hibernation",
+            "authentication": true,
+            "fields": [
+                {
+                    "name": "id",
+                    "value": 67,
+                    "start_pos": 0,
+                    "end_pos": 0
+                },
+                {
+                    "name": "source_callsign",
+                    "value": null,
+                    "start_pos": 1,
+                    "end_pos": 7
+                },
+                {
+                    "name": "hibernation_in_hours",
+                    "value": null,
+                    "start_pos": 8,
+                    "end_pos": 9
+                },
+                {
+                    "name": "hmac_hash",
+                    "value": null,
+                    "start_pos": 10,
+                    "end_pos": 29
+                }
+            ]
+        },
+        {
+            "name": "Leave hibernation",
+            "authentication": true,
+            "fields": [
+                {
+                    "name": "id",
+                    "value": 68,
+                    "start_pos": 0,
+                    "end_pos": 0
+                },
+                {
+                    "name": "source_callsign",
+                    "value": null,
+                    "start_pos": 1,
+                    "end_pos": 7
+                },
+                {
+                    "name": "hmac_hash",
+                    "value": null,
+                    "start_pos": 8,
+                    "end_pos": 27
+                }
+            ]
+        },
+        {
+            "name": "Activate module",
+            "authentication": true,
+            "fields": [
+                {
+                    "name": "id",
+                    "value": 69,
+                    "start_pos": 0,
+                    "end_pos": 0
+                },    
+                {
+                    "name": "source_callsign",
+                    "value": null,
+                    "start_pos": 1,
+                    "end_pos": 7
+                },
+                {
+                    "name": "module_id",
+                    "value": null,
+                    "start_pos": 8,
+                    "end_pos": 8
+                },
+                {
+                    "name": "hmac_hash",
+                    "value": null,
+                    "start_pos": 9,
+                    "end_pos": 28
+                }
+            ]
+        },
+        {
+            "name": "Deactivate module",
+            "authentication": true,
+            "fields": [
+                {
+                    "name": "id",
+                    "value": 70,
+                    "start_pos": 0,
+                    "end_pos": 0
+                },
+                {
+                    "name": "source_callsign",
+                    "value": null,
+                    "start_pos": 1,
+                    "end_pos": 7
+                },
+                {
+                    "name": "module_id",
+                    "value": null,
+                    "start_pos": 8,
+                    "end_pos": 8
+                },
+                {
+                    "name": "hmac_hash",
+                    "value": null,
+                    "start_pos": 9,
+                    "end_pos": 28
+                }
+            ]
+        },
+        {
+            "name": "Activate payload",
+            "authentication": true,
+            "fields": [
+                {
+                    "name": "id",
+                    "value": 71,
+                    "start_pos": 0,
+                    "end_pos": 0
+                },
+                {
+                    "name": "source_callsign",
+                    "value": null,
+                    "start_pos": 1,
+                    "end_pos": 7
+                },
+                {
+                    "name": "payload_id",
+                    "value": null,
+                    "start_pos": 8,
+                    "end_pos": 8
+                },
+                {
+                    "name": "hmac_hash",
+                    "value": null,
+                    "start_pos": 9,
+                    "end_pos": 28
+                }
+            ]
+        },
+        {
+            "name": "Deactivate payload",
+            "authentication": true,
+            "fields": [
+                {
+                    "name": "id",
+                    "value": 72,
+                    "start_pos": 0,
+                    "end_pos": 0
+                },
+                {
+                    "name": "source_callsign",
+                    "value": null,
+                    "start_pos": 1,
+                    "end_pos": 7
+                },
+                {
+                    "name": "payload_id",
+                    "value": null,
+                    "start_pos": 8,
+                    "end_pos": 8
+                },
+                {
+                    "name": "hmac_hash",
+                    "value": null,
+                    "start_pos": 9,
+                    "end_pos": 28
+                }
+            ]
+        },
+        {
+            "name": "Erase memory",
+            "authentication": true,
+            "fields": [
+                {
+                    "name": "id",
+                    "value": 73,
+                    "start_pos": 0,
+                    "end_pos": 0
+                },
+                {
+                    "name": "source_callsign",
+                    "value": null,
+                    "start_pos": 1,
+                    "end_pos": 7
+                },
+                {
+                    "name": "hmac_hash",
+                    "value": null,
+                    "start_pos": 8,
+                    "end_pos": 27
+                }
+            ]
+        },
+        {
+            "name": "Force reset",
+            "authentication": true,
+            "fields": [
+                {
+                    "name": "id",
+                    "value": 74,
+                    "start_pos": 0,
+                    "end_pos": 0
+                },
+                {
+                    "name": "source_callsign",
+                    "value": null,
+                    "start_pos": 1,
+                    "end_pos": 7
+                },
+                {
+                    "name": "hmac_hash",
+                    "value": null,
+                    "start_pos": 8,
+                    "end_pos": 27
+                }
+            ]
+        },
+        {
+            "name": "Get payload data",
+            "authentication": true,
+            "fields": [
+                {
+                    "name": "id",
+                    "value": 75,
+                    "start_pos": 0,
+                    "end_pos": 0
+                },
+                {
+                    "name": "source_callsign",
+                    "value": null,
+                    "start_pos": 1,
+                    "end_pos": 7
+                },
+                {
+                    "name": "payload_id",
+                    "value": null,
+                    "start_pos": 8,
+                    "end_pos": 8
+                },
+                {
+                    "name": "payload_arguments",
+                    "value": null,
+                    "start_pos": 9,
+                    "end_pos": 20 
+                },
+                {
+                    "name": "hmac_hash",
+                    "value": null,
+                    "start_pos": 21,
+                    "end_pos": 40
+                }
+            ]
+        },
+        {
+            "name": "Set parameter",
+            "authentication": true,
+            "fields": [
+                {
+                    "name": "id",
+                    "value": 76,
+                    "start_pos": 0,
+                    "end_pos": 0
+                },
+                {
+                    "name": "source_callsign",
+                    "value": null,
+                    "start_pos": 1,
+                    "end_pos": 7
+                },
+                {
+                    "name": "subsystem_id",
+                    "value": null,
+                    "start_pos": 8,
+                    "end_pos": 8
+                },
+                {
+                    "name": "parameter_id",
+                    "value": null,
+                    "start_pos": 9,
+                    "end_pos": 9
+                },
+                {
+                    "name": "parameter_value",
+                    "value": null,
+                    "start_pos": 10,
+                    "end_pos": 13
+                },
+                {
+                    "name": "hmac_hash",
+                    "value": null,
+                    "start_pos": 14,
+                    "end_pos": 33
+                }
+            ]
+        },
+        {
+            "name": "Get parameter",
+            "authentication": true,
+            "fields": [
+                {
+                    "name": "id",
+                    "value": 77,
+                    "start_pos": 0,
+                    "end_pos": 0
+                },
+                {
+                    "name": "source_callsign",
+                    "value": null,
+                    "start_pos": 1,
+                    "end_pos": 7
+                },
+                {
+                    "name": "subsystem_id",
+                    "value": null,
+                    "start_pos": 8,
+                    "end_pos": 8
+                },
+                {
+                    "name": "parameter_id",
+                    "value": null,
+                    "start_pos": 9,
+                    "end_pos": 9
+                },
+                {
+                    "name": "hmac_hash",
+                    "value": null,
+                    "start_pos": 14,
+                    "end_pos": 33
+                }
+            ]
+        },
+        {
+            "name": "Transmit packet",
+            "authentication": true,
+            "fields": [
+                {
+                    "name": "id",
+                    "value": 78,
+                    "start_pos": 0,
+                    "end_pos": 0
+                },
+                {
+                    "name": "source_callsign",
+                    "value": null,
+                    "start_pos": 1,
+                    "end_pos": 7
+                },
+                {
+                    "name": "byte_sequence",
+                    "value": null,
+                    "start_pos": 8,
+                    "end_pos": 39
+                },
+                {
+                    "name": "hmac_hash",
+                    "value": null,
+                    "start_pos": 40,
+                    "end_pos": 59
+                }
+            ]
+        },
+        {
+            "name": "Update TLE",
+            "authentication": true,
+            "fields": [
+                {
+                    "name": "id",
+                    "value": 79,
+                    "start_pos": 0,
+                    "end_pos": 0
+                },
+                {
+                    "name": "source_callsign",
+                    "value": null,
+                    "start_pos": 1,
+                    "end_pos": 7
+                },
+                {
+                    "name": "line",
+                    "value": null,
+                    "start_pos": 8,
+                    "end_pos": 8
+                },
+                {
+                    "name": "tle_line",
+                    "value": null,
+                    "start_pos": 9,
+                    "end_pos": 77
+                },
+                {
+                    "name": "hmac_hash",
+                    "value": null,
+                    "start_pos": 78,
+                    "end_pos": 97
+                }
+            ]
+        }
+    ]
+}
