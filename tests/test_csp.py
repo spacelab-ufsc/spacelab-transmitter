@@ -25,7 +25,7 @@ import random
 
 sys.path.append(".")
 
-from spacelab_decoder.csp import CSP, _CSP_PRIO_NORM
+from spacelab_transmitter.csp import CSP, _CSP_PRIO_NORM
 
 def test_address_config():
     adr1 = random.randint(0, 31)
