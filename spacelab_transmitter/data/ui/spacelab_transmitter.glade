@@ -1078,7 +1078,7 @@ Gabriel Mariano Marcelino - PU5GMA &lt;gabriel.mm8@gmail.com&gt;</property>
           </packing>
         </child>
         <child>
-          <!-- n-columns=4 n-rows=3 -->
+          <!-- n-columns=4 n-rows=4 -->
           <object class="GtkGrid">
             <property name="visible">True</property>
             <property name="can-focus">False</property>
@@ -1231,6 +1231,38 @@ Gabriel Mariano Marcelino - PU5GMA &lt;gabriel.mm8@gmail.com&gt;</property>
                 <property name="left-attach">2</property>
                 <property name="top-attach">2</property>
               </packing>
+            </child>
+            <child>
+              <object class="GtkButton" id="button_csp_reboot">
+                <property name="label" translatable="yes">Reboot</property>
+                <property name="visible">True</property>
+                <property name="sensitive">False</property>
+                <property name="can-focus">True</property>
+                <property name="receives-default">True</property>
+              </object>
+              <packing>
+                <property name="left-attach">3</property>
+                <property name="top-attach">2</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkButton" id="button_csp_shutdown">
+                <property name="label" translatable="yes">Shutdown</property>
+                <property name="visible">True</property>
+                <property name="sensitive">False</property>
+                <property name="can-focus">True</property>
+                <property name="receives-default">True</property>
+              </object>
+              <packing>
+                <property name="left-attach">0</property>
+                <property name="top-attach">3</property>
+              </packing>
+            </child>
+            <child>
+              <placeholder/>
+            </child>
+            <child>
+              <placeholder/>
             </child>
             <child>
               <placeholder/>

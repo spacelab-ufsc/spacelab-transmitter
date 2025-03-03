@@ -362,6 +362,10 @@ class SpaceLabTransmitter:
         self.button_csp_cmp_poke.connect("clicked", self.on_button_csp_cmp_poke_clicked)
         self.button_csp_cmp_clock = self.builder.get_object("button_csp_cmp_clock")
         self.button_csp_cmp_clock.connect("clicked", self.on_button_csp_cmp_clock_clicked)
+        self.button_csp_reboot = self.builder.get_object("button_csp_reboot")
+        self.button_csp_reboot.connect("clicked", self.on_button_csp_reboot_clicked)
+        self.button_csp_shutdown = self.builder.get_object("button_csp_shutdown")
+        self.button_csp_shutdown.connect("clicked", self.on_button_csp_shutdown_clicked)
 
     def run(self):
         self.window.show_all()          
@@ -1071,6 +1075,28 @@ class SpaceLabTransmitter:
             error_dialog.run()
             error_dialog.destroy()
 
+    def on_button_csp_reboot_clicked(self, button):
+        try:
+            csp = CSP(_CSP_MY_ADDRESS)
+            csp_pkt = csp.encode_reboot(1)  # 1 = Satellite (OBDH) address
+            self._transmit_tc(csp_pkt, "CSP Reboot")
+        except Exception as err:
+            error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error generating the \"CSP Reboot\" telecommand!")
+            error_dialog.format_secondary_text(str(err))
+            error_dialog.run()
+            error_dialog.destroy()
+
+    def on_button_csp_shutdown_clicked(self, button):
+        try:
+            csp = CSP(_CSP_MY_ADDRESS)
+            csp_pkt = csp.encode_shutdown(1)    # 1 = Satellite (OBDH) address
+            self._transmit_tc(csp_pkt, "CSP Shutdown")
+        except Exception as err:
+            error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error generating the \"CSP Shutdown\" telecommand!")
+            error_dialog.format_secondary_text(str(err))
+            error_dialog.run()
+            error_dialog.destroy()
+
     def _transmit_tc(self, pkt, tc_name):
         carrier_frequency = self.entry_carrier_frequency.get_text()
         tx_gain = self.spinbutton_tx_gain.get_text()
@@ -1268,6 +1294,8 @@ class SpaceLabTransmitter:
             self.button_csp_cmp_peek.set_sensitive(False)
             self.button_csp_cmp_poke.set_sensitive(False)
             self.button_csp_cmp_clock.set_sensitive(False)
+            self.button_csp_reboot.set_sensitive(False)
+            self.button_csp_shutdown.set_sensitive(False)
         elif self.switch_button.get_active() == True:
             self.button_ping_request.set_sensitive(True)
             self.button_enter_hibernation.set_sensitive(True)
@@ -1297,6 +1325,8 @@ class SpaceLabTransmitter:
             self.button_csp_cmp_peek.set_sensitive(True)
             self.button_csp_cmp_poke.set_sensitive(True)
             self.button_csp_cmp_clock.set_sensitive(True)
+            self.button_csp_reboot.set_sensitive(True)
+            self.button_csp_shutdown.set_sensitive(True)
 
     def on_combobox_satellite_changed(self, combobox):
         # Clear the list of packet types

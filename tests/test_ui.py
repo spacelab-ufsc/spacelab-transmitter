@@ -149,6 +149,8 @@ def test_ui():
     button_csp_cmp_peek             = builder.get_object("button_csp_cmp_peek")
     button_csp_cmp_poke             = builder.get_object("button_csp_cmp_poke")
     button_csp_cmp_clock            = builder.get_object("button_csp_cmp_clock")
+    button_csp_reboot               = builder.get_object("button_csp_reboot")
+    button_csp_shutdown             = builder.get_object("button_csp_shutdown")
 
     assert button_csp_services              != None
     assert dialog_csp_services              != None
@@ -163,3 +165,5 @@ def test_ui():
     assert button_csp_cmp_peek              != None
     assert button_csp_cmp_poke              != None
     assert button_csp_cmp_clock             != None
+    assert button_csp_reboot                != None
+    assert button_csp_shutdown              != None
