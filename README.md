@@ -1,5 +1,5 @@
 <h1 align="center">
-    SPACELAB TRANSMITTER
+    SPACELAB-TRANSMITTER
     <br>
 </h1>
 
@@ -20,11 +20,12 @@
 <p align="center">
     <a href="#overview">Overview</a> •
     <a href="#dependencies">Dependencies</a> •
+    <a href="#installing">Installing</a> •
     <a href="#documentation">Documentation</a> •
     <a href="#license">License</a>
 </p>
 
-# Overview
+## Overview
 
 SpaceLab Packet Transmitter is a software to transmit audio records to the satellites of SpaceLab.
 
@@ -32,7 +33,7 @@ Below, there is an image of the main window of the software:
 
 <img src="docs/img/main-window.png" width=""/>
 
-## Satellites
+### Satellites
 
 This program will support the satellites below:
 
@@ -41,7 +42,7 @@ This program will support the satellites below:
 * Catarina-A1
 * Catarina-A2
 
-# Dependencies
+## Dependencies
 
 * [PyGObject](https://pypi.org/project/PyGObject/)
 * [PyNGHam](https://pypi.org/project/pyngham/)
@@ -51,13 +52,13 @@ This program will support the satellites below:
 * [UHD](https://github.com/EttusResearch/uhd)
 * [PyADI-IIO](https://github.com/analogdevicesinc/pyadi-iio)
 
-## Installation on Ubuntu
+### Installation on Ubuntu
 
 ```sudo apt install python3 python3-gi python3-numpy python3-scipy python3-ephem python3-uhd```
 
 ```pip install pyngham pyadi-iio```
 
-## Installation on Fedora
+### Installation on Fedora
 
 ```sudo dnf install python3 python3-gobject python3-numpy python3-scipy python3-ephem uhd uhd-devel```
 
@@ -67,17 +68,17 @@ This program will support the satellites below:
 
 ```python setup.py install```
 
-# Documentation
+## Documentation
 
-## Dependencies
+### Dependencies
 
 * Sphinx
 * sphinx-redactor-theme
 
-## Building the Documentation
+### Building the Documentation
 
 ```make html```
 
-# License
+## License
 
 This project is licensed under GPLv3 license.
