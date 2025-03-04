@@ -153,7 +153,7 @@ class CSP:
 
         pkt.append(((dst_adr & 15) << 4) | ((dst_port & 60) >> 2))
 
-        pkt.append((dst_port << 6) | src_port)
+        pkt.append(((dst_port & 3) << 6) | src_port)
 
         pkt.append((int(sfp) << 4) | (int(hmac) << 3) | (int(xtea) << 2) | (int(rdp) << 2) | int(crc))
 
