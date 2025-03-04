@@ -61,7 +61,7 @@ from spacelab_transmitter.gmsk import GMSK
 from spacelab_transmitter.usrp import USRP
 from spacelab_transmitter.pluto import Pluto
 from spacelab_transmitter.csp import CSP
-from spacelab_transmitter.ax100mode5 import AX100Mode5
+from spacelab_transmitter.ax100 import AX100Mode5
 
 from pyngham import PyNGHam
 
