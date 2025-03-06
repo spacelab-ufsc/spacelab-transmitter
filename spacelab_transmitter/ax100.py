@@ -24,7 +24,8 @@ from pyngham import RS
 
 from spacelab_transmitter.golay24 import Golay24
 
-_AX100_SYNC_WORD_DEFAULT = [147, 11, 81, 222]
+_AX100_PREAMBLE_DEFAULT     = [0xAA]*4
+_AX100_SYNC_WORD_DEFAULT    = [147, 11, 81, 222]
 
 # Repeats after 255 bits, but repeats byte-aligning after 255 byte
 _AX100_CCSDS_POLY = [0xFF, 0x48, 0x0E, 0xC0, 0x9A, 0x0D, 0x70, 0xBC, 0x8E, 0x2C, 0x93, 0xAD, 0xA7,
@@ -56,7 +57,32 @@ class AX100Mode5:
         """
         Constructor.
         """
-        self._sync_word = _AX100_SYNC_WORD_DEFAULT.copy()
+        self._preamble = list()
+        self._sync_word = list()
+
+        self.set_preamble(_AX100_PREAMBLE_DEFAULT)
+        self.set_sync_word(_AX100_SYNC_WORD_DEFAULT)
+
+    def set_preamble(self, preamb):
+        """
+        Configure the preamble sequence.
+
+        :param preamb: Is the new preamble seuqence in list format.
+        :type: list[int]
+
+        :return: None
+        :rtype: None
+        """
+        self._preamble = preamb.copy()
+
+    def get_preamble(self):
+        """
+        Gets the preamble sequence.
+
+        :return: The pramble sequence as a list of integers.
+        :rtype: list[int]
+        """
+        return self._preamble
 
     def set_sync_word(self, sw):
         """
@@ -68,7 +94,7 @@ class AX100Mode5:
         :return: None
         :rtype: None
         """
-        self._synq_word = sw
+        self._sync_word = sw.copy()
 
     def get_sync_word(self):
         """
@@ -92,7 +118,7 @@ class AX100Mode5:
         pkt = list()
 
         # Preamble
-        pkt += [0xAA]*4
+        pkt += self.get_preamble()
 
         # Sync word
         pkt += self.get_sync_word()
@@ -105,7 +131,7 @@ class AX100Mode5:
 
         # Reversing the Golay24 data (another GomSpace magic)
         pkt.append(((gol_res[1] & 0x0F) << 4) | ((gol_res[2] & 0xF0) >> 4))
-        pkt.append(((gol_res[2] & 0x0F) << 4) | ((gol_res[0] & 0xF0) >> 4)) 
+        pkt.append(((gol_res[2] & 0x0F) << 4) | ((gol_res[0] & 0xF0) >> 4))
         pkt.append(((gol_res[0] & 0x0F) << 4) | ((gol_res[1] & 0xF0) >> 4))
 
         # Data
@@ -121,11 +147,39 @@ class AX100Mode5:
 
         return pkt
 
-    def decode(self):
+    def decode(self, pkt):
         """
+        :note: The pkt must not contain the preamble and the sync word.
+
         :return: .
         """
-        pass
+        # Golay24
+        gol = Golay24()
+
+        # Reversing the Golay24 data (GomSpace magic)
+        gol_seq = list()
+        gol_seq.append(((pkt[1] & 0x0F) << 4) | ((pkt[2] & 0xF0) >> 4))
+        gol_seq.append(((pkt[2] & 0x0F) << 4) | ((pkt[0] & 0xF0) >> 4))
+        gol_seq.append(((pkt[0] & 0x0F) << 4) | ((pkt[1] & 0xF0) >> 4))
+
+        pkt_len = gol.decode(gol_seq) & 0xFF    # Removing 0x06, GomSpace magic...
+
+        # De-scrambling
+        rs_block = self._scrambling(pkt[3:])    # 3 = Removing Golay24 bytes
+
+        # Get Reed-Solomon parity data
+        rs_par = rs_block[-32:]
+
+        # Getting the payload and adding padding
+        rs_data = self._padding(rs_block[:-32])
+
+        # Applying the Reed-Solomon decoder
+        rs = RS(8, 0x187, 112, 11, 32, 0)
+
+        data, err, err_pos = rs.decode(rs_data + rs_par, [0], 0)
+
+        # Return the payload data after Reed-Solomon correction
+        return data[:pkt_len]
 
     def _padding(self, data, target_len=223):
         """
@@ -135,10 +189,12 @@ class AX100Mode5:
         :return: .
         :rtype: list[int]
         """
-        while(len(data) < target_len):
-            data.append(0)
+        buf = data.copy()
 
-        return data
+        while(len(buf) < target_len):
+            buf.append(0)
+
+        return buf
 
     def _scrambling(self, data):
         """
