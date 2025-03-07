@@ -861,10 +861,24 @@ class SpaceLabTransmitter:
         response = dialog.run()
         if response == Gtk.ResponseType.OK:
             try:
-                callsign = self.entry_preferences_general_callsign.get_text()
-                fr = TransmitPacket()
-                pl = fr.generate(callsign, dialog.get_data())
-                self._transmit_tc(pl, "Transmit Packet")
+                if len(dialog.get_data()) == 0 or len(dialog.get_data()) > 45:
+                    raise ValueError("The data length must be greater than 0 and lesser than 45!")
+
+                dialog_pw = DialogPassword(self.window)
+
+                response_key = dialog_pw.run()
+                if response_key == Gtk.ResponseType.OK:
+                    callsign = self.entry_preferences_general_callsign.get_text()
+                    fr = TransmitPacket()
+                    pl = fr.generate(callsign, dialog.get_data(), dialog_pw.get_key())
+                    self._transmit_tc(pl, "Transmit Packet")
+                    dialog_pw.destroy()
+                elif response_key == Gtk.ResponseType.CANCEL:
+                    dialog_pw.destroy()
+                elif response_key == Gtk.ResponseType.DELETE_EVENT:
+                    dialog_pw.destroy()
+                else:
+                    dialog_pw.destroy()
             except Exception as err:
                 error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error generating the \"Transmit Packet\" telecommand!")
                 error_dialog.format_secondary_text(str(err))
