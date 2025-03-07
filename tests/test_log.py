@@ -20,8 +20,6 @@
 #  
 #
 
-
-import sys
 import os
 import random
 import string
@@ -30,8 +28,6 @@ import csv
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
-
-sys.path.append(".")
 
 from spacelab_transmitter.spacelabtransmitter import SpaceLabTransmitter
 

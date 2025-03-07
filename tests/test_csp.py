@@ -20,10 +20,7 @@
 #  
 #
 
-import sys
 import random
-
-sys.path.append(".")
 
 from spacelab_transmitter.csp import CSP, _CSP_PRIO_NORM
 

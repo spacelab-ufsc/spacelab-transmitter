@@ -20,10 +20,7 @@
 #  
 #
 
-import sys
 import pytest
-
-sys.path.append(".")
 
 from spacelab_transmitter.golay24 import Golay24
 

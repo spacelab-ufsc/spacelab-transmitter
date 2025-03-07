@@ -20,12 +20,9 @@
 #  
 #
 
-import sys
 import random
 
 import pytest
-
-sys.path.append(".")
 
 from spacelab_transmitter.ax100 import AX100Mode5
 

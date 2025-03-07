@@ -20,14 +20,10 @@
 #  
 #
 
-
-import sys
 import random
 import string
 import hashlib
 import hmac
-
-sys.path.append(".")
 
 from spacelab_transmitter.tc_ping import Ping
 from spacelab_transmitter.tc_broadcast import Broadcast

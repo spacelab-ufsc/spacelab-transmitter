@@ -206,7 +206,6 @@ class AX100Mode5:
             self._decoder_pkt_len = gol.decode(self._reverse_golay_field(self._decoder_golay_buf)) & 0xFF
 
             self._decoder_golay_buf.clear()
-            self._decoder_rs_buf.clear()
         elif self._decoder_pos < 3 + self._decoder_pkt_len - 1:         # Receiving Reed-Solomon block (data part)
             self._decoder_rs_buf.append(self._scrambling([byte], start_pos=self._decoder_pos-3)[0])
             self._decoder_pos += 1
@@ -225,16 +224,26 @@ class AX100Mode5:
 
             rs = RS(8, 0x187, 112, 11, 32, 0)
 
-            data, err, err_pos = rs.decode(self._decoder_rs_buf, [0], 0)
+            data, err, err_pos = rs.decode(self._decoder_rs_buf.copy(), [0], 0)
+
+            self._decoder_rs_buf.clear()
 
             return data[:self._decoder_pkt_len]
         else:   # Decoder is lost! Reset
-            self._decoder_pos = 0
-            self._decoder_pkt_len = 0
-            self._decoder_golay_buf.clear()
-            self._decoder_rs_buf.clear()
+            self.reset_decoder()
 
         return None
+
+    def reset_decoder(self):
+        """
+        Resets the byte stream decoder.
+
+        :return: None
+        """
+        self._decoder_pos = 0
+        self._decoder_pkt_len = 0
+        self._decoder_golay_buf.clear()
+        self._decoder_rs_buf.clear()
 
     def _padding(self, data, target_len=223):
         """
@@ -262,6 +271,9 @@ class AX100Mode5:
         :return: The input data scrambled.
         :rtype: list[int]
         """
+        if start_pos > len(_AX100_CCSDS_POLY)-1:
+            start_pos -= len(_AX100_CCSDS_POLY)
+
         for i in range(start_pos, start_pos+len(data)):
             data[i-start_pos] = data[i-start_pos] ^ _AX100_CCSDS_POLY[i]
 

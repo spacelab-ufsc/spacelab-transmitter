@@ -20,10 +20,7 @@
 #  
 #
 
-import sys
 import random
-
-sys.path.append(".")
 
 from spacelab_transmitter.gmsk import GMSK
 
