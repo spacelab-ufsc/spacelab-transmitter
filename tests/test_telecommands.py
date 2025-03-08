@@ -25,22 +25,22 @@ import string
 import hashlib
 import hmac
 
-from spacelab_transmitter.tc_ping import Ping
-from spacelab_transmitter.tc_broadcast import Broadcast
-from spacelab_transmitter.tc_enter_hibernation import Enter_hibernation
-from spacelab_transmitter.tc_leave_hibernation import LeaveHibernation
-from spacelab_transmitter.tc_activate_module import ActivateModule
-from spacelab_transmitter.tc_deactivate_module import DeactivateModule
-from spacelab_transmitter.tc_set_parameter import SetParameter
-from spacelab_transmitter.tc_erase_memory import EraseMemory
-from spacelab_transmitter.tc_force_reset import ForceReset
-from spacelab_transmitter.tc_get_payload_data import GetPayloadData
-from spacelab_transmitter.tc_data_request import DataRequest
-from spacelab_transmitter.tc_get_parameter import GetParameter
-from spacelab_transmitter.tc_get_parameter import GetParameter
-from spacelab_transmitter.tc_activate_payload import ActivatePayload
-from spacelab_transmitter.tc_deactivate_payload import DeactivatePayload
-from spacelab_transmitter.tc_update_tle import UpdateTLE
+from tc_ping import Ping
+from tc_broadcast import Broadcast
+from tc_enter_hibernation import Enter_hibernation
+from tc_leave_hibernation import LeaveHibernation
+from tc_activate_module import ActivateModule
+from tc_deactivate_module import DeactivateModule
+from tc_set_parameter import SetParameter
+from tc_erase_memory import EraseMemory
+from tc_force_reset import ForceReset
+from tc_get_payload_data import GetPayloadData
+from tc_data_request import DataRequest
+from tc_get_parameter import GetParameter
+from tc_get_parameter import GetParameter
+from tc_activate_payload import ActivatePayload
+from tc_deactivate_payload import DeactivatePayload
+from tc_update_tle import UpdateTLE
 
 def test_tc_ping():
     x = Ping()

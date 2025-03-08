@@ -22,7 +22,7 @@
 
 import pytest
 
-from spacelab_transmitter.golay24 import Golay24
+from golay24 import Golay24
 
 @pytest.fixture
 def golay():

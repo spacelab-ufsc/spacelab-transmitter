@@ -22,7 +22,7 @@
 
 import random
 
-from spacelab_transmitter.gmsk import GMSK
+from gmsk import GMSK
 
 def test_modulator_demodulator():
     data = [random.randint(0, 255) for _ in range(1000)]

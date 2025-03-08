@@ -24,7 +24,7 @@ import random
 
 import pytest
 
-from spacelab_transmitter.ax100 import AX100Mode5
+from ax100 import AX100Mode5
 
 @pytest.fixture
 def ax100_mode5():

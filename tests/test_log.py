@@ -29,7 +29,7 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
-from spacelab_transmitter.spacelabtransmitter import SpaceLabTransmitter
+from spacelabtransmitter import SpaceLabTransmitter
 
 _DIR_CONFIG_LOGFILE_LINUX   = 'spacelab_transmitter'
 _DEFAULT_LOGFILE_PATH       = os.path.join(os.path.expanduser('~'), _DIR_CONFIG_LOGFILE_LINUX)
