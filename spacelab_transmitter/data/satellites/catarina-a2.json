@@ -13,7 +13,7 @@
             "sync_word": [147, 11, 81, 222],
             "protocol_link": "AX100-Mode5",
             "protocol_network": "CSP",
-            "packets": ["data_request", "broadcast_msg", "enter_hibernation", "leave_hibernation", "erase_memory", "force_reset", "get_payload_data", "set_param", "get_param", "csp_services"]
+            "packets": ["data_request", "broadcast_msg", "enter_hibernation", "leave_hibernation", "erase_memory", "force_reset", "get_payload_data", "set_param", "get_param", "time_sync", "csp_services"]
         }
     ]
 }

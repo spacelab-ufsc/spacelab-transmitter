@@ -27,6 +27,7 @@ from datetime import datetime
 import json
 import csv
 import socket
+import time
 
 import gi
 gi.require_version('Gtk', '3.0')
@@ -101,7 +102,7 @@ _TELECOMMANDS                   = ["ping", "data_request", "broadcast_msg", "ent
                                    "leave_hibernation", "activate_module", "deactivate_module",
                                    "activate_payload", "deactivate_payload", "erase_memory", "force_reset",
                                    "get_payload_data", "set_param", "get_param", "transmit_pkt", "update_tle",
-                                   "csp_services"]
+                                   "time_sync", "csp_services"]
 
 # SDRs
 _SDR_MODELS                     = ['USRP', 'Pluto SDR']
@@ -308,6 +309,10 @@ class SpaceLabTransmitter:
         # Update TLE
         self.button_update_tle = self.builder.get_object("button_update_tle")
         self.button_update_tle.connect("clicked", self.on_button_update_tle_clicked)
+
+        # Time Sync
+        self.button_time_sync = self.builder.get_object("button_time_sync")
+        self.button_time_sync.connect("clicked", self.on_button_time_sync_clicked)
 
         # CSP Services
         self.button_csp_services = self.builder.get_object("button_csp_services")
@@ -1015,6 +1020,42 @@ class SpaceLabTransmitter:
         else:
             dialog.destroy()
 
+    def on_button_time_sync_clicked(self, button):
+        dialog = DialogPassword(self.window)
+
+        response = dialog.run()
+        if response == Gtk.ResponseType.OK:
+            try:
+                ts = int(time.time())
+
+                pl = list()
+                pl.append((ts >> 24) & 0xFF)
+                pl.append((ts >> 16) & 0xFF)
+                pl.append((ts >> 8) & 0xFF)
+                pl.append((ts >> 0) & 0xFF)
+
+                pkt = list()
+                if self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_SLP:
+                    slp = SLP()
+                    pkt = slp.encode_private(0x50, self.entry_preferences_general_callsign.get_text(), dialog.get_key(), pl)
+                elif self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_CSP:
+                    csp = CSP(_CSP_MY_ADDRESS)
+                    pkt = csp.encode(CSP_PRIO_NORM, 1, CSP_PORT_TIME_SYNC, CSP_PORT_TIME_SYNC, False, True, False, False, False, pl, dialog.get_key())  # 1 = Satellite (OBDH) address
+                self._transmit_tc(pkt, "Time Sync")
+            except ValueError as err:
+                error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error generating the \"Time Sync\" telecommand!")
+                error_dialog.format_secondary_text(str(err))
+                error_dialog.run()
+                error_dialog.destroy()
+            finally:
+                dialog.destroy()
+        elif response == Gtk.ResponseType.CANCEL:
+            dialog.destroy()
+        elif response == Gtk.ResponseType.DELETE_EVENT:
+            dialog.destroy()
+        else:
+            dialog.destroy()
+
     def on_button_csp_services_clicked(self, button):
         response = self.dialog_csp_services.run()
 
@@ -1393,6 +1434,7 @@ class SpaceLabTransmitter:
         self.button_deactivate_payload.set_sensitive(False)
         self.button_get_payload_data.set_sensitive(False)
         self.button_update_tle.set_sensitive(False)
+        self.button_time_sync.set_sensitive(False)
         self.button_tx_pkt.set_sensitive(False)
         self.button_csp_services.set_sensitive(False)
         self.button_csp_ping.set_sensitive(False)
@@ -1426,6 +1468,7 @@ class SpaceLabTransmitter:
         if "deactivate_payload" in avail_pkts:  self.button_deactivate_payload.set_sensitive(state)
         if "get_payload_data" in avail_pkts:    self.button_get_payload_data.set_sensitive(state)
         if "update_tle" in avail_pkts:          self.button_update_tle.set_sensitive(state)
+        if "time_sync" in avail_pkts:           self.button_time_sync.set_sensitive(state)
         if "transmit_pkt" in avail_pkts:        self.button_tx_pkt.set_sensitive(state)
         if "csp_services" in avail_pkts:
             self.button_csp_services.set_sensitive(state)
@@ -1552,6 +1595,7 @@ class SpaceLabTransmitter:
         self.button_get_parameter.set_tooltip_text("")
         self.button_tx_pkt.set_tooltip_text("")
         self.button_update_tle.set_tooltip_text("")
+        self.button_time_sync.set_tooltip_text("")
         self.button_csp_services.set_tooltip_text("")
 
         with open(filename) as f:
@@ -1592,5 +1636,7 @@ class SpaceLabTransmitter:
                         self.button_tx_pkt.set_tooltip_text(sat_info['links'][lk_idx]['tooltips']['transmit_pkt'])
                     if 'update_tle' in sat_info['links'][lk_idx]['packets']:
                         self.button_update_tle.set_tooltip_text(sat_info['links'][lk_idx]['tooltips']['update_tle'])
+                    if 'time_sync' in sat_info['links'][lk_idx]['packets']:
+                        self.button_update_tle.set_tooltip_text(sat_info['links'][lk_idx]['tooltips']['time_sync'])
                     if 'csp_services' in sat_info['links'][lk_idx]['packets']:
                         self.button_csp_services.set_tooltip_text(sat_info['links'][lk_idx]['tooltips']['csp_services'])
