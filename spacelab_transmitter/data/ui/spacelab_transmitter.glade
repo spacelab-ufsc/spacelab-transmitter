@@ -47,7 +47,7 @@ Author: Vitória Beatriz Bianchin <vitoriabbianchin@gmail.com>
     <property name="step-increment">1</property>
     <property name="page-increment">10</property>
   </object>
-  <object class="GtkListStore" id="liststore_packet_type">
+  <object class="GtkListStore" id="liststore_link">
     <columns>
       <!-- column-name link -->
       <column type="gchararray"/>
@@ -305,19 +305,13 @@ Author: Vitória Beatriz Bianchin <vitoriabbianchin@gmail.com>
                               </packing>
                             </child>
                             <child>
-                              <object class="GtkComboBox" id="combobox_packet_type">
+                              <object class="GtkComboBox" id="combobox_link">
                                 <property name="width-request">200</property>
                                 <property name="visible">True</property>
                                 <property name="can-focus">False</property>
                                 <property name="tooltip-text" translatable="yes">Packet type</property>
-                                <property name="model">liststore_packet_type</property>
+                                <property name="model">liststore_link</property>
                                 <property name="active">0</property>
-                                <child>
-                                  <object class="GtkCellRendererText" id="beacon_packet"/>
-                                  <attributes>
-                                    <attribute name="text">0</attribute>
-                                  </attributes>
-                                </child>
                               </object>
                               <packing>
                                 <property name="left-attach">1</property>

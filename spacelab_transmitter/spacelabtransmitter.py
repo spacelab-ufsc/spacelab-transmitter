@@ -38,23 +38,6 @@ from gi.repository import GdkPixbuf
 
 import spacelab_transmitter.version
 
-from spacelab_transmitter.tc_activate_module import ActivateModule
-from spacelab_transmitter.tc_broadcast import Broadcast
-from spacelab_transmitter.tc_data_request import DataRequest
-from spacelab_transmitter.tc_deactivate_module import DeactivateModule
-from spacelab_transmitter.tc_activate_payload import ActivatePayload
-from spacelab_transmitter.tc_deactivate_payload import DeactivatePayload
-from spacelab_transmitter.tc_erase_memory import EraseMemory
-from spacelab_transmitter.tc_force_reset import ForceReset
-from spacelab_transmitter.tc_get_parameter import GetParameter
-from spacelab_transmitter.tc_get_payload_data import GetPayloadData
-from spacelab_transmitter.tc_leave_hibernation import LeaveHibernation
-from spacelab_transmitter.tc_set_parameter import SetParameter
-from spacelab_transmitter.tc_transmit_packet import TransmitPacket
-from spacelab_transmitter.tc_ping import Ping
-from spacelab_transmitter.tc_enter_hibernation import Enter_hibernation
-from spacelab_transmitter.tc_update_tle import UpdateTLE
-
 from spacelab_transmitter.telecommands_transmission import DialogDataRequest, DialogDeactivatePayload, DialogEnterHibernation, DialogActivatePayload, DialogGetPayloadData, DialogSetParameter, DialogDeactivateModule, DialogActivateModule, DialogGetParameter, DialogBroadcastMessage, DialogTransmitPacket, DialogEraseMemory, DialogUpdateTLE, DialogCSPPeek, DialogCSPPoke
 
 from spacelab_transmitter.gmsk import GMSK
@@ -62,6 +45,9 @@ from spacelab_transmitter.usrp import USRP
 from spacelab_transmitter.pluto import Pluto
 from spacelab_transmitter.csp import CSP
 from spacelab_transmitter.ax100 import AX100Mode5
+from spacelab_transmitter.satellite import Satellite
+from spacelab_transmitter.link import Link
+from spacelab_transmitter.slp import SLP
 
 from pyngham import PyNGHam
 
@@ -109,6 +95,8 @@ _SATELLITES                     = [["FloripaSat-1", "floripasat-1.json"],
 _MODULATION_GMSK                = "GMSK"
 
 # Protocols
+_PROTOCOL_SLP                   = "SLP"
+_PROTOCOL_CSP                   = "CSP"
 _PROTOCOL_NGHAM                 = "NGHam"
 _PROTOCOL_AX100MODE5            = "AX100-Mode5"
 
@@ -166,6 +154,8 @@ class SpaceLabTransmitter:
         else:
             self.builder.add_from_file(_UI_FILE_LINUX_SYSTEM)
 
+        self._satellite = Satellite()
+
         self._client_socket = None
 
         self.builder.connect_signals(self)
@@ -173,7 +163,6 @@ class SpaceLabTransmitter:
         self._build_widgets()
         self.write_log("SpaceLab Transmitter initialized!")
         self._load_preferences()
-        self._active_tcs = list()
 
     def _build_widgets(self):
         # Main window
@@ -241,11 +230,12 @@ class SpaceLabTransmitter:
         self.combobox_satellite.add_attribute(cell, "text", 0)
         self.combobox_satellite.connect("changed", self.on_combobox_satellite_changed)
 
-        # Packet type combobox
-        self.liststore_packet_type = self.builder.get_object("liststore_packet_type")
-        self.combobox_packet_type = self.builder.get_object("combobox_packet_type")
-        self.combobox_packet_type.pack_start(cell, True)
-        self.combobox_packet_type.add_attribute(cell, "text", 0)
+        # Link type combobox
+        self.liststore_link = self.builder.get_object("liststore_link")
+        self.combobox_link = self.builder.get_object("combobox_link")
+        self.combobox_link.pack_start(cell, True)
+        self.combobox_link.add_attribute(cell, "text", 0)
+        self.combobox_link.connect("changed", self.on_combobox_link_changed)
 
         # TCP socket
         self.entry_tcp_address = self.builder.get_object("entry_tcp_address")
@@ -388,10 +378,11 @@ class SpaceLabTransmitter:
         Gtk.main_quit()
 
     def on_button_ping_request_command_clicked(self, button):
-        callsign = self.entry_preferences_general_callsign.get_text()
-        fr = Ping()
-        pl = fr.generate(callsign)
-        self._transmit_tc(pl, "Ping")
+        pkt = list()
+        if self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_SLP:
+            slp = SLP()
+            pkt = slp.encode(0x40, self.entry_preferences_general_callsign.get_text(), list())
+        self._transmit_tc(pkt, "Ping")
 
     def on_button_enter_hibernation_clicked(self, button):
         dialog = DialogEnterHibernation(self.window)
@@ -399,17 +390,23 @@ class SpaceLabTransmitter:
         response = dialog.run()
         if response == Gtk.ResponseType.OK:
             try:
-                if dialog.get_hours() <= 0 or dialog.get_hours() > 2**16-1:
-                    raise ValueError()
+                hbn_hours = dialog.get_hours()
+                if hbn_hours <= 0 or hbn_hours > 2**16-1:
+                    raise ValueError("The hibernation duration must be greater than zero and lesser than 65536!")
 
                 dialog_pw = DialogPassword(self.window)
 
                 response_key = dialog_pw.run()
                 if response_key == Gtk.ResponseType.OK:
-                    callsign = self.entry_preferences_general_callsign.get_text()
-                    fr = Enter_hibernation()
-                    pl = fr.generate(callsign, dialog.get_hours(), dialog_pw.get_key())
-                    self._transmit_tc(pl, "Enter Hibernation")
+                    pkt = list()
+                    if self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_SLP:
+                        pl = [(hbn_hours >> 8) & 0xFF, (hbn_hours >> 0) & 0xFF]
+                        slp = SLP()
+                        pkt = slp.encode_private(0x43, self.entry_preferences_general_callsign.get_text(), dialog_pw.get_key(), pl)
+#                    elif self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_CSP:
+#                        csp = CSP()
+#                        pkt = csp.encode()
+                    self._transmit_tc(pkt, "Enter Hibernation")
                     dialog_pw.destroy()
                 elif response_key == Gtk.ResponseType.CANCEL:
                     dialog_pw.destroy()
@@ -417,9 +414,9 @@ class SpaceLabTransmitter:
                     dialog_pw.destroy()
                 else:
                     dialog_pw.destroy()
-            except ValueError:
+            except ValueError as err:
                 error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error generating the \"Enter Hibernation\" telecommand!")
-                error_dialog.format_secondary_text("The hibernation duration must be greater than zero and lesser than 65536!")
+                error_dialog.format_secondary_text(str(err))
                 error_dialog.run()
                 error_dialog.destroy()
             finally:
@@ -437,17 +434,22 @@ class SpaceLabTransmitter:
         response = dialog.run()
         if response == Gtk.ResponseType.OK:
             try:
-                if dialog.get_ac_mod_id() < 0 or dialog.get_ac_mod_id() > 255:
-                    raise ValueError()
+                mod_id = dialog.get_ac_mod_id()
+                if mod_id < 0 or mod_id > 255:
+                    raise ValueError("The module ID must be between 0 and 255!")
 
                 dialog_pw = DialogPassword(self.window)
 
                 response_key = dialog_pw.run()
                 if response_key == Gtk.ResponseType.OK:
-                    callsign = self.entry_preferences_general_callsign.get_text()
-                    fr = ActivateModule()
-                    pl = fr.generate(callsign, dialog.get_ac_mod_id(), dialog_pw.get_key())
-                    self._transmit_tc(pl, "Activate Module")
+                    pkt = list()
+                    if self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_SLP:
+                        slp = SLP()
+                        pkt = slp.encode_private(0x45, self.entry_preferences_general_callsign.get_text(), dialog_pw.get_key(), [mod_id])
+#                    elif self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_CSP:
+#                        csp = CSP()
+#                        pkt = csp.encode()
+                    self._transmit_tc(pkt, "Activate Module")
                     dialog_pw.destroy()
                 elif response_key == Gtk.ResponseType.CANCEL:
                     dialog_pw.destroy()
@@ -455,9 +457,9 @@ class SpaceLabTransmitter:
                     dialog_pw.destroy()
                 else:
                     dialog_pw.destroy()
-            except ValueError:
+            except ValueError as err:
                 error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error generating the \"Activate Module\" telecommand!")
-                error_dialog.format_secondary_text("The module ID must be between 0 and 255!")
+                error_dialog.format_secondary_text(str(err))
                 error_dialog.run()
                 error_dialog.destroy()
             finally:
@@ -475,17 +477,22 @@ class SpaceLabTransmitter:
         response = dialog.run()
         if response == Gtk.ResponseType.OK:
             try:
-                if dialog.get_deac_mod_id() < 0 or dialog.get_deac_mod_id() > 255:
-                    raise ValueError()
+                mod_id = dialog.get_deac_mod_id()
+                if mod_id < 0 or mod_id > 255:
+                    raise ValueError("The module ID must be between 0 and 255!")
 
                 dialog_pw = DialogPassword(self.window)
 
                 response_key = dialog_pw.run()
                 if response_key == Gtk.ResponseType.OK:
-                    callsign = self.entry_preferences_general_callsign.get_text()
-                    fr = DeactivateModule()
-                    pl = fr.generate(callsign, dialog.get_deac_mod_id(), dialog_pw.get_key())
-                    self._transmit_tc(pl, "Deactivate Module")
+                    pkt = list()
+                    if self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_SLP:
+                        slp = SLP()
+                        pkt = slp.encode_private(0x46, self.entry_preferences_general_callsign.get_text(), dialog_pw.get_key(), [mod_id])
+#                    elif self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_CSP:
+#                        csp = CSP()
+#                        pkt = csp.encode()
+                    self._transmit_tc(pkt, "Deactivate Module")
                     dialog_pw.destroy()
                 elif response_key == Gtk.ResponseType.CANCEL:
                     dialog_pw.destroy()
@@ -493,9 +500,9 @@ class SpaceLabTransmitter:
                     dialog_pw.destroy()
                 else:
                     dialog_pw.destroy()
-            except ValueError:
+            except ValueError as err:
                 error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error generating the \"Deactivate Module\" telecommand!")
-                error_dialog.format_secondary_text("The module ID must be between 0 and 255!")
+                error_dialog.format_secondary_text(str(err))
                 error_dialog.run()
                 error_dialog.destroy()
             finally:
@@ -513,17 +520,22 @@ class SpaceLabTransmitter:
         response = dialog.run()
         if response == Gtk.ResponseType.OK:
             try:
-                if dialog.get_deac_pl_id() < 0 or dialog.get_deac_pl_id() > 255:
-                    raise ValueError()
+                pl_id = dialog.get_deac_pl_id()
+                if pl_id < 0 or pl_id > 255:
+                    raise ValueError("The payload ID must be between 0 and 255!")
 
                 dialog_pw = DialogPassword(self.window)
 
                 response_key = dialog_pw.run()
                 if response_key == Gtk.ResponseType.OK:
-                    callsign = self.entry_preferences_general_callsign.get_text()
-                    fr = DeactivatePayload()
-                    pl = fr.generate(callsign, dialog.get_deac_pl_id(), dialog_pw.get_key())
-                    self._transmit_tc(pl, "Deactivate Payload")
+                    pkt = list()
+                    if self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_SLP:
+                        slp = SLP()
+                        pkt = slp.encode_private(0x46, self.entry_preferences_general_callsign.get_text(), dialog_pw.get_key(), [pl_id])
+#                    elif self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_CSP:
+#                        csp = CSP()
+#                        pkt = csp.encode()
+                    self._transmit_tc(pkt, "Deactivate Payload")
                     dialog_pw.destroy()
                 elif response_key == Gtk.ResponseType.CANCEL:
                     dialog_pw.destroy()
@@ -531,9 +543,9 @@ class SpaceLabTransmitter:
                     dialog_pw.destroy()
                 else:
                     dialog_pw.destroy()
-            except ValueError:
+            except ValueError as err:
                 error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error generating the \"Deactivate Payload\" telecommand!")
-                error_dialog.format_secondary_text("The payload ID must be between 0 and 255!")
+                error_dialog.format_secondary_text(str(err))
                 error_dialog.run()
                 error_dialog.destroy()
             finally:
@@ -551,17 +563,22 @@ class SpaceLabTransmitter:
         response = dialog.run()
         if response == Gtk.ResponseType.OK:
             try:
-                if dialog.get_ac_pl_id() < 0 or dialog.get_ac_pl_id() > 255:
-                    raise ValueError()
+                pl_id = dialog.get_ac_pl_id()
+                if pl_id < 0 or pl_id > 255:
+                    raise ValueError("The payload ID must be between 0 and 255!")
 
                 dialog_pw = DialogPassword(self.window)
 
                 response_key = dialog_pw.run()
                 if response_key == Gtk.ResponseType.OK:
-                    callsign = self.entry_preferences_general_callsign.get_text()
-                    fr = ActivatePayload()
-                    pl = fr.generate(callsign, dialog.get_ac_pl_id(), dialog_pw.get_key())
-                    self._transmit_tc(pl, "Activate Payload")
+                    pkt = list()
+                    if self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_SLP:
+                        slp = SLP()
+                        pkt = slp.encode_private(0x47, self.entry_preferences_general_callsign.get_text(), dialog_pw.get_key(), [pl_id])
+#                    elif self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_CSP:
+#                        csp = CSP()
+#                        pkt = csp.encode()
+                    self._transmit_tc(pkt, "Activate Payload")
                     dialog_pw.destroy()
                 elif response_key == Gtk.ResponseType.CANCEL:
                     dialog_pw.destroy()
@@ -569,9 +586,9 @@ class SpaceLabTransmitter:
                     dialog_pw.destroy()
                 else:
                     dialog_pw.destroy()
-            except ValueError:
+            except ValueError as err:
                 error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error generating the \"Activate Module\" telecommand!")
-                error_dialog.format_secondary_text("The payload ID must be between 0 and 255!")
+                error_dialog.format_secondary_text(str(err))
                 error_dialog.run()
                 error_dialog.destroy()
             finally:
@@ -589,28 +606,32 @@ class SpaceLabTransmitter:
         response = dialog.run()
         if response == Gtk.ResponseType.OK:
             try:
-                if dialog.get_mem_id() < 0 or dialog.get_mem_id() > 255:
-                    raise ValueError()
+                mem_id = dialog.get_mem_id()
+                if mem_id < 0 or mem_id > 255:
+                    raise ValueError("The memory ID must be between 0 and 255!")
 
                 dialog_pw = DialogPassword(self.window)
 
                 response_key = dialog_pw.run()
                 if response_key == Gtk.ResponseType.OK:
-                    callsign = self.entry_preferences_general_callsign.get_text()
-                    fr = EraseMemory()
-                    pl = fr.generate(callsign, dialog.get_mem_id(), dialog_pw.get_key())
-                    self._transmit_tc(pl, "Erase Memory")
+                    pkt = list()
+                    if self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_SLP:
+                        slp = SLP()
+                        pkt = slp.encode_private(0x49, self.entry_preferences_general_callsign.get_text(), dialog_pw.get_key(), [mem_id])
+#                    elif self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_CSP:
+#                        csp = CSP()
+#                        pkt = csp.encode()
+                    self._transmit_tc(pkt, "Erase Memory")
                     dialog_pw.destroy()
-                    dialog.destroy()
                 elif response_key == Gtk.ResponseType.CANCEL:
                     dialog_pw.destroy()
                 elif response_key == Gtk.ResponseType.DELETE_EVENT:
                     dialog_pw.destroy()
                 else:
                     dialog_pw.destroy()
-            except ValueError:
+            except ValueError as err:
                 error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error generating the \"Erase Memory\" telecommand!")
-                error_dialog.format_secondary_text("The memory ID must be between 0 and 255!")
+                error_dialog.format_secondary_text(str(err))
                 error_dialog.run()
                 error_dialog.destroy()
             finally:
@@ -628,23 +649,36 @@ class SpaceLabTransmitter:
         response = dialog.run()
         if response == Gtk.ResponseType.OK:
             try:
-                if dialog.get_subsys_id() < 0 or dialog.get_subsys_id() > 255:
+                subsys_id = dialog.get_subsys_id()
+                param_id = dialog.get_param_id()
+                param_val = dialog.get_param_val()
+                if subsys_id < 0 or subsys_id > 255:
                     raise ValueError("The subsystem ID must be between 0 and 255!")
 
-                if dialog.get_param_id() < 0 or dialog.get_param_id() > 255:
+                if param_id < 0 or param_id > 255:
                     raise ValueError("The parameter ID must be between 0 and 255!")
 
-                if dialog.get_param_val() < 0 or dialog.get_param_val() > 2**32-1:
+                if param_val < 0 or param_val > 2**32-1:
                     raise ValueError("The payload value must be between 0 and 4294967295!")
 
                 dialog_pw = DialogPassword(self.window)
 
                 response_key = dialog_pw.run()
                 if response_key == Gtk.ResponseType.OK:
-                    callsign = self.entry_preferences_general_callsign.get_text()
-                    fr = SetParameter()
-                    pl = fr.generate(callsign, dialog.get_subsys_id(), dialog.get_param_id(), dialog.get_param_val(), dialog_pw.get_key())
-                    self._transmit_tc(pl, "Set Parameter")
+                    pl = [subsys_id, param_id]
+                    pl.append((param_val >> 24) & 0xFF)
+                    pl.append((param_val >> 16) & 0xFF)
+                    pl.append((param_val >> 8) & 0xFF)
+                    pl.append(param_val & 0xFF)
+
+                    pkt = list()
+                    if self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_SLP:
+                        slp = SLP()
+                        pkt = slp.encode_private(0x49, self.entry_preferences_general_callsign.get_text(), dialog_pw.get_key(), pl)
+#                    elif self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_CSP:
+#                        csp = CSP()
+#                        pkt = csp.encode()
+                    self._transmit_tc(pkt, "Set Parameter")
                     dialog_pw.destroy()
                 elif response_key == Gtk.ResponseType.CANCEL:
                     dialog_pw.destroy()
@@ -672,23 +706,40 @@ class SpaceLabTransmitter:
         response = dialog.run()
         if response == Gtk.ResponseType.OK:
             try:
-                if dialog.get_data_id() < 0 or dialog.get_data_id() > 255:
+                data_id = dialog.get_data_id()
+                start_ts = dialog.get_start_ts()
+                end_ts = dialog.get_end_ts()
+                if data_id < 0 or data_id > 255:
                     raise ValueError("The data ID must be between 0 and 255!")
 
-                if dialog.get_start_ts() < 0 or dialog.get_start_ts() > 2**32-1:
+                if start_ts < 0 or start_ts > 2**32-1:
                     raise ValueError("The start timestamp must be between 0 and 4294967295!")
 
-                if dialog.get_end_ts() < 0 or dialog.get_end_ts() > 2**32-1:
+                if end_ts < 0 or end_ts > 2**32-1:
                     raise ValueError("The end timestamp must be between 0 and 4294967295!")
 
                 dialog_pw = DialogPassword(self.window)
 
                 response_key = dialog_pw.run()
                 if response_key == Gtk.ResponseType.OK:
-                    callsign = self.entry_preferences_general_callsign.get_text()
-                    fr = DataRequest()
-                    pl = fr.generate(callsign, dialog.get_data_id(), dialog.get_start_ts(), dialog.get_end_ts(), dialog_pw.get_key())
-                    self._transmit_tc(pl, "Data Request")
+                    pl = [data_id]
+                    pl.append((start_ts >> 24) & 0xFF)
+                    pl.append((start_ts >> 16) & 0xFF)
+                    pl.append((start_ts >> 8) & 0xFF)
+                    pl.append((start_ts >> 0) & 0xFF)
+                    pl.append((end_ts >> 24) & 0xFF)
+                    pl.append((end_ts >> 16) & 0xFF)
+                    pl.append((end_ts >> 8) & 0xFF)
+                    pl.append((end_ts >> 0) & 0xFF)
+
+                    pkt = list()
+                    if self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_SLP:
+                        slp = SLP()
+                        pkt = slp.encode_private(0x41, self.entry_preferences_general_callsign.get_text(), dialog_pw.get_key(), pl)
+#                    elif self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_CSP:
+#                        csp = CSP()
+#                        pkt = csp.encode()
+                    self._transmit_tc(pkt, "Data Request")
                     dialog_pw.destroy()
                 elif response_key == Gtk.ResponseType.CANCEL:
                     dialog_pw.destroy()
@@ -715,10 +766,15 @@ class SpaceLabTransmitter:
 
         response = dialog.run()
         if response == Gtk.ResponseType.OK:
-            callsign = self.entry_preferences_general_callsign.get_text()
-            fr = LeaveHibernation()
-            pl = fr.generate(callsign, dialog.get_key())
-            self._transmit_tc(pl, "Leave Hibernation")
+            pkt = list()
+            if self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_SLP:
+                slp = SLP()
+                pkt = slp.encode_private(0x44, self.entry_preferences_general_callsign.get_text(), dialog.get_key(), list())
+#            elif self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_CSP:
+#                csp = CSP()
+#                pkt = csp.encode()
+            self._transmit_tc(pkt, "Leave Hibernation")
+            dialog.destroy()
         elif response == Gtk.ResponseType.CANCEL:
             dialog.destroy()
         elif response == Gtk.ResponseType.DELETE_EVENT:
@@ -731,10 +787,15 @@ class SpaceLabTransmitter:
 
         response = dialog.run()
         if response == Gtk.ResponseType.OK:
-            callsign = self.entry_preferences_general_callsign.get_text()
-            fr = ForceReset()
-            pl = fr.generate(callsign, dialog.get_key())
-            self._transmit_tc(pl, "Force Reset")
+            pkt = list()
+            if self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_SLP:
+                slp = SLP()
+                pkt = slp.encode_private(0x4A, self.entry_preferences_general_callsign.get_text(), dialog.get_key(), list())
+#            elif self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_CSP:
+#                csp = CSP()
+#                pkt = csp.encode()
+            self._transmit_tc(pkt, "Force Reset")
+            dialog.destroy()
         elif response == Gtk.ResponseType.CANCEL:
             dialog.destroy()
         elif response == Gtk.ResponseType.DELETE_EVENT:
@@ -748,20 +809,27 @@ class SpaceLabTransmitter:
         response = dialog.run()
         if response == Gtk.ResponseType.OK:
             try:
-                if dialog.get_subsys_id() < 0 or dialog.get_subsys_id() > 255:
+                subsys_id = dialog.get_subsys_id()
+                param_id = dialog.get_param_id()
+                if subsys_id < 0 or subsys_id > 255:
                     raise ValueError("The subsystem ID must be between 0 and 255!")
 
-                if dialog.get_param_id() < 0 or dialog.get_param_id() > 255:
+                if param_id < 0 or param_id > 255:
                     raise ValueError("The parameter ID must be between 0 and 255!")
 
                 dialog_pw = DialogPassword(self.window)
 
                 response_key = dialog_pw.run()
                 if response_key == Gtk.ResponseType.OK:
-                    callsign = self.entry_preferences_general_callsign.get_text()
-                    fr = GetParameter()
-                    pl = fr.generate(callsign, dialog.get_subsys_id(), dialog.get_param_id(), dialog_pw.get_key())
-                    self._transmit_tc(pl, "Get Parameter")
+                    pl = [subsys_id, param_id]
+                    pkt = list()
+                    if self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_SLP:
+                        slp = SLP()
+                        pkt = slp.encode_private(0x4D, self.entry_preferences_general_callsign.get_text(), dialog_pw.get_key(), pl)
+#                    elif self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_CSP:
+#                        csp = CSP()
+#                        pkt = csp.encode()
+                    self._transmit_tc(pkt, "Get Parameter")
                     dialog_pw.destroy()
                 elif response_key == Gtk.ResponseType.CANCEL:
                     dialog_pw.destroy()
@@ -789,20 +857,28 @@ class SpaceLabTransmitter:
         response = dialog.run()
         if response == Gtk.ResponseType.OK:
             try:
-                if dialog.get_pl_id() < 0 or dialog.get_pl_id() > 255:
+                pl_id = dialog.get_pl_id()
+                pl_args = dialog.get_pl_args()
+                if pl_id < 0 or pl_id > 255:
                     raise ValueError("The payload ID must be between 0 and 255!")
 
-                if len(dialog.get_pl_args()) == 0:
+                if len(pl_args) == 0:
                     raise ValueError("The payload arguments cannot be empty!")
 
                 dialog_pw = DialogPassword(self.window)
 
                 response_key = dialog_pw.run()
                 if response_key == Gtk.ResponseType.OK:
-                    callsign = self.entry_preferences_general_callsign.get_text()
-                    fr = GetPayloadData()
-                    pl = fr.generate(callsign, dialog.get_pl_id(), dialog.get_pl_args(), dialog_pw.get_key())
-                    self._transmit_tc(pl, "Get Payload Data")
+                    pl = [pl_id]
+                    pl += pl_args
+                    pkt = list()
+                    if self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_SLP:
+                        slp = SLP()
+                        pkt = slp.encode_private(0x4B, self.entry_preferences_general_callsign.get_text(), dialog_pw.get_key(), pl)
+#                    elif self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_CSP:
+#                        csp = CSP()
+#                        pkt = csp.encode()
+                    self._transmit_tc(pkt, "Get Payload Data")
                     dialog_pw.destroy()
                 elif response_key == Gtk.ResponseType.CANCEL:
                     dialog_pw.destroy()
@@ -830,16 +906,28 @@ class SpaceLabTransmitter:
         response = dialog.run()
         if response == Gtk.ResponseType.OK:
             try:
-                if len(dialog.get_dst_callsign()) == 0 or len(dialog.get_dst_callsign()) > 7:
+                dst_adr = dialog.get_dst_callsign()
+                msg = dialog.get_message()
+                if len(dst_adr) == 0 or len(dst_adr) > 7:
                     raise ValueError("The destination callsign must be between 0 and 7 characters long!")
 
-                if len(dialog.get_message()) == 0 or len(dialog.get_message()) > 38:
+                if len(msg) == 0 or len(msg) > 38:
                     raise ValueError("The message must be between 0 and 38 characters long!")
 
-                callsign = self.entry_preferences_general_callsign.get_text()
-                fr = Broadcast()
-                pl = fr.generate(callsign, dialog.get_dst_callsign(), dialog.get_message())
-                self._transmit_tc(pl, "Broadcast Message")
+                pl = list()
+                n = 7 - len(dst_adr)
+                if n != 7:
+                    dst_adr = n*" " + dst_adr
+                pl += [ord(i) for i in dst_adr]
+                pl += [ord(i) for i in msg]
+                pkt = list()
+                if self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_SLP:
+                    slp = SLP()
+                    pkt = slp.encode(0x42, self.entry_preferences_general_callsign.get_text(), pl)
+#                elif self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_CSP:
+#                    csp = CSP()
+#                    pkt = csp.encode()
+                self._transmit_tc(pkt, "Broadcast Message")
                 dialog.destroy()
             except ValueError as err:
                 error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error generating the \"Broadcast Message\" telecommand!")
@@ -861,17 +949,22 @@ class SpaceLabTransmitter:
         response = dialog.run()
         if response == Gtk.ResponseType.OK:
             try:
-                if len(dialog.get_data()) == 0 or len(dialog.get_data()) > 45:
+                data = dialog.get_data()
+                if len(data) == 0 or len(data) > 45:
                     raise ValueError("The data length must be greater than 0 and lesser than 45!")
 
                 dialog_pw = DialogPassword(self.window)
 
                 response_key = dialog_pw.run()
                 if response_key == Gtk.ResponseType.OK:
-                    callsign = self.entry_preferences_general_callsign.get_text()
-                    fr = TransmitPacket()
-                    pl = fr.generate(callsign, dialog.get_data(), dialog_pw.get_key())
-                    self._transmit_tc(pl, "Transmit Packet")
+                    pkt = list()
+                    if self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_SLP:
+                        slp = SLP()
+                        pkt = slp.encode_private(0x4E, self.entry_preferences_general_callsign.get_text(), dialog_pw.get_key(), data)
+#                    elif self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_CSP:
+#                        csp = CSP()
+#                        pkt = csp.encode()
+                    self._transmit_tc(pkt, "Transmit Packet")
                     dialog_pw.destroy()
                 elif response_key == Gtk.ResponseType.CANCEL:
                     dialog_pw.destroy()
@@ -879,7 +972,7 @@ class SpaceLabTransmitter:
                     dialog_pw.destroy()
                 else:
                     dialog_pw.destroy()
-            except Exception as err:
+            except ValueError as err:
                 error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error generating the \"Transmit Packet\" telecommand!")
                 error_dialog.format_secondary_text(str(err))
                 error_dialog.run()
@@ -899,20 +992,28 @@ class SpaceLabTransmitter:
         response = dialog.run()
         if response == Gtk.ResponseType.OK:
             try:
-                if dialog.get_tle_line_num() < 0 or dialog.get_tle_line_num() > 2:
+                line_num = dialog.get_tle_line_num()
+                tle_line = dialog.get_tle_line()
+                if line_num < 0 or line_num > 2:
                     raise ValueError("The TLE line number must be between 0 and 2!")
 
-                if len(dialog.get_tle_line()) != 69:
+                if len(tle_line) != 69:
                     raise ValueError("The TLE line must be 69 characters long!")
 
                 dialog_pw = DialogPassword(self.window)
 
                 response_key = dialog_pw.run()
                 if response_key == Gtk.ResponseType.OK:
-                    callsign = self.entry_preferences_general_callsign.get_text()
-                    fr = UpdateTLE()
-                    pl = fr.generate(callsign, dialog.get_tle_line_num(), dialog.get_tle_line(), dialog_pw.get_key())
-                    self._transmit_tc(pl, "Update TLE")
+                    pl = [line_num]
+                    pl += [ord(i) for i in tle_line]
+                    pkt = list()
+                    if self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_SLP:
+                        slp = SLP()
+                        pkt = slp.encode_private(0x4F, self.entry_preferences_general_callsign.get_text(), dialog_pw.get_key(), pl)
+#                    elif self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_CSP:
+#                        csp = CSP()
+#                        pkt = csp.encode()
+                    self._transmit_tc(pkt, "Update TLE")
                     dialog_pw.destroy()
                 elif response_key == Gtk.ResponseType.CANCEL:
                     dialog_pw.destroy()
@@ -1124,12 +1225,16 @@ class SpaceLabTransmitter:
         tx_gain = self.spinbutton_tx_gain.get_text()
         callsign = self.entry_preferences_general_callsign.get_text()
 
-        mod_name, freq, baud, sync, prot_name = self._get_link_info()
+        mod_name = self._satellite.get_active_link().get_modulation()
+        freq = self._satellite.get_active_link().get_frequency()
+        baud = self._satellite.get_active_link().get_baudrate()
+        sync = self._satellite.get_active_link().get_sync_word()
+        prot_link = self._satellite.get_active_link().get_link_protocol()
 
         prot = None
-        if prot_name == _PROTOCOL_NGHAM:
+        if prot_link == _PROTOCOL_NGHAM:
             prot = PyNGHam()
-        elif prot_name == _PROTOCOL_AX100MODE5:
+        elif prot_link == _PROTOCOL_AX100MODE5:
             prot = AX100Mode5()
         else:
             error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error transmitting a" + tc_name + "telecommand!")
@@ -1324,23 +1429,25 @@ class SpaceLabTransmitter:
         self.button_csp_reboot.set_sensitive(False)
         self.button_csp_shutdown.set_sensitive(False)
 
-        if "ping" in self._active_tcs: self.button_ping_request.set_sensitive(state)
-        if "enter_hibernation" in self._active_tcs: self.button_enter_hibernation.set_sensitive(state)
-        if "deactivate_module" in self._active_tcs: self.button_deactivate_module.set_sensitive(state)
-        if "erase_memory" in self._active_tcs: self.button_erase_memory.set_sensitive(state)
-        if "set_param" in self._active_tcs: self.button_set_parameter.set_sensitive(state)
-        if "data_request" in self._active_tcs: self.button_data_request.set_sensitive(state)
-        if "leave_hibernation" in self._active_tcs: self.button_leave_hibernation.set_sensitive(state)
-        if "activate_payload" in self._active_tcs: self.button_activate_payload.set_sensitive(state)
-        if "force_reset" in self._active_tcs: self.button_force_reset.set_sensitive(state)
-        if "get_param" in self._active_tcs: self.button_get_parameter.set_sensitive(state)
-        if "broadcast_msg" in self._active_tcs: self.button_broadcast_message.set_sensitive(state)
-        if "activate_module" in self._active_tcs: self.button_activate_module.set_sensitive(state)
-        if "deactivate_payload" in self._active_tcs: self.button_deactivate_payload.set_sensitive(state)
-        if "get_payload_data" in self._active_tcs: self.button_get_payload_data.set_sensitive(state)
-        if "update_tle" in self._active_tcs: self.button_update_tle.set_sensitive(state)
-        if "transmit_pkt" in self._active_tcs: self.button_tx_pkt.set_sensitive(state)
-        if "csp_services" in self._active_tcs:
+        avail_pkts = self._satellite.get_active_link().get_packets()
+
+        if "ping" in avail_pkts:                self.button_ping_request.set_sensitive(state)
+        if "enter_hibernation" in avail_pkts:   self.button_enter_hibernation.set_sensitive(state)
+        if "deactivate_module" in avail_pkts:   self.button_deactivate_module.set_sensitive(state)
+        if "erase_memory" in avail_pkts:        self.button_erase_memory.set_sensitive(state)
+        if "set_param" in avail_pkts:           self.button_set_parameter.set_sensitive(state)
+        if "data_request" in avail_pkts:        self.button_data_request.set_sensitive(state)
+        if "leave_hibernation" in avail_pkts:   self.button_leave_hibernation.set_sensitive(state)
+        if "activate_payload" in avail_pkts:    self.button_activate_payload.set_sensitive(state)
+        if "force_reset" in avail_pkts:         self.button_force_reset.set_sensitive(state)
+        if "get_param" in avail_pkts:           self.button_get_parameter.set_sensitive(state)
+        if "broadcast_msg" in avail_pkts:       self.button_broadcast_message.set_sensitive(state)
+        if "activate_module" in avail_pkts:     self.button_activate_module.set_sensitive(state)
+        if "deactivate_payload" in avail_pkts:  self.button_deactivate_payload.set_sensitive(state)
+        if "get_payload_data" in avail_pkts:    self.button_get_payload_data.set_sensitive(state)
+        if "update_tle" in avail_pkts:          self.button_update_tle.set_sensitive(state)
+        if "transmit_pkt" in avail_pkts:        self.button_tx_pkt.set_sensitive(state)
+        if "csp_services" in avail_pkts:
             self.button_csp_services.set_sensitive(state)
             self.button_csp_ping.set_sensitive(state)
             self.button_csp_ps.set_sensitive(state)
@@ -1357,9 +1464,6 @@ class SpaceLabTransmitter:
             self.button_csp_shutdown.set_sensitive(state)
 
     def on_combobox_satellite_changed(self, combobox):
-        # Clear the list of packet types
-        self.liststore_packet_type.clear()
-
         sat_filename = _SATELLITES[self.combobox_satellite.get_active()][1]
         sat_config_file = str()
 
@@ -1369,46 +1473,37 @@ class SpaceLabTransmitter:
             sat_config_file = _SAT_JSON_SYSTEM_PATH + sat_filename
 
         try:
-            with open(sat_config_file) as f:
-                sat_info = json.load(f)
+            self._satellite.load_from_file(sat_config_file)
 
-                if 'links' in sat_info:
-                    for i in range(len(sat_info['links'])):
-                        self.liststore_packet_type.append([sat_info['links'][i]['name']])
-                else:
-                    self.liststore_packet_type.append(['Uplink'])
+            self.liststore_link.clear() # Clear the list of link types
 
-            self._active_tcs = list()
-            if 'telecommands' in sat_info:
-                for tc in sat_info["telecommands"]:
-                    for tc_avail in _TELECOMMANDS:
-                        if tc == tc_avail:
-                            self._active_tcs.append(tc)
-            else:
-                self._active_tcs = _TELECOMMANDS.copy()
-
-            if self.switch_button.get_active() == False:
-                self._update_tc_buttons(False)
-            elif self.switch_button.get_active() == True:
-                self._update_tc_buttons(True)
-
-            modulation, frequency, baudrate, sync_word, protocol = self._get_link_info()
-            self.entry_carrier_frequency.set_text(str(int(frequency)))
-        except FileNotFoundError as e:
+            for lk in self._satellite.get_links():
+                self.liststore_link.append([lk.get_name()])
+        except (FileNotFoundError, RuntimeError) as e:
             error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error opening the satellite configuration file!")
             error_dialog.format_secondary_text(str(e))
             error_dialog.run()
             error_dialog.destroy()
 
-            self.combobox_packet_type.set_active(-1)
+            self.combobox_link.set_active(-1)
         except:
             error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error opening the satellite configuration file!")
             error_dialog.format_secondary_text("Is the configuration file correct?")
             error_dialog.run()
             error_dialog.destroy()
-        else:
+        finally:
             # Sets the first packet type as the active packet type
-            self.combobox_packet_type.set_active(0)
+            self.combobox_link.set_active(0)
+
+    def on_combobox_link_changed(self, combobox):
+        self._satellite.set_active_link(self.combobox_link.get_active())
+
+        self.entry_carrier_frequency.set_text(str(self._satellite.get_active_link().get_frequency()))
+
+        if self.switch_button.get_active() == False:
+            self._update_tc_buttons(False)
+        elif self.switch_button.get_active() == True:
+            self._update_tc_buttons(True)
 
     def on_combobox_sdr_changed(self, combobox):
         if self.combobox_sdr.get_active() == 0:   # USRP
@@ -1457,23 +1552,3 @@ class SpaceLabTransmitter:
         self.entry_tcp_port.set_sensitive(True)
         self.button_tcp_connect.set_sensitive(True)
         self.button_tcp_disconnect.set_sensitive(False)
-
-    def _get_link_info(self):
-        sat_config_file = str()
-
-        for i in range(len(_SATELLITES)):
-            if self.combobox_satellite.get_active() == i:
-                if os.path.isfile(_SAT_JSON_LOCAL_PATH + _SATELLITES[i][1]):
-                    sat_config_file = _SAT_JSON_LOCAL_PATH + _SATELLITES[i][1]
-                else:
-                    sat_config_file = _SAT_JSON_SYSTEM_PATH + _SATELLITES[i][1]
-
-        with open(sat_config_file) as f:
-            sat_info = json.load(f)
-            modulation  = sat_info['modulation']
-            frequency   = sat_info['frequency']
-            baudrate    = sat_info['baudrate']
-            sync_word   = sat_info['sync_word']
-            protocol    = sat_info['protocol']
-
-            return modulation, frequency, baudrate, sync_word, protocol
