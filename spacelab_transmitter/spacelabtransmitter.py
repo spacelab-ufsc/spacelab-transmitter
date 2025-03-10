@@ -87,7 +87,6 @@ _DEFAULT_LOGFILE                = 'logfile.csv'
 # Satellites
 _SATELLITES                     = [["FloripaSat-1", "floripasat-1.json"],
                                    ["GOLDS-UFSC", "golds-ufsc.json"],
-                                   ["Aldebaran-1", "aldebaran-1.json"],
                                    ["Catarina-A1", "catarina-a1.json"],
                                    ["Catarina-A2", "catarina-a2.json"]]
 
@@ -369,8 +368,6 @@ class SpaceLabTransmitter:
         Gtk.main()
 
     def on_main_window_destroy(self, window):
-        self._save_preferences()
-
         if self._client_socket:
             self._client_socket.close()
 
@@ -1348,7 +1345,7 @@ class SpaceLabTransmitter:
 
         self.logfile_chooser_button.set_filename(_DEFAULT_LOGFILE_PATH)
 
-        self.combobox_sdr.set_active(-1)
+        self.combobox_sdr.set_active(0)
         self.entry_carrier_frequency.set_text(str(_DEFAULT_FREQUENCY))
         self.entry_sample_rate.set_text(str(_DEFAULT_SAMPLE_RATE))
 
