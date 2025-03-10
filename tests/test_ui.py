@@ -54,6 +54,8 @@ def test_ui():
     button_get_payload_data         = builder.get_object("button_get_payload_data")
     button_tx_pkt                   = builder.get_object("button_tx_pkt")
     button_update_tle               = builder.get_object("button_update_tle")
+    button_time_sync                = builder.get_object("button_time_sync")
+    button_csp_services             = builder.get_object("button_csp_services")
     combobox_sdr                    = builder.get_object("combobox_sdr")
     liststore_sdr_devices           = builder.get_object("liststore_sdr_devices")
     entry_carrier_frequency         = builder.get_object("entry_carrier_frequency")
@@ -90,6 +92,8 @@ def test_ui():
     assert button_get_payload_data          != None
     assert button_tx_pkt                    != None
     assert button_update_tle                != None
+    assert button_time_sync                 != None
+    assert button_csp_services              != None
     assert combobox_sdr                     != None
     assert liststore_sdr_devices            != None
     assert entry_carrier_frequency          != None
@@ -136,7 +140,6 @@ def test_ui():
     assert filechooserbutton_logfile            != None
 
     # CSP Services Dialog
-    button_csp_services             = builder.get_object("button_csp_services")
     dialog_csp_services             = builder.get_object("dialog_csp_services")
     button_csp_ping                 = builder.get_object("button_csp_ping")
     button_csp_ps                   = builder.get_object("button_csp_ps")
@@ -152,7 +155,6 @@ def test_ui():
     button_csp_reboot               = builder.get_object("button_csp_reboot")
     button_csp_shutdown             = builder.get_object("button_csp_shutdown")
 
-    assert button_csp_services              != None
     assert dialog_csp_services              != None
     assert button_csp_ping                  != None
     assert button_csp_ps                    != None

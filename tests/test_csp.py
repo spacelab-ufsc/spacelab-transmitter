@@ -25,7 +25,7 @@ import string
 import hashlib
 import hmac
 
-from csp import CSP, _CSP_PRIO_NORM
+from csp import CSP, CSP_PRIO_NORM
 
 def test_address_config():
     adr1 = random.randint(0, 31)
@@ -335,7 +335,7 @@ def test_encode():
 
     csp = CSP(src_adr)
 
-    pkt = csp.encode(_CSP_PRIO_NORM, dst_adr, src_port, dst_port, False, False, False, False, False, pl)
+    pkt = csp.encode(CSP_PRIO_NORM, dst_adr, src_port, dst_port, False, False, False, False, False, pl)
 
     assert (pkt[0] >> 6) == 2                                       # Priority
     assert ((pkt[0] >> 1) & 31) == src_adr                          # Source address
@@ -366,7 +366,7 @@ def test_encode_with_hmac():
 
     csp = CSP(src_adr)
 
-    pkt = csp.encode(_CSP_PRIO_NORM, dst_adr, src_port, dst_port, False, True, False, False, False, pl, key)
+    pkt = csp.encode(CSP_PRIO_NORM, dst_adr, src_port, dst_port, False, True, False, False, False, pl, key)
 
     assert (pkt[0] >> 6) == 2                                       # Priority
     assert ((pkt[0] >> 1) & 31) == src_adr                          # Source address
@@ -394,7 +394,7 @@ def test_decode():
 
     csp = CSP(src_adr)
 
-    pkt = csp.encode(_CSP_PRIO_NORM, dst_adr, src_port, dst_port, False, False, False, False, False, pl)
+    pkt = csp.encode(CSP_PRIO_NORM, dst_adr, src_port, dst_port, False, False, False, False, False, pl)
     pkt_dec = csp.decode(pkt)
 
     assert pkt_dec["priority"] == 2         # Priority
@@ -426,7 +426,7 @@ def test_append_hmac():
 
     csp = CSP(src_adr)
 
-    pkt = csp.encode(_CSP_PRIO_NORM, dst_adr, src_port, dst_port, False, False, False, False, False, pl)
+    pkt = csp.encode(CSP_PRIO_NORM, dst_adr, src_port, dst_port, False, False, False, False, False, pl)
 
     pkt = csp.append_hmac(pkt, key)
 
