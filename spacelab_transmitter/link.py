@@ -28,22 +28,63 @@ class Link:
         """
         Class constructor.
         """
-        self._name              = ""
-        self._direction         = ""
-        self._frequency         = 0
-        self._modulation        = ""
-        self._baudrate          = 0
+        self._id                = str()
+        self._name              = str()
+        self._direction         = str()
+        self._frequency         = int()
+        self._modulation        = str()
+        self._baudrate          = int()
         self._preamble          = list()
         self._sync_word         = list()
-        self._protocol_link     = ""
-        self._protocol_network  = ""
+        self._protocol_link     = str()
+        self._protocol_network  = str()
         self._packets           = list()
+
+    def __str__(self):
+        """
+        String representation of the communication link.
+
+        :return: A text description of the link configuration.
+        :rtype: str
+        """
+        txt =  "Name: " + self.get_name() + "\n\r"
+        txt += "Direction: " + self.get_direction() + "\n\r"
+        txt += "Frequency: " + str(self.get_frequency()) + "\n\r"
+        txt += "Modulation: " + self.get_modulation() + "\n\r"
+        txt += "Baudrate: " + str(self.get_baudrate()) + "\n\r"
+        txt += "Preamble: " + str(self.get_preamble()) + "\n\r"
+        txt += "Sync. Word: " + str(self.get_sync_word()) + "\n\r"
+        txt += "Link protocol: " + self.get_link_protocol() + "\n\r"
+        txt += "Network protocol: " + self.get_network_protocol() + "\n\r"
+        txt += "Packets: " + str(self.get_packets()) + "\n\r"
+
+        return txt
+
+    def set_id(self, id):
+        """
+        Sets the ID of the communication link.
+
+        :param id: Is the ID of the communication link as an string.
+        :type: str
+
+        :return: None.
+        """
+        self._id = id
+
+    def get_id(self):
+        """
+        Gets the ID of the communication link.
+
+        :return: The ID of the link.
+        :rtype: str
+        """
+        return self._id
 
     def set_name(self, name):
         """
         Sets the name of the communication link.
 
-        :param name:
+        :param name: Is the name of the link.
         :type: str
 
         :return: None

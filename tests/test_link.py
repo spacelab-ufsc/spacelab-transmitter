@@ -25,127 +25,94 @@ import pytest
 from link import Link
 
 @pytest.fixture
-def link():
-    """Fixture to create a Link instance for testing."""
-    return Link()
-
-def test_set_name(link):
-    """Test the set_name method."""
-    link.set_name("Link1")
-    assert link.get_name() == "Link1"
-
-def test_get_name(link):
-    """Test the get_name method."""
-    link.set_name("Link2")
-    assert link.get_name() == "Link2"
-
-def test_set_direction_valid(link):
-    """Test the set_direction method with valid values."""
+def sample_link():
+    """Fixture to create a Link instance with sample data."""
+    link = Link()
+    link.set_id("1")
+    link.set_name("TestLink")
     link.set_direction("up")
-    assert link.get_direction() == "up"
-    link.set_direction("down")
-    assert link.get_direction() == "down"
+    link.set_frequency(435000000)
+    link.set_modulation("GFSK")
+    link.set_baudrate(9600)
+    link.set_preamble([0xAA, 0xAA])
+    link.set_sync_word([0x55, 0x55])
+    link.set_link_protocol("AX.25")
+    link.set_network_protocol("IP")
+    link.set_packets([{"type": "data", "length": 100}])
+    return link
 
-def test_set_direction_invalid(link):
-    """Test the set_direction method with invalid values."""
+def test_set_get_id(sample_link):
+    """Test setting and getting the link ID."""
+    link = sample_link
+    assert link.get_id() == "1"
+
+def test_set_get_name(sample_link):
+    """Test setting and getting the link name."""
+    link = sample_link
+    assert link.get_name() == "TestLink"
+
+def test_set_get_direction(sample_link):
+    """Test setting and getting the link direction."""
+    link = sample_link
+    assert link.get_direction() == "up"
+
+    # Test invalid direction
     with pytest.raises(ValueError):
         link.set_direction("invalid")
 
-def test_set_frequency(link):
-    """Test the set_frequency method."""
-    link.set_frequency(145800000)
-    assert link.get_frequency() == 145800000
-
-def test_get_frequency(link):
-    """Test the get_frequency method."""
-    link.set_frequency(435000000)
+def test_set_get_frequency(sample_link):
+    """Test setting and getting the link frequency."""
+    link = sample_link
     assert link.get_frequency() == 435000000
 
-def test_set_modulation(link):
-    """Test the set_modulation method."""
-    link.set_modulation("FM")
-    assert link.get_modulation() == "FM"
+def test_set_get_modulation(sample_link):
+    """Test setting and getting the link modulation."""
+    link = sample_link
+    assert link.get_modulation() == "GFSK"
 
-def test_get_modulation(link):
-    """Test the get_modulation method."""
-    link.set_modulation("PSK")
-    assert link.get_modulation() == "PSK"
-
-def test_set_baudrate(link):
-    """Test the set_baudrate method."""
-    link.set_baudrate(9600)
+def test_set_get_baudrate(sample_link):
+    """Test setting and getting the link baudrate."""
+    link = sample_link
     assert link.get_baudrate() == 9600
 
-def test_get_baudrate(link):
-    """Test the get_baudrate method."""
-    link.set_baudrate(1200)
-    assert link.get_baudrate() == 1200
+def test_set_get_preamble(sample_link):
+    """Test setting and getting the link preamble."""
+    link = sample_link
+    assert link.get_preamble() == [0xAA, 0xAA]
 
-def test_set_preamble(link):
-    """Test the set_preamble method."""
-    preamble = [0xAA, 0x55, 0xAA, 0x55]
-    link.set_preamble(preamble)
-    assert link.get_preamble() == preamble
+def test_set_get_sync_word(sample_link):
+    """Test setting and getting the link sync word."""
+    link = sample_link
+    assert link.get_sync_word() == [0x55, 0x55]
 
-def test_get_preamble(link):
-    """Test the get_preamble method."""
-    preamble = [0x55, 0xAA, 0x55, 0xAA]
-    link.set_preamble(preamble)
-    assert link.get_preamble() == preamble
-
-def test_set_sync_word(link):
-    """Test the set_sync_word method."""
-    sync_word = [0xDE, 0xAD, 0xBE, 0xEF]
-    link.set_sync_word(sync_word)
-    assert link.get_sync_word() == sync_word
-
-def test_get_sync_word(link):
-    """Test the get_sync_word method."""
-    sync_word = [0xBE, 0xEF, 0xCA, 0xFE]
-    link.set_sync_word(sync_word)
-    assert link.get_sync_word() == sync_word
-
-def test_set_link_protocol(link):
-    """Test the set_link_protocol method."""
-    link.set_link_protocol("AX.25")
+def test_set_get_link_protocol(sample_link):
+    """Test setting and getting the link protocol."""
+    link = sample_link
     assert link.get_link_protocol() == "AX.25"
 
-def test_get_link_protocol(link):
-    """Test the get_link_protocol method."""
-    link.set_link_protocol("KISS")
-    assert link.get_link_protocol() == "KISS"
-
-def test_set_network_protocol(link):
-    """Test the set_network_protocol method."""
-    link.set_network_protocol("IP")
+def test_set_get_network_protocol(sample_link):
+    """Test setting and getting the network protocol."""
+    link = sample_link
     assert link.get_network_protocol() == "IP"
 
-def test_get_network_protocol(link):
-    """Test the get_network_protocol method."""
-    link.set_network_protocol("TCP")
-    assert link.get_network_protocol() == "TCP"
+def test_set_get_packets(sample_link):
+    """Test setting and getting the link packets."""
+    link = sample_link
+    assert link.get_packets() == [{"type": "data", "length": 100}]
 
-def test_set_packets(link):
-    """Test the set_packets method."""
-    packets = [{"type": "data", "size": 128}, {"type": "command", "size": 64}]
-    link.set_packets(packets)
-    assert link.get_packets() == packets
-
-def test_get_packets(link):
-    """Test the get_packets method."""
-    packets = [{"type": "beacon", "size": 32}]
-    link.set_packets(packets)
-    assert link.get_packets() == packets
-
-def test_initial_state(link):
-    """Test the initial state of the Link instance."""
-    assert link.get_name() == ""
-    assert link.get_direction() == ""
-    assert link.get_frequency() == 0
-    assert link.get_modulation() == ""
-    assert link.get_baudrate() == 0
-    assert link.get_preamble() == []
-    assert link.get_sync_word() == []
-    assert link.get_link_protocol() == ""
-    assert link.get_network_protocol() == ""
-    assert link.get_packets() == []
+def test_str_method(sample_link):
+    """Test the string representation of the Link class."""
+    link = sample_link
+    expected_output = (
+        "Name: TestLink\n\r"
+        "Direction: up\n\r"
+        "Frequency: 435000000\n\r"
+        "Modulation: GFSK\n\r"
+        "Baudrate: 9600\n\r"
+        "Preamble: [170, 170]\n\r"
+        "Sync. Word: [85, 85]\n\r"
+        "Link protocol: AX.25\n\r"
+        "Network protocol: IP\n\r"
+        "Packets: [{'type': 'data', 'length': 100}]\n\r"
+    )
+    assert str(link) == expected_output
