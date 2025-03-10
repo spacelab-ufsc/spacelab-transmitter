@@ -30,7 +30,8 @@
                 "set_param": "Subsystems IDs:\n- OBDH = 0\n- EPS = 1\n- TTC 0 = 2\n- TTC 1 = 3",
                 "get_param": "Subsystems IDs:\n- OBDH = 0\n- EPS = 1\n- TTC 0 = 2\n- TTC 1 = 3",
                 "transmit_pkt": "Transmits a list of bytes over the UHF downlink",
-                "update_tle": ""
+                "update_tle": "",
+                "time_sync": ""
             }
         }
     ]

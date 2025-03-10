@@ -109,6 +109,24 @@ _SDR_MODELS                     = ['USRP', 'Pluto SDR']
 
 _CSP_MY_ADDRESS                 = 10
 
+# SLP IDs
+SLP_ID_PING                     = 0x40
+SLP_ID_DATA_REQUEST             = 0x41
+SLP_ID_BROADCAST_MESSAGE        = 0x42
+SLP_ID_ENTER_HIBERNATION        = 0x43
+SLP_ID_LEAVE_HIBERNATION        = 0x44
+SLP_ID_ACTIVATE_MODULE          = 0x45
+SLP_ID_DEACTIVATE_MODULE        = 0x46
+SLP_ID_ACTIVATE_PAYLOAD         = 0x47
+SLP_ID_DEACTIVATE_PAYLOAD       = 0x48
+SLP_ID_ERASE_MEMORY             = 0x49
+SLP_ID_FORCE_RESET              = 0x4A
+SLP_ID_GET_PAYLOAD_DATA         = 0x4B
+SLP_ID_SET_PARAMETER            = 0x4C
+SLP_ID_GET_PARAMETER            = 0x4D
+SLP_ID_TRANSMIT_PACKET          = 0x4E
+SLP_ID_UPDATE_TLE               = 0x4F
+
 # CSP Ports
 CSP_PORT_DATA_REQUEST           = 35
 CSP_PORT_BROADCAST_MSG          = 36
@@ -359,7 +377,7 @@ class SpaceLabTransmitter:
         pkt = list()
         if self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_SLP:
             slp = SLP()
-            pkt = slp.encode(0x40, self.entry_preferences_general_callsign.get_text(), list())
+            pkt = slp.encode(SLP_ID_PING, self.entry_preferences_general_callsign.get_text(), list())
         self._transmit_tc(pkt, "Ping")
 
     def on_button_enter_hibernation_clicked(self, button):
@@ -380,7 +398,7 @@ class SpaceLabTransmitter:
                     if self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_SLP:
                         pl = [(hbn_hours >> 8) & 0xFF, (hbn_hours >> 0) & 0xFF]
                         slp = SLP()
-                        pkt = slp.encode_private(0x43, self.entry_preferences_general_callsign.get_text(), dialog_pw.get_key(), pl)
+                        pkt = slp.encode_private(SLP_ID_ENTER_HIBERNATION, self.entry_preferences_general_callsign.get_text(), dialog_pw.get_key(), pl)
 #                    elif self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_CSP:
 #                        csp = CSP()
 #                        pkt = csp.encode()
@@ -423,7 +441,7 @@ class SpaceLabTransmitter:
                     pkt = list()
                     if self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_SLP:
                         slp = SLP()
-                        pkt = slp.encode_private(0x45, self.entry_preferences_general_callsign.get_text(), dialog_pw.get_key(), [mod_id])
+                        pkt = slp.encode_private(SLP_ID_ACTIVATE_MODULE, self.entry_preferences_general_callsign.get_text(), dialog_pw.get_key(), [mod_id])
 #                    elif self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_CSP:
 #                        csp = CSP()
 #                        pkt = csp.encode()
@@ -466,7 +484,7 @@ class SpaceLabTransmitter:
                     pkt = list()
                     if self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_SLP:
                         slp = SLP()
-                        pkt = slp.encode_private(0x46, self.entry_preferences_general_callsign.get_text(), dialog_pw.get_key(), [mod_id])
+                        pkt = slp.encode_private(SLP_ID_DEACTIVATE_MODULE, self.entry_preferences_general_callsign.get_text(), dialog_pw.get_key(), [mod_id])
 #                    elif self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_CSP:
 #                        csp = CSP()
 #                        pkt = csp.encode()
@@ -509,7 +527,7 @@ class SpaceLabTransmitter:
                     pkt = list()
                     if self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_SLP:
                         slp = SLP()
-                        pkt = slp.encode_private(0x46, self.entry_preferences_general_callsign.get_text(), dialog_pw.get_key(), [pl_id])
+                        pkt = slp.encode_private(SLP_ID_DEACTIVATE_PAYLOAD, self.entry_preferences_general_callsign.get_text(), dialog_pw.get_key(), [pl_id])
 #                    elif self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_CSP:
 #                        csp = CSP()
 #                        pkt = csp.encode()
@@ -552,7 +570,7 @@ class SpaceLabTransmitter:
                     pkt = list()
                     if self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_SLP:
                         slp = SLP()
-                        pkt = slp.encode_private(0x47, self.entry_preferences_general_callsign.get_text(), dialog_pw.get_key(), [pl_id])
+                        pkt = slp.encode_private(SLP_ID_ACTIVATE_PAYLOAD, self.entry_preferences_general_callsign.get_text(), dialog_pw.get_key(), [pl_id])
 #                    elif self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_CSP:
 #                        csp = CSP()
 #                        pkt = csp.encode()
@@ -595,7 +613,7 @@ class SpaceLabTransmitter:
                     pkt = list()
                     if self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_SLP:
                         slp = SLP()
-                        pkt = slp.encode_private(0x49, self.entry_preferences_general_callsign.get_text(), dialog_pw.get_key(), [mem_id])
+                        pkt = slp.encode_private(SLP_ID_ERASE_MEMORY, self.entry_preferences_general_callsign.get_text(), dialog_pw.get_key(), [mem_id])
 #                    elif self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_CSP:
 #                        csp = CSP()
 #                        pkt = csp.encode()
@@ -653,7 +671,7 @@ class SpaceLabTransmitter:
                         pl.append(param_val & 0xFF)
 
                         slp = SLP()
-                        pkt = slp.encode_private(0x49, self.entry_preferences_general_callsign.get_text(), dialog_pw.get_key(), pl)
+                        pkt = slp.encode_private(SLP_ID_SET_PARAMETER, self.entry_preferences_general_callsign.get_text(), dialog_pw.get_key(), pl)
                     elif self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_CSP:
                         pl.append(4)
                         pl.append((param_val >> 24) & 0xFF)
@@ -720,7 +738,7 @@ class SpaceLabTransmitter:
                     pkt = list()
                     if self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_SLP:
                         slp = SLP()
-                        pkt = slp.encode_private(0x41, self.entry_preferences_general_callsign.get_text(), dialog_pw.get_key(), pl)
+                        pkt = slp.encode_private(SLP_ID_DATA_REQUEST, self.entry_preferences_general_callsign.get_text(), dialog_pw.get_key(), pl)
 #                    elif self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_CSP:
 #                        csp = CSP()
 #                        pkt = csp.encode()
@@ -754,7 +772,7 @@ class SpaceLabTransmitter:
             pkt = list()
             if self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_SLP:
                 slp = SLP()
-                pkt = slp.encode_private(0x44, self.entry_preferences_general_callsign.get_text(), dialog.get_key(), list())
+                pkt = slp.encode_private(SLP_ID_LEAVE_HIBERNATION, self.entry_preferences_general_callsign.get_text(), dialog.get_key(), list())
 #            elif self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_CSP:
 #                csp = CSP()
 #                pkt = csp.encode()
@@ -775,7 +793,7 @@ class SpaceLabTransmitter:
             pkt = list()
             if self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_SLP:
                 slp = SLP()
-                pkt = slp.encode_private(0x4A, self.entry_preferences_general_callsign.get_text(), dialog.get_key(), list())
+                pkt = slp.encode_private(SLP_ID_FORCE_RESET, self.entry_preferences_general_callsign.get_text(), dialog.get_key(), list())
 #            elif self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_CSP:
 #                csp = CSP()
 #                pkt = csp.encode()
@@ -810,7 +828,7 @@ class SpaceLabTransmitter:
                     pkt = list()
                     if self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_SLP:
                         slp = SLP()
-                        pkt = slp.encode_private(0x4D, self.entry_preferences_general_callsign.get_text(), dialog_pw.get_key(), pl)
+                        pkt = slp.encode_private(SLP_ID_GET_PARAMETER, self.entry_preferences_general_callsign.get_text(), dialog_pw.get_key(), pl)
 #                    elif self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_CSP:
 #                        csp = CSP()
 #                        pkt = csp.encode()
@@ -859,7 +877,7 @@ class SpaceLabTransmitter:
                     pkt = list()
                     if self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_SLP:
                         slp = SLP()
-                        pkt = slp.encode_private(0x4B, self.entry_preferences_general_callsign.get_text(), dialog_pw.get_key(), pl)
+                        pkt = slp.encode_private(SLP_ID_GET_PAYLOAD_DATA, self.entry_preferences_general_callsign.get_text(), dialog_pw.get_key(), pl)
 #                    elif self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_CSP:
 #                        csp = CSP()
 #                        pkt = csp.encode()
@@ -908,7 +926,7 @@ class SpaceLabTransmitter:
                 pkt = list()
                 if self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_SLP:
                     slp = SLP()
-                    pkt = slp.encode(0x42, self.entry_preferences_general_callsign.get_text(), pl)
+                    pkt = slp.encode(SLP_ID_BROADCAST_MESSAGE, self.entry_preferences_general_callsign.get_text(), pl)
 #                elif self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_CSP:
 #                    csp = CSP()
 #                    pkt = csp.encode()
@@ -945,7 +963,7 @@ class SpaceLabTransmitter:
                     pkt = list()
                     if self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_SLP:
                         slp = SLP()
-                        pkt = slp.encode_private(0x4E, self.entry_preferences_general_callsign.get_text(), dialog_pw.get_key(), data)
+                        pkt = slp.encode_private(SLP_ID_TRANSMIT_PACKET, self.entry_preferences_general_callsign.get_text(), dialog_pw.get_key(), data)
 #                    elif self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_CSP:
 #                        csp = CSP()
 #                        pkt = csp.encode()
@@ -994,7 +1012,7 @@ class SpaceLabTransmitter:
                     pkt = list()
                     if self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_SLP:
                         slp = SLP()
-                        pkt = slp.encode_private(0x4F, self.entry_preferences_general_callsign.get_text(), dialog_pw.get_key(), pl)
+                        pkt = slp.encode_private(SLP_ID_UPDATE_TLE, self.entry_preferences_general_callsign.get_text(), dialog_pw.get_key(), pl)
 #                    elif self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_CSP:
 #                        csp = CSP()
 #                        pkt = csp.encode()
@@ -1036,8 +1054,10 @@ class SpaceLabTransmitter:
 
                 pkt = list()
                 if self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_SLP:
+                    # There is no Time Sync TC for the SLP protocol, instead, we use a Set Parameter TC
+                    pl = [0, 0] + pl
                     slp = SLP()
-                    pkt = slp.encode_private(0x50, self.entry_preferences_general_callsign.get_text(), dialog.get_key(), pl)
+                    pkt = slp.encode_private(SLP_ID_SET_PARAMETER, self.entry_preferences_general_callsign.get_text(), dialog.get_key(), pl)
                 elif self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_CSP:
                     csp = CSP(_CSP_MY_ADDRESS)
                     pkt = csp.encode(CSP_PRIO_NORM, 1, CSP_PORT_TIME_SYNC, CSP_PORT_TIME_SYNC, False, True, False, False, False, pl, dialog.get_key())  # 1 = Satellite (OBDH) address
