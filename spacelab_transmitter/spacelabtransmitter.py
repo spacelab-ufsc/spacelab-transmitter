@@ -40,7 +40,7 @@ from spacelab_transmitter.tc_dialogs import DialogDataRequest, DialogDeactivateP
 from spacelab_transmitter.gmsk import GMSK
 from spacelab_transmitter.usrp import USRP
 from spacelab_transmitter.pluto import Pluto
-from spacelab_transmitter.csp import CSP
+from spacelab_transmitter.csp import CSP, CSP_PRIO_NORM
 from spacelab_transmitter.ax100 import AX100Mode5
 from spacelab_transmitter.satellite import Satellite
 from spacelab_transmitter.link import Link
@@ -107,6 +107,18 @@ _TELECOMMANDS                   = ["ping", "data_request", "broadcast_msg", "ent
 _SDR_MODELS                     = ['USRP', 'Pluto SDR']
 
 _CSP_MY_ADDRESS                 = 10
+
+# CSP Ports
+CSP_PORT_DATA_REQUEST           = 35
+CSP_PORT_BROADCAST_MSG          = 36
+CSP_PORT_ENTER_HIBERNATION      = 37
+CSP_PORT_LEAVE_HIBERNATION      = 38
+CSP_PORT_ERASE_MEMORY           = 43
+CSP_PORT_FORCE_RESET            = 44
+CSP_PORT_GET_PAYLOAD_DATA       = 45
+CSP_PORT_SET_PARAM              = 46
+CSP_PORT_GET_PARAM              = 47
+CSP_PORT_TIME_SYNC              = 48
 
 class SpaceLabTransmitter:
 
@@ -627,18 +639,25 @@ class SpaceLabTransmitter:
                 response_key = dialog_pw.run()
                 if response_key == Gtk.ResponseType.OK:
                     pl = [subsys_id, param_id]
-                    pl.append((param_val >> 24) & 0xFF)
-                    pl.append((param_val >> 16) & 0xFF)
-                    pl.append((param_val >> 8) & 0xFF)
-                    pl.append(param_val & 0xFF)
 
                     pkt = list()
                     if self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_SLP:
+                        pl.append((param_val >> 24) & 0xFF)
+                        pl.append((param_val >> 16) & 0xFF)
+                        pl.append((param_val >> 8) & 0xFF)
+                        pl.append(param_val & 0xFF)
+
                         slp = SLP()
                         pkt = slp.encode_private(0x49, self.entry_preferences_general_callsign.get_text(), dialog_pw.get_key(), pl)
-#                    elif self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_CSP:
-#                        csp = CSP()
-#                        pkt = csp.encode()
+                    elif self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_CSP:
+                        pl.append(4)
+                        pl.append((param_val >> 24) & 0xFF)
+                        pl.append((param_val >> 16) & 0xFF)
+                        pl.append((param_val >> 8) & 0xFF)
+                        pl.append(param_val & 0xFF)
+
+                        csp = CSP(_CSP_MY_ADDRESS)
+                        pkt = csp.encode(CSP_PRIO_NORM, 1, CSP_PORT_SET_PARAM, CSP_PORT_SET_PARAM, False, True, False, False, False, pl, dialog_pw.get_key())  # 1 = Satellite (OBDH) address
                     self._transmit_tc(pkt, "Set Parameter")
                     dialog_pw.destroy()
                 elif response_key == Gtk.ResponseType.CANCEL:
