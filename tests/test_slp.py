@@ -38,6 +38,21 @@ def test_encode(slp):
     encoded_pkt = slp.encode(id, src_adr, pl)
     assert encoded_pkt == [1, 32, 32, 80, 80, 53, 85, 70, 1, 2, 3]
 
+    # Test encoding with a source address longer than 7 bytes
+    with pytest.raises(ValueError):
+        slp.encode(id, "LONG_CALLSIGN", pl)
+
+def test_encode_private(slp):
+    """Test encoding a private SLP packet."""
+    id = 2
+    src_adr = "PP5UF"
+    key = "secret_key"
+    pl = [0x04, 0x05, 0x06]
+    encoded_pkt = slp.encode_private(id, src_adr, key, pl)
+
+    assert len(encoded_pkt) == len([2, 32, 32, 80, 80, 53, 85, 70, 4, 5, 6]) + 20  # 20 bytes for SHA1 HMAC
+    assert encoded_pkt[:11] == [2, 32, 32, 80, 80, 53, 85, 70, 4, 5, 6]
+
 def test_decode(slp):
     """Test the decode method."""
     pkt = [1, 32, 32, 80, 80, 53, 85, 70, 1, 2, 3]
@@ -48,6 +63,10 @@ def test_decode(slp):
         "src_adr": "PP5UF",
         "payload": [1, 2, 3]
     }
+
+    # Test decoding a packet that is too short
+    with pytest.raises(IndexError):
+        slp.decode([1, 2, 3])
 
 def test_encode_short_callsign(slp):
     """Test the encode method with a short callsign."""

@@ -20,6 +20,9 @@
 #
 #
 
+import hashlib
+import hmac
+
 class SLP:
     """
     SpaceLab network layer protocol.
@@ -56,6 +59,33 @@ class SLP:
         pkt += pl
 
         return pkt
+
+    def encode_private(self, id, src_adr, key, pl):
+        """
+        Encodes a private SLP packet.
+
+        The private packets have an HMAC hash computed from a given key.
+
+        :param id: Is the ID code of the packet.
+        :type: int
+
+        :param src_adr: Is the source address of the packet.
+        :type: str
+
+        :param key: Is the packet key.
+        :type: str
+
+        :param pl: Is the payload of the packet.
+        :type: list[int]
+
+        :return: The SLP encoded packet.
+        :rtype: list[int]
+        """
+        pkt = self.encode(id, src_adr, pl)
+
+        hashed = hmac.new(key.encode('utf-8'), bytes(pkt), hashlib.sha1)
+
+        return pkt + list(hashed.digest())
 
     def decode(self, pkt):
         """
