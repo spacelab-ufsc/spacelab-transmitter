@@ -171,7 +171,6 @@ class SpaceLabTransmitter:
             self.window.set_icon_from_file(_ICON_FILE_LOCAL)
         else:
             self.window.set_icon_from_file(_ICON_FILE_LINUX_SYSTEM)
-        self.window.set_wmclass(self.window.get_title(), self.window.get_title())
         self.window.connect("destroy", self.on_main_window_destroy)
 
         # Entry_preferences_general_callsign builder
