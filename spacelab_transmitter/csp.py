@@ -20,6 +20,9 @@
 #  
 #
 
+import hashlib
+import hmac
+
 # Priorities
 _CSP_PRIO_CRITICAL  = 0
 _CSP_PRIO_HIGH      = 1
@@ -91,7 +94,7 @@ class CSP:
         """
         return self._my_adr
 
-    def encode(self, prio, src_adr, dst_adr, src_port, dst_port, sfp, hmac, xtea, rdp, crc, pl):
+    def encode(self, prio, src_adr, dst_adr, src_port, dst_port, sfp, hmac, xtea, rdp, crc, pl, hmac_key=str()):
         """
         Encode a CSP packet.
 
@@ -128,6 +131,9 @@ class CSP:
         :param pl: Is the payload of the CSP packet.
         :type: list[int]
 
+        :param hmac_key: Is the HMAC key (optional, only used if the HMAC is enabled).
+        :type: str
+
         :return: A list with the byte sequence of the CSP packet.
         :rtype: list[int]
         """
@@ -159,6 +165,10 @@ class CSP:
 
         # Payload
         pkt += pl
+
+        # HMAC
+        if hmac:
+            pkt = self.append_hmac(pkt, hmac_key)
 
         return pkt
 
@@ -417,3 +427,34 @@ class CSP:
 
     def _decode_pl(self, pl):
         return {"payload": pl}
+
+    def append_hmac(self, pkt, key, inc_header=False):
+        """
+        Enables the HMAC authentication to an existing packet.
+
+        :param pkt: Is the CSP packet to add the HMAC hash.
+        :type: list
+
+        :param key: Is the HMAC key to compute the hash.
+        :type: str
+
+        :param inc_header: A flag to indicate if the HMAC must be computed considering the CSP header or not.
+        :type: bool
+
+        :return: The given CSP packet with the HMAC hash enabled.
+        :rtype: list
+        """
+        # Enabling HMAC flag in header
+        pkt[3] |= (1 << 3)
+
+        # Defining if the HMAC will be computed considering the CSP header or not
+        pkt4hmac = list()
+        if inc_header:
+            pkt4hmac = pkt
+        else:
+            pkt4hmac = pkt[4:]
+
+        # Compute the HMAC hash
+        hashed = hmac.new(key.encode('utf-8'), bytes(pkt4hmac), hashlib.sha1)
+
+        return pkt + list(hashed.digest())
