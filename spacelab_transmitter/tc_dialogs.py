@@ -1,5 +1,5 @@
 #
-#  telecommands_transmission.py
+#  tc_dialogs.py
 #  
 #  Copyright The SpaceLab-Transmitter Contributors.
 #  
@@ -301,13 +301,13 @@ class DialogDataRequest(Gtk.Dialog):
         label.set_halign(Gtk.Align.START)
         self.entry_data_id = Gtk.Entry()
 
-        label2 = Gtk.Label(label="Start Timestamp:")
+        label2 = Gtk.Label(label="Start Page:")
         label2.set_halign(Gtk.Align.START)
-        self.entry_start_ts = Gtk.Entry()
+        self.entry_start_page = Gtk.Entry()
 
-        label3 = Gtk.Label(label="End Timestamp:")
+        label3 = Gtk.Label(label="End Page:")
         label3.set_halign(Gtk.Align.START)
-        self.entry_end_ts = Gtk.Entry()
+        self.entry_end_page = Gtk.Entry()
 
         grid = Gtk.Grid()
         grid.set_row_spacing(5)
@@ -321,8 +321,8 @@ class DialogDataRequest(Gtk.Dialog):
         grid.attach(label2, 0, 1, 1, 1)
         grid.attach(label3, 0, 2, 1, 1)
         grid.attach(self.entry_data_id, 1, 0, 1, 1)
-        grid.attach(self.entry_start_ts, 1, 1, 1, 1)
-        grid.attach(self.entry_end_ts, 1, 2, 1, 1)
+        grid.attach(self.entry_start_page, 1, 1, 1, 1)
+        grid.attach(self.entry_end_page, 1, 2, 1, 1)
 
         box_content = self.get_content_area()
         box_content.add(grid)
@@ -338,11 +338,11 @@ class DialogDataRequest(Gtk.Dialog):
     def get_data_id(self):
         return int(self.entry_data_id.get_text())
 
-    def get_start_ts(self):
-        return int(self.entry_start_ts.get_text())
+    def get_start_page(self):
+        return int(self.entry_start_page.get_text())
 
-    def get_end_ts(self):
-        return int(self.entry_end_ts.get_text())
+    def get_end_page(self):
+        return int(self.entry_end_page.get_text())
 
 class DialogGetPayloadData(Gtk.Dialog):
     def __init__(self, parent):

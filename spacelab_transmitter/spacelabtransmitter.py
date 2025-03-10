@@ -38,7 +38,7 @@ from gi.repository import GdkPixbuf
 
 import spacelab_transmitter.version
 
-from spacelab_transmitter.telecommands_transmission import DialogDataRequest, DialogDeactivatePayload, DialogEnterHibernation, DialogActivatePayload, DialogGetPayloadData, DialogSetParameter, DialogDeactivateModule, DialogActivateModule, DialogGetParameter, DialogBroadcastMessage, DialogTransmitPacket, DialogEraseMemory, DialogUpdateTLE, DialogCSPPeek, DialogCSPPoke
+from spacelab_transmitter.tc_dialogs import DialogDataRequest, DialogDeactivatePayload, DialogEnterHibernation, DialogActivatePayload, DialogGetPayloadData, DialogSetParameter, DialogDeactivateModule, DialogActivateModule, DialogGetParameter, DialogBroadcastMessage, DialogTransmitPacket, DialogEraseMemory, DialogUpdateTLE, DialogCSPPeek, DialogCSPPoke
 
 from spacelab_transmitter.gmsk import GMSK
 from spacelab_transmitter.usrp import USRP
@@ -703,15 +703,15 @@ class SpaceLabTransmitter:
         if response == Gtk.ResponseType.OK:
             try:
                 data_id = dialog.get_data_id()
-                start_ts = dialog.get_start_ts()
-                end_ts = dialog.get_end_ts()
+                start_page = dialog.get_start_page()
+                end_page = dialog.get_end_page()
                 if data_id < 0 or data_id > 255:
                     raise ValueError("The data ID must be between 0 and 255!")
 
-                if start_ts < 0 or start_ts > 2**32-1:
+                if start_page < 0 or start_page > 2**32-1:
                     raise ValueError("The start timestamp must be between 0 and 4294967295!")
 
-                if end_ts < 0 or end_ts > 2**32-1:
+                if end_page < 0 or end_page > 2**32-1:
                     raise ValueError("The end timestamp must be between 0 and 4294967295!")
 
                 dialog_pw = DialogPassword(self.window)
@@ -719,14 +719,14 @@ class SpaceLabTransmitter:
                 response_key = dialog_pw.run()
                 if response_key == Gtk.ResponseType.OK:
                     pl = [data_id]
-                    pl.append((start_ts >> 24) & 0xFF)
-                    pl.append((start_ts >> 16) & 0xFF)
-                    pl.append((start_ts >> 8) & 0xFF)
-                    pl.append((start_ts >> 0) & 0xFF)
-                    pl.append((end_ts >> 24) & 0xFF)
-                    pl.append((end_ts >> 16) & 0xFF)
-                    pl.append((end_ts >> 8) & 0xFF)
-                    pl.append((end_ts >> 0) & 0xFF)
+                    pl.append((start_page >> 24) & 0xFF)
+                    pl.append((start_page >> 16) & 0xFF)
+                    pl.append((start_page >> 8) & 0xFF)
+                    pl.append((start_page >> 0) & 0xFF)
+                    pl.append((end_page >> 24) & 0xFF)
+                    pl.append((end_page >> 16) & 0xFF)
+                    pl.append((end_page >> 8) & 0xFF)
+                    pl.append((end_page >> 0) & 0xFF)
 
                     pkt = list()
                     if self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_SLP:
