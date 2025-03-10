@@ -35,9 +35,9 @@ def test_ui():
     switch_doppler                  = builder.get_object("switch_doppler")
     toolbutton_about                = builder.get_object("toolbutton_about")
     combobox_satellite              = builder.get_object("combobox_satellite")
-    combobox_packet_type            = builder.get_object("combobox_packet_type")
+    combobox_link                   = builder.get_object("combobox_link")
     liststore_satellite             = builder.get_object("liststore_satellite")
-    liststore_packet_type           = builder.get_object("liststore_packet_type")
+    liststore_link                  = builder.get_object("liststore_link")
     button_ping_request             = builder.get_object("button_ping_request")
     button_enter_hibernation        = builder.get_object("button_enter_hibernation")
     button_deactivate_module        = builder.get_object("button_deactivate_module")
@@ -71,9 +71,9 @@ def test_ui():
     assert switch_doppler                   != None
     assert toolbutton_about                 != None
     assert combobox_satellite               != None
-    assert combobox_packet_type             != None
+    assert combobox_link                    != None
     assert liststore_satellite              != None
-    assert liststore_packet_type            != None
+    assert liststore_link                   != None
     assert button_ping_request              != None
     assert button_enter_hibernation         != None
     assert button_deactivate_module         != None
