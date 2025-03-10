@@ -13,7 +13,25 @@
             "sync_word": [93, 230, 42, 126],
             "protocol_link": "NGHam",
             "protocol_network": "SLP",
-            "packets": ["ping", "data_request", "broadcast_msg", "enter_hibernation", "leave_hibernation", "activate_module", "deactivate_module", "activate_payload", "deactivate_payload", "erase_memory", "force_reset", "get_payload_data", "set_param", "get_param", "transmit_pkt", "update_tle"]
+            "packets": ["ping", "data_request", "broadcast_msg", "enter_hibernation", "leave_hibernation", "activate_module", "deactivate_module", "activate_payload", "deactivate_payload", "erase_memory", "force_reset", "get_payload_data", "set_param", "get_param", "transmit_pkt", "update_tle", "time_sync"],
+            "tooltips": {
+                "ping": "",
+                "data_request": "Data Type IDs:\n- OBDH = 0\n- EPS = 1\n- TTC 0 = 2\n- TTC 1 = 3\n- Antenna = 4",
+                "broadcast_msg": "Broadcast an ASCII message over the VHF downlink",
+                "enter_hibernation": "",
+                "leave_hibernation": "",
+                "activate_module": "IDs:\n- Battery Heater = 1\n- Beacon = 2\n- Periodic Telemetry = 3",
+                "deactivate_module": "IDs:\n- Battery Heater = 1\n- Beacon = 2\n- Periodic Telemetry = 3",
+                "activate_payload": "IDs:\n- EDC 1 = 1\n- EDC 2 = 2\n- Payload-X = 3",
+                "deactivate_payload": "IDs:\n- EDC 1 = 1\n- EDC 2 = 2\n- Payload-X = 3",
+                "erase_memory": "IDs:\n- Flash = 0\n- FRAM = 1",
+                "force_reset": "",
+                "get_payload_data": "IDs:\n- EDC 1 = 1\n- EDC 2 = 2\n- Payload-X = 3",
+                "set_param": "Subsystems IDs:\n- OBDH = 0\n- EPS = 1\n- TTC 0 = 2\n- TTC 1 = 3",
+                "get_param": "Subsystems IDs:\n- OBDH = 0\n- EPS = 1\n- TTC 0 = 2\n- TTC 1 = 3",
+                "transmit_pkt": "Transmits a list of bytes over the UHF downlink",
+                "update_tle": ""
+            }
         }
     ]
 }
