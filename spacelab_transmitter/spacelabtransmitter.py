@@ -22,11 +22,8 @@
 #  
 #
 
-
 import os
-import threading
 from datetime import datetime
-import pathlib
 import json
 import csv
 import socket
@@ -38,7 +35,7 @@ from gi.repository import GdkPixbuf
 
 import spacelab_transmitter.version
 
-from spacelab_transmitter.tc_dialogs import DialogDataRequest, DialogDeactivatePayload, DialogEnterHibernation, DialogActivatePayload, DialogGetPayloadData, DialogSetParameter, DialogDeactivateModule, DialogActivateModule, DialogGetParameter, DialogBroadcastMessage, DialogTransmitPacket, DialogEraseMemory, DialogUpdateTLE, DialogCSPPeek, DialogCSPPoke
+from spacelab_transmitter.tc_dialogs import DialogDataRequest, DialogDeactivatePayload, DialogEnterHibernation, DialogActivatePayload, DialogGetPayloadData, DialogSetParameter, DialogDeactivateModule, DialogActivateModule, DialogGetParameter, DialogBroadcastMessage, DialogTransmitPacket, DialogEraseMemory, DialogUpdateTLE, DialogCSPPeek, DialogCSPPoke, DialogPassword
 
 from spacelab_transmitter.gmsk import GMSK
 from spacelab_transmitter.usrp import USRP
@@ -110,38 +107,6 @@ _TELECOMMANDS                   = ["ping", "data_request", "broadcast_msg", "ent
 _SDR_MODELS                     = ['USRP', 'Pluto SDR']
 
 _CSP_MY_ADDRESS                 = 10
-
-class DialogPassword(Gtk.Dialog):
-    def __init__(self, parent):
-        super().__init__(title="Authentication", transient_for=parent, flags=0)
-        self.add_buttons(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK)
-
-        label = Gtk.Label(label="Key:")
-        self.entry_password = Gtk.Entry()
-
-        grid = Gtk.Grid()
-        grid.set_column_spacing(10)
-        grid.set_margin_start(10)
-        grid.set_margin_end(10)
-        grid.set_margin_top(5)
-        grid.set_margin_bottom(5)
-
-        grid.add(label)
-        grid.attach(self.entry_password, 1, 0, 1, 1)
-
-        box_content = self.get_content_area()
-        box_content.add(grid)
-
-        box_buttons = self.get_action_area()
-        grid.set_column_spacing(10)
-        box_buttons.set_margin_start(10)
-        box_buttons.set_margin_end(10)
-        box_buttons.set_margin_bottom(5)
-
-        self.show_all()
-
-    def get_key(self):
-        return self.entry_password.get_text()
 
 class SpaceLabTransmitter:
 
@@ -1475,6 +1440,8 @@ class SpaceLabTransmitter:
 
             for lk in self._satellite.get_links():
                 self.liststore_link.append([lk.get_name()])
+
+            self._load_tooltips(sat_config_file)
         except (FileNotFoundError, RuntimeError) as e:
             error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error opening the satellite configuration file!")
             error_dialog.format_secondary_text(str(e))
@@ -1548,3 +1515,63 @@ class SpaceLabTransmitter:
         self.entry_tcp_port.set_sensitive(True)
         self.button_tcp_connect.set_sensitive(True)
         self.button_tcp_disconnect.set_sensitive(False)
+
+    def _load_tooltips(self, filename):
+        self.button_ping_request.set_tooltip_text("")
+        self.button_data_request.set_tooltip_text("")
+        self.button_broadcast_message.set_tooltip_text("")
+        self.button_enter_hibernation.set_tooltip_text("")
+        self.button_leave_hibernation.set_tooltip_text("")
+        self.button_activate_module.set_tooltip_text("")
+        self.button_deactivate_module.set_tooltip_text("")
+        self.button_activate_payload.set_tooltip_text("")
+        self.button_deactivate_payload.set_tooltip_text("")
+        self.button_erase_memory.set_tooltip_text("")
+        self.button_force_reset.set_tooltip_text("")
+        self.button_get_payload_data.set_tooltip_text("")
+        self.button_set_parameter.set_tooltip_text("")
+        self.button_get_parameter.set_tooltip_text("")
+        self.button_tx_pkt.set_tooltip_text("")
+        self.button_update_tle.set_tooltip_text("")
+        self.button_csp_services.set_tooltip_text("")
+
+        with open(filename) as f:
+            sat_info = json.load(f)
+
+            lk_idx = self.combobox_link.get_active()
+            if 'links' in sat_info:
+                if 'tooltips' in sat_info['links'][lk_idx]:
+                    if 'ping' in sat_info['links'][lk_idx]['packets']:
+                        self.button_ping_request.set_tooltip_text(sat_info['links'][lk_idx]['tooltips']['ping'])
+                    if 'data_request' in sat_info['links'][lk_idx]['packets']:
+                        self.button_data_request.set_tooltip_text(sat_info['links'][lk_idx]['tooltips']['data_request'])
+                    if 'broadcast_msg' in sat_info['links'][lk_idx]['packets']:
+                        self.button_broadcast_message.set_tooltip_text(sat_info['links'][lk_idx]['tooltips']['broadcast_msg'])
+                    if 'enter_hibernation' in sat_info['links'][lk_idx]['packets']:
+                        self.button_enter_hibernation.set_tooltip_text(sat_info['links'][lk_idx]['tooltips']['enter_hibernation'])
+                    if 'leave_hibernation' in sat_info['links'][lk_idx]['packets']:
+                        self.button_leave_hibernation.set_tooltip_text(sat_info['links'][lk_idx]['tooltips']['leave_hibernation'])
+                    if 'activate_module' in sat_info['links'][lk_idx]['packets']:
+                        self.button_activate_module.set_tooltip_text(sat_info['links'][lk_idx]['tooltips']['activate_module'])
+                    if 'deactivate_module' in sat_info['links'][lk_idx]['packets']:
+                        self.button_deactivate_module.set_tooltip_text(sat_info['links'][lk_idx]['tooltips']['deactivate_module'])
+                    if 'activate_payload' in sat_info['links'][lk_idx]['packets']:
+                        self.button_activate_payload.set_tooltip_text(sat_info['links'][lk_idx]['tooltips']['activate_payload'])
+                    if 'deactivate_payload' in sat_info['links'][lk_idx]['packets']:
+                        self.button_deactivate_payload.set_tooltip_text(sat_info['links'][lk_idx]['tooltips']['deactivate_payload'])
+                    if 'erase_memory' in sat_info['links'][lk_idx]['packets']:
+                        self.button_erase_memory.set_tooltip_text(sat_info['links'][lk_idx]['tooltips']['erase_memory'])
+                    if 'force_reset' in sat_info['links'][lk_idx]['packets']:
+                        self.button_force_reset.set_tooltip_text(sat_info['links'][lk_idx]['tooltips']['force_reset'])
+                    if 'get_payload_data' in sat_info['links'][lk_idx]['packets']:
+                        self.button_get_payload_data.set_tooltip_text(sat_info['links'][lk_idx]['tooltips']['get_payload_data'])
+                    if 'set_param' in sat_info['links'][lk_idx]['packets']:
+                        self.button_set_parameter.set_tooltip_text(sat_info['links'][lk_idx]['tooltips']['set_param'])
+                    if 'get_param' in sat_info['links'][lk_idx]['packets']:
+                        self.button_get_parameter.set_tooltip_text(sat_info['links'][lk_idx]['tooltips']['get_param'])
+                    if 'transmit_pkt' in sat_info['links'][lk_idx]['packets']:
+                        self.button_tx_pkt.set_tooltip_text(sat_info['links'][lk_idx]['tooltips']['transmit_pkt'])
+                    if 'update_tle' in sat_info['links'][lk_idx]['packets']:
+                        self.button_update_tle.set_tooltip_text(sat_info['links'][lk_idx]['tooltips']['update_tle'])
+                    if 'csp_services' in sat_info['links'][lk_idx]['packets']:
+                        self.button_csp_services.set_tooltip_text(sat_info['links'][lk_idx]['tooltips']['csp_services'])
