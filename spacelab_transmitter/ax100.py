@@ -23,7 +23,7 @@
 from spacelab_transmitter.golay24 import Golay24
 from spacelab_transmitter.rs import RS
 
-_AX100_PREAMBLE_DEFAULT     = [0xAA]*4
+_AX100_PREAMBLE_DEFAULT     = [0xAA]*8
 _AX100_SYNC_WORD_DEFAULT    = [147, 11, 81, 222]
 
 # Repeats after 255 bits, but repeats byte-aligning after 255 byte
@@ -144,7 +144,7 @@ class AX100Mode5:
         pkt += rs.encode(self._padding(data))
 
         # Scramble
-        pkt[11:] = self._scrambling(pkt[11:])
+        pkt[len(self.get_preamble())+len(self.get_sync_word())+len(gol_res):] = self._scrambling(pkt[len(self.get_preamble())+len(self.get_sync_word())+len(gol_res):])
 
         return pkt
 
