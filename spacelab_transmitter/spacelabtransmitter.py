@@ -1278,7 +1278,7 @@ class SpaceLabTransmitter:
         elif prot_link == _PROTOCOL_AX100MODE5:
             prot = AX100Mode5()
         else:
-            error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error transmitting a" + tc_name + "telecommand!")
+            error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error transmitting a " + tc_name + " telecommand!")
             error_dialog.format_secondary_text("The " + prot_name + " protocol is not supported yet!")
             error_dialog.run()
             error_dialog.destroy()
@@ -1292,8 +1292,8 @@ class SpaceLabTransmitter:
             if mod_name == _MODULATION_GMSK:
                 mod = GMSK(0.5, baud)   # BT = 0.5
             else:
-                error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error transmitting a" + tc_name + "telecommand!")
-                error_dialog.format_secondary_text("The" + mod_name + "modulation is not supported yet!")
+                error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error transmitting a " + tc_name + " telecommand!")
+                error_dialog.format_secondary_text("The " + mod_name + " modulation is not supported yet!")
                 error_dialog.run()
                 error_dialog.destroy()
 
@@ -1307,7 +1307,7 @@ class SpaceLabTransmitter:
             elif self.combobox_sdr.get_active() == 1: # Pluto SDR
                 sdr = Pluto(int(self.entry_sample_rate.get_text()), int(tx_gain))
             else:
-                error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error transmitting a" + tc_name + "telecommand!")
+                error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error transmitting a " + tc_name + " telecommand!")
                 error_dialog.format_secondary_text("SDR device not supported yet!")
                 error_dialog.run()
                 error_dialog.destroy()
@@ -1315,16 +1315,16 @@ class SpaceLabTransmitter:
                 return
 
             if sdr.transmit(samples, duration_s, sample_rate, int(carrier_frequency)):
-                self.write_log(tc_name + " transmitted to " + _SATELLITES[self.combobox_satellite.get_active()][0] + " from" + callsign + " in " + carrier_frequency + " Hz with a gain of " + tx_gain + " dB")
+                self.write_log(tc_name + " transmitted to " + self._satellite.get_name() + " from " + callsign + " in " + carrier_frequency + " Hz with a gain of " + tx_gain + " dB")
             else:
                 self.write_log("Error transmitting a " + tc_name + " telecommand!")
         else:
             if self._client_socket:
                 try:
                     self._client_socket.send(bytearray(enc_pkt))  # Send message to server
-                    self.write_log(tc_name + " transmitted to " + _SATELLITES[self.combobox_satellite.get_active()][0] + " from" + callsign + " via " + self.entry_tcp_address.get_text() + ":" + self.entry_tcp_port.get_text())
+                    self.write_log(tc_name + " transmitted to " + self._satellite.get_name() + " from " + callsign + " via " + self.entry_tcp_address.get_text() + ":" + self.entry_tcp_port.get_text())
                 except socket.error as e:
-                    error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error transmitting a" + tc_name + "telecommand!")
+                    error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error transmitting a " + tc_name + " telecommand!")
                     error_dialog.format_secondary_text(str(e))
                     error_dialog.run()
                     error_dialog.destroy()
