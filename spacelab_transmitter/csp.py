@@ -179,17 +179,34 @@ class CSP:
 
         return self.encode(CSP_PRIO_NORM, dst_adr, _CSP_PORT_CMP, _CSP_PORT_CMP, False, False, False, False, False, pl)
 
-    def encode_cmp_set_route(self, dst_adr):
+    def encode_cmp_set_route(self, dst_adr, dest_node, next_hop_mac, ifc):
         """
         Encodes a CSP CMP Set Route Request packet.
 
         :param dst_adr: Destination address (must be between 0 and 31).
         :type: int
 
+        :param dest_node: Is the destination node to set the route.
+        :type: int
+
+        :param next_hop_mac: Is the next hop MAC to set the route.
+        :type: int
+
+        :param ifc: Is the interface name to set the route.
+        :type: str
+
         :return: A list with the byte sequence of the CSP Ping Request packet.
         :rtype: list[int]
         """
+        if len(ifc) > 11:
+            raise ValueError('The interface name must have up to 11 characters!')
+
         pl = [_CSP_CMP_REQUEST, _CSP_CMP_ROUTE_SET]
+
+        pl.append(dest_node)
+        pl.append(next_hop_mac)
+
+        pl += [ord(c) for c in ifc]
 
         return self.encode(CSP_PRIO_NORM, dst_adr, _CSP_PORT_CMP, _CSP_PORT_CMP, False, False, False, False, False, pl)
 

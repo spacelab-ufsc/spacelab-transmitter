@@ -237,7 +237,7 @@ class DialogGetParameter(Gtk.Dialog):
 
     def get_param_id(self):
         return int(self.entry_param_id.get_text())
-    
+
 class DialogSetParameter(Gtk.Dialog):
     def __init__(self, parent):
         super().__init__(title="Set Parameter", transient_for=parent, flags=0)
@@ -666,6 +666,60 @@ class DialogCSPIFStat(Gtk.Dialog):
         self.show_all()
 
     def get_csp_if_name(self):
+        return self.entry_if_name.get_text()
+
+class DialogCSPRouteSet(Gtk.Dialog):
+    def __init__(self, parent):
+        super().__init__(title="CSP Route Set", transient_for=parent, flags=0)
+
+        self.add_buttons(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK)
+
+        label = Gtk.Label(label="Destination Node:")
+        label.set_halign(Gtk.Align.START)
+        self.entry_dest_node = Gtk.Entry()
+
+        label2 = Gtk.Label(label="Nest hop MAC:")
+        label2.set_halign(Gtk.Align.START)
+        self.entry_next_hop_mac = Gtk.Entry()
+
+        label3 = Gtk.Label(label="Interface:")
+        label3.set_halign(Gtk.Align.START)
+        self.entry_if_name = Gtk.Entry()
+        self.entry_if_name.set_max_length(11)
+
+        grid = Gtk.Grid()
+        grid.set_row_spacing(5)
+        grid.set_column_spacing(10)
+        grid.set_margin_start(10)
+        grid.set_margin_end(10)
+        grid.set_margin_top(5)
+        grid.set_margin_bottom(5)
+
+        grid.add(label)
+        grid.attach(label2, 0, 1, 1, 1)
+        grid.attach(label3, 0, 2, 1, 1)
+        grid.attach(self.entry_dest_node, 1, 0, 1, 1)
+        grid.attach(self.entry_next_hop_mac, 1, 1, 1, 1)
+        grid.attach(self.entry_if_name, 1, 2, 1, 1)
+
+        box_content = self.get_content_area()
+        box_content.add(grid)
+
+        box_buttons = self.get_action_area()
+        grid.set_column_spacing(10)
+        box_buttons.set_margin_start(10)
+        box_buttons.set_margin_end(10)
+        box_buttons.set_margin_bottom(5)
+
+        self.show_all()
+
+    def get_dest_node(self):
+        return int(self.entry_dest_node.get_text())
+
+    def get_next_hop_mac(self):
+        return int(self.entry_next_hop_mac.get_text())
+
+    def get_if_name(self):
         return self.entry_if_name.get_text()
 
 class DialogPassword(Gtk.Dialog):

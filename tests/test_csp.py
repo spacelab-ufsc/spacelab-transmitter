@@ -64,10 +64,13 @@ def test_encode_cmp_ident():
 def test_encode_cmp_set_route():
     src_adr = random.randint(0, 31)
     dst_adr = random.randint(0, 31)
+    dest_node = random.randint(0, 255)
+    next_hop_mac = random.randint(0, 255)
+    if_name = ''.join(random.choices(string.ascii_uppercase + string.ascii_lowercase + string.digits, k=random.randint(1, 11)))
 
     csp = CSP(src_adr)
 
-    pkt = csp.encode_cmp_set_route(dst_adr)
+    pkt = csp.encode_cmp_set_route(dst_adr, dest_node, next_hop_mac, if_name)
 
     assert (pkt[0] >> 6) == 2                                       # Priority
     assert ((pkt[0] >> 1) & 31) == src_adr                          # Source address
@@ -79,7 +82,11 @@ def test_encode_cmp_set_route():
     assert ((pkt[3] >> 2) & 1) == 0                                 # XTEA
     assert ((pkt[3] >> 1) & 1)== 0                                  # RDP
     assert (pkt[3] & 1) == 0                                        # CRC
-    assert pkt[4:] == [0, 2]                                        # Payload
+    assert pkt[4] == 0                                              # CMP Type
+    assert pkt[5] == 2                                              # CMP Code
+    assert pkt[6] == dest_node                                      # Destination node
+    assert pkt[7] == next_hop_mac                                   # Next hop MAC
+    assert pkt[8:] == [ord(c) for c in if_name]                     # Interface
 
 def test_encode_cmp_if_stat():
     src_adr = random.randint(0, 31)

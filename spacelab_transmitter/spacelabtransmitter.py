@@ -36,7 +36,7 @@ from gi.repository import GdkPixbuf
 
 import spacelab_transmitter.version
 
-from spacelab_transmitter.tc_dialogs import DialogDataRequest, DialogDeactivatePayload, DialogEnterHibernation, DialogActivatePayload, DialogGetPayloadData, DialogSetParameter, DialogDeactivateModule, DialogActivateModule, DialogGetParameter, DialogBroadcastMessage, DialogTransmitPacket, DialogEraseMemory, DialogUpdateTLE, DialogCSPPeek, DialogCSPPoke, DialogCSPIFStat, DialogPassword
+from spacelab_transmitter.tc_dialogs import DialogDataRequest, DialogDeactivatePayload, DialogEnterHibernation, DialogActivatePayload, DialogGetPayloadData, DialogSetParameter, DialogDeactivateModule, DialogActivateModule, DialogGetParameter, DialogBroadcastMessage, DialogTransmitPacket, DialogEraseMemory, DialogUpdateTLE, DialogCSPPeek, DialogCSPPoke, DialogCSPIFStat, DialogCSPRouteSet, DialogPassword
 
 from spacelab_transmitter.gmsk import GMSK
 from spacelab_transmitter.usrp import USRP
@@ -1151,15 +1151,36 @@ class SpaceLabTransmitter:
             error_dialog.destroy()
 
     def on_button_csp_route_set_clicked(self, button):
-        try:
-            csp = CSP(_CSP_MY_ADDRESS)
-            csp_pkt = csp.encode_cmp_set_route(1)   # 1 = Satellite (OBDH) address
-            self._transmit_tc(csp_pkt, "CSP CMP Route Set")
-        except Exception as err:
-            error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error generating the \"CSP CMP Route Set\" telecommand!")
-            error_dialog.format_secondary_text(str(err))
-            error_dialog.run()
-            error_dialog.destroy()
+        dialog = DialogCSPRouteSet(self.window)
+
+        response = dialog.run()
+        if response == Gtk.ResponseType.OK:
+            try:
+                if (dialog.get_dest_node() < 0) or (dialog.get_dest_node() > 255):
+                    raise ValueError("The destination node must be between 0 and 255!")
+
+                if (dialog.get_next_hop_mac() < 0) or (dialog.get_next_hop_mac() > 255):
+                    raise ValueError("The next hop MAC must be between 0 and 255!")
+
+                if len(dialog.get_if_name()) > 11:
+                    raise ValueError("The IF name must have up to 11 characters!")
+
+                csp = CSP(_CSP_MY_ADDRESS)
+                csp_pkt = csp.encode_cmp_set_route(1, dialog.get_dest_node(), dialog.get_next_hop_mac(), dialog.get_if_name())  # 1 = Satellite (OBDH) address
+                self._transmit_tc(csp_pkt, "CSP CMP Route Set")
+            except Exception as err:
+                error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error generating the \"CSP CMP Route Set\" telecommand!")
+                error_dialog.format_secondary_text(str(err))
+                error_dialog.run()
+                error_dialog.destroy()
+            finally:
+                dialog.destroy()
+        elif response == Gtk.ResponseType.CANCEL:
+            dialog.destroy()
+        elif response == Gtk.ResponseType.DELETE_EVENT:
+            dialog.destroy()
+        else:
+            dialog.destroy()
 
     def on_button_csp_cmp_if_stat_clicked(self, button):
         dialog = DialogCSPIFStat(self.window)
