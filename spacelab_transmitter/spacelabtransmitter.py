@@ -36,7 +36,7 @@ from gi.repository import GdkPixbuf
 
 import spacelab_transmitter.version
 
-from spacelab_transmitter.tc_dialogs import DialogDataRequest, DialogDeactivatePayload, DialogEnterHibernation, DialogActivatePayload, DialogGetPayloadData, DialogSetParameter, DialogDeactivateModule, DialogActivateModule, DialogGetParameter, DialogBroadcastMessage, DialogTransmitPacket, DialogEraseMemory, DialogUpdateTLE, DialogCSPPeek, DialogCSPPoke, DialogPassword
+from spacelab_transmitter.tc_dialogs import DialogDataRequest, DialogDeactivatePayload, DialogEnterHibernation, DialogActivatePayload, DialogGetPayloadData, DialogSetParameter, DialogDeactivateModule, DialogActivateModule, DialogGetParameter, DialogBroadcastMessage, DialogTransmitPacket, DialogEraseMemory, DialogUpdateTLE, DialogCSPPeek, DialogCSPPoke, DialogCSPIFStat, DialogPassword
 
 from spacelab_transmitter.gmsk import GMSK
 from spacelab_transmitter.usrp import USRP
@@ -356,8 +356,10 @@ class SpaceLabTransmitter:
         self.button_csp_cmp_peek.connect("clicked", self.on_button_csp_cmp_peek_clicked)
         self.button_csp_cmp_poke = self.builder.get_object("button_csp_cmp_poke")
         self.button_csp_cmp_poke.connect("clicked", self.on_button_csp_cmp_poke_clicked)
-        self.button_csp_cmp_clock = self.builder.get_object("button_csp_cmp_clock")
-        self.button_csp_cmp_clock.connect("clicked", self.on_button_csp_cmp_clock_clicked)
+        self.button_csp_cmp_set_clock = self.builder.get_object("button_csp_cmp_set_clock")
+        self.button_csp_cmp_set_clock.connect("clicked", self.on_button_csp_cmp_set_clock_clicked)
+        self.button_csp_cmp_get_clock = self.builder.get_object("button_csp_cmp_get_clock")
+        self.button_csp_cmp_get_clock.connect("clicked", self.on_button_csp_cmp_get_clock_clicked)
         self.button_csp_reboot = self.builder.get_object("button_csp_reboot")
         self.button_csp_reboot.connect("clicked", self.on_button_csp_reboot_clicked)
         self.button_csp_shutdown = self.builder.get_object("button_csp_shutdown")
@@ -1160,15 +1162,30 @@ class SpaceLabTransmitter:
             error_dialog.destroy()
 
     def on_button_csp_cmp_if_stat_clicked(self, button):
-        try:
-            csp = CSP(_CSP_MY_ADDRESS)
-            csp_pkt = csp.encode_cmp_if_stat(1) # 1 = Satellite (OBDH) address
-            self._transmit_tc(csp_pkt, "CSP CMP IF Stat")
-        except Exception as err:
-            error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error generating the \"CSP CMP IF Stat\" telecommand!")
-            error_dialog.format_secondary_text(str(err))
-            error_dialog.run()
-            error_dialog.destroy()
+        dialog = DialogCSPIFStat(self.window)
+
+        response = dialog.run()
+        if response == Gtk.ResponseType.OK:
+            try:
+                if len(dialog.get_csp_if_name()) > 11:
+                    raise ValueError("The IF name must have up to 11 characters!")
+
+                csp = CSP(_CSP_MY_ADDRESS)
+                csp_pkt = csp.encode_cmp_if_stat(1, dialog.get_csp_if_name()) # 1 = Satellite (OBDH) address
+                self._transmit_tc(csp_pkt, "CSP CMP IF Status")
+            except Exception as err:
+                error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error generating the \"CSP CMP IF Stat\" telecommand!")
+                error_dialog.format_secondary_text(str(err))
+                error_dialog.run()
+                error_dialog.destroy()
+            finally:
+                dialog.destroy()
+        elif response == Gtk.ResponseType.CANCEL:
+            dialog.destroy()
+        elif response == Gtk.ResponseType.DELETE_EVENT:
+            dialog.destroy()
+        else:
+            dialog.destroy()
 
     def on_button_csp_cmp_peek_clicked(self, button):
         dialog = DialogCSPPeek(self.window)
@@ -1228,7 +1245,18 @@ class SpaceLabTransmitter:
         else:
             dialog.destroy()
 
-    def on_button_csp_cmp_clock_clicked(self, button):
+    def on_button_csp_cmp_set_clock_clicked(self, button):
+        try:
+            csp = CSP(_CSP_MY_ADDRESS)
+            csp_pkt = csp.encode_cmp_set_clock(1, int(time.time()), 0)  # 1 = Satellite (OBDH) address
+            self._transmit_tc(csp_pkt, "CSP CMP Set Clock")
+        except Exception as err:
+            error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error generating the \"CSP CMP Set Clock\" telecommand!")
+            error_dialog.format_secondary_text(str(err))
+            error_dialog.run()
+            error_dialog.destroy()
+
+    def on_button_csp_cmp_get_clock_clicked(self, button):
         try:
             csp = CSP(_CSP_MY_ADDRESS)
             csp_pkt = csp.encode_cmp_get_clock(1)   # 1 = Satellite (OBDH) address
@@ -1467,7 +1495,8 @@ class SpaceLabTransmitter:
         self.button_csp_cmp_if_stat.set_sensitive(False)
         self.button_csp_cmp_peek.set_sensitive(False)
         self.button_csp_cmp_poke.set_sensitive(False)
-        self.button_csp_cmp_clock.set_sensitive(False)
+        self.button_csp_cmp_set_clock.set_sensitive(False)
+        self.button_csp_cmp_get_clock.set_sensitive(False)
         self.button_csp_reboot.set_sensitive(False)
         self.button_csp_shutdown.set_sensitive(False)
 
@@ -1502,7 +1531,8 @@ class SpaceLabTransmitter:
             self.button_csp_cmp_if_stat.set_sensitive(state)
             self.button_csp_cmp_peek.set_sensitive(state)
             self.button_csp_cmp_poke.set_sensitive(state)
-            self.button_csp_cmp_clock.set_sensitive(state)
+            self.button_csp_cmp_set_clock.set_sensitive(state)
+            self.button_csp_cmp_get_clock.set_sensitive(state)
             self.button_csp_reboot.set_sensitive(state)
             self.button_csp_shutdown.set_sensitive(state)
 

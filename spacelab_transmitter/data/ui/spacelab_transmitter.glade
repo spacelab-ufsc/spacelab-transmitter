@@ -1225,8 +1225,8 @@ Gabriel Mariano Marcelino - PU5GMA &lt;gabriel.mm8@gmail.com&gt;</property>
               </packing>
             </child>
             <child>
-              <object class="GtkButton" id="button_csp_cmp_clock">
-                <property name="label" translatable="yes">CMP Clock</property>
+              <object class="GtkButton" id="button_csp_cmp_set_clock">
+                <property name="label" translatable="yes">Set Clock</property>
                 <property name="visible">True</property>
                 <property name="sensitive">False</property>
                 <property name="can-focus">True</property>
@@ -1234,19 +1234,6 @@ Gabriel Mariano Marcelino - PU5GMA &lt;gabriel.mm8@gmail.com&gt;</property>
               </object>
               <packing>
                 <property name="left-attach">2</property>
-                <property name="top-attach">2</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkButton" id="button_csp_reboot">
-                <property name="label" translatable="yes">Reboot</property>
-                <property name="visible">True</property>
-                <property name="sensitive">False</property>
-                <property name="can-focus">True</property>
-                <property name="receives-default">True</property>
-              </object>
-              <packing>
-                <property name="left-attach">3</property>
                 <property name="top-attach">2</property>
               </packing>
             </child>
@@ -1259,12 +1246,35 @@ Gabriel Mariano Marcelino - PU5GMA &lt;gabriel.mm8@gmail.com&gt;</property>
                 <property name="receives-default">True</property>
               </object>
               <packing>
+                <property name="left-attach">1</property>
+                <property name="top-attach">3</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkButton" id="button_csp_reboot">
+                <property name="label" translatable="yes">Reboot</property>
+                <property name="visible">True</property>
+                <property name="sensitive">False</property>
+                <property name="can-focus">True</property>
+                <property name="receives-default">True</property>
+              </object>
+              <packing>
                 <property name="left-attach">0</property>
                 <property name="top-attach">3</property>
               </packing>
             </child>
             <child>
-              <placeholder/>
+              <object class="GtkButton" id="button_csp_cmp_get_clock">
+                <property name="label" translatable="yes">Get Clock</property>
+                <property name="visible">True</property>
+                <property name="sensitive">False</property>
+                <property name="can-focus">True</property>
+                <property name="receives-default">True</property>
+              </object>
+              <packing>
+                <property name="left-attach">3</property>
+                <property name="top-attach">2</property>
+              </packing>
             </child>
             <child>
               <placeholder/>
