@@ -1225,11 +1225,11 @@ class SpaceLabTransmitter:
                 if dialog.get_csp_mem_adr() < 0 or dialog.get_csp_mem_adr() > 2**32-1:
                     raise ValueError("The memory address must be between 0 and 4294967295!")
 
-                if dialog.get_csp_mem_len() < 0 or dialog.get_csp_mem_len() > 2**32-1:
-                    raise ValueError("The memory length must be between 0 and 4294967295!")
+                if len(dialog.get_csp_mem_data()) > 200:
+                    raise ValueError("The memory length must be between 0 and 200!")
 
                 csp = CSP(_CSP_MY_ADDRESS)
-                csp_pkt = csp.encode_cmp_poke(1, dialog.get_csp_mem_adr(), dialog.get_csp_mem_len()) # 1 = Satellite (OBDH) address
+                csp_pkt = csp.encode_cmp_poke(1, dialog.get_csp_mem_adr(), dialog.get_csp_mem_data()) # 1 = Satellite (OBDH) address
                 self._transmit_tc(csp_pkt, "CSP Poke")
             except ValueError as err:
                 error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error generating the \"CSP Poke\" telecommand!")

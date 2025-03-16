@@ -598,9 +598,9 @@ class DialogCSPPoke(Gtk.Dialog):
         label.set_halign(Gtk.Align.START)
         self.entry_mem_adr = Gtk.Entry()
 
-        label2 = Gtk.Label(label="Length [bytes]:")
+        label2 = Gtk.Label(label="Data:")
         label2.set_halign(Gtk.Align.START)
-        self.entry_mem_len = Gtk.Entry()
+        self.entry_mem_data = Gtk.Entry()
 
         grid = Gtk.Grid()
         grid.set_row_spacing(5)
@@ -613,7 +613,7 @@ class DialogCSPPoke(Gtk.Dialog):
         grid.add(label)
         grid.attach(self.entry_mem_adr, 1, 0, 1, 1)
         grid.attach(label2, 0, 1, 1, 1)
-        grid.attach(self.entry_mem_len, 1, 1, 1, 1)
+        grid.attach(self.entry_mem_data, 1, 1, 1, 1)
 
         box_content = self.get_content_area()
         box_content.add(grid)
@@ -629,8 +629,8 @@ class DialogCSPPoke(Gtk.Dialog):
     def get_csp_mem_adr(self):
         return int(self.entry_mem_adr.get_text())
 
-    def get_csp_mem_len(self):
-        return int(self.entry_mem_len.get_text())
+    def get_csp_mem_data(self):
+        return eval(self.entry_mem_data.get_text())
 
 class DialogCSPIFStat(Gtk.Dialog):
     def __init__(self, parent):
