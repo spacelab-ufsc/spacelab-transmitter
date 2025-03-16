@@ -639,6 +639,7 @@ class DialogPassword(Gtk.Dialog):
 
         label = Gtk.Label(label="Key:")
         self.entry_password = Gtk.Entry()
+        self.entry_password.set_visibility(False)
 
         grid = Gtk.Grid()
         grid.set_column_spacing(10)
