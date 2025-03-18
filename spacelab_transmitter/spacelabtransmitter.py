@@ -46,6 +46,7 @@ from spacelab_transmitter.ax100 import AX100Mode5
 from spacelab_transmitter.satellite import Satellite
 from spacelab_transmitter.link import Link
 from spacelab_transmitter.slp import SLP
+from spacelab_transmitter.dopplershift import DopplerShift
 
 from pyngham import PyNGHam
 
@@ -68,6 +69,9 @@ _SAT_JSON_SYSTEM_PATH           = '/usr/share/spacelab_decoder/'
 _DEFAULT_CALLSIGN               = 'PP5UF'
 _DEFAULT_LOCATION               = 'Florianópolis'
 _DEFAULT_COUNTRY                = 'Brazil'
+_DEFAULT_LATITUDE               = '-27.600719'
+_DEFAULT_LONGITUDE              = '-48.517392'
+_DEFAULT_ALTITUDE               = '15'
 _DEFAULT_DOPPLER_ADDRESS        = '127.0.0.1'
 _DEFAULT_DOPPLER_PORT           = 7356
 _DEFAULT_FREQUENCY              = 437000000
@@ -254,6 +258,9 @@ class SpaceLabTransmitter:
         self.entry_preferences_general_callsign = self.builder.get_object("entry_preferences_general_callsign")
         self.entry_preferences_general_location = self.builder.get_object("entry_preferences_general_location")
         self.entry_preferences_general_country = self.builder.get_object("entry_preferences_general_country")
+        self.entry_preferences_general_latitude = self.builder.get_object("entry_preferences_general_latitude")
+        self.entry_preferences_general_longitude = self.builder.get_object("entry_preferences_general_longitude")
+        self.entry_preferences_general_altitude = self.builder.get_object("entry_preferences_general_altitude")
 
         self.radiobutton_doppler_tle_file = self.builder.get_object("radiobutton_doppler_tle_file")
         self.filechooser_doppler_tle_file = self.builder.get_object("filechooser_doppler_tle_file")
@@ -1363,8 +1370,27 @@ class SpaceLabTransmitter:
 
                 return
 
-            if sdr.transmit(samples, duration_s, sample_rate, int(carrier_frequency)):
-                self.write_log(tc_name + " transmitted to " + self._satellite.get_name() + " from " + callsign + " in " + carrier_frequency + " Hz with a gain of " + tx_gain + " dB")
+            if self.switch_doppler.get_active():
+                if self.radiobutton_doppler_tle_file.get_active():
+                    doppler = DopplerShift("up")
+
+                    lat = float(self.entry_preferences_general_latitude.get_text())
+                    lon = float(self.entry_preferences_general_longitude.get_text())
+                    alt = int(self.entry_preferences_general_altitude.get_text())
+
+                    tle_file = self.filechooser_doppler_tle_file.get_filename()
+
+                    if tle_file != "":
+                        doppler.set_tle_from_file(tle_file)
+                        doppler.set_observer_position(lat, lon, alt)
+                        doppler.set_frequency(int(carrier_frequency))
+
+                        carrier_frequency = doppler.get_shifted_frequency()
+                    else:
+                        raise RuntimeError("No TLE file provided!")
+
+            if sdr.transmit(samples, duration_s, sample_rate, carrier_frequency):
+                self.write_log(tc_name + " transmitted to " + self._satellite.get_name() + " from " + callsign + " in " + str(carrier_frequency) + " Hz with a gain of " + tx_gain + " dB")
             else:
                 self.write_log("Error transmitting a " + tc_name + " telecommand!")
         else:
@@ -1412,6 +1438,9 @@ class SpaceLabTransmitter:
             self.entry_preferences_general_callsign.set_text(config["callsign"])
             self.entry_preferences_general_location.set_text(config["location"])
             self.entry_preferences_general_country.set_text(config["country"])
+            self.entry_preferences_general_latitude.set_text(config["latitude"])
+            self.entry_preferences_general_longitude.set_text(config["longitude"])
+            self.entry_preferences_general_altitude.set_text(config["altitude"])
             if config["doppler_from_network"]:
                 self.radiobutton_doppler_network.set_active(True)
             else:
@@ -1431,6 +1460,9 @@ class SpaceLabTransmitter:
         self.entry_preferences_general_callsign.set_text(_DEFAULT_CALLSIGN)
         self.entry_preferences_general_location.set_text(_DEFAULT_LOCATION)
         self.entry_preferences_general_country.set_text(_DEFAULT_COUNTRY)
+        self.entry_preferences_general_latitude.set_text(_DEFAULT_LATITUDE)
+        self.entry_preferences_general_longitude.set_text(_DEFAULT_LONGITUDE)
+        self.entry_preferences_general_altitude.set_text(_DEFAULT_ALTITUDE)
 
         self.filechooser_doppler_tle_file.set_filename("")
         self.radiobutton_doppler_network.set_active(True)
@@ -1454,6 +1486,9 @@ class SpaceLabTransmitter:
             json.dump({"callsign": self.entry_preferences_general_callsign.get_text(),
                        "location": self.entry_preferences_general_location.get_text(),
                        "country": self.entry_preferences_general_country.get_text(),
+                       "latitude": self.entry_preferences_general_latitude.get_text(),
+                       "longitude": self.entry_preferences_general_longitude.get_text(),
+                       "altitude": self.entry_preferences_general_altitude.get_text(),
                        "doppler_from_network": self.radiobutton_doppler_network.get_active(),
                        "tle_file": self.filechooser_doppler_tle_file.get_filename(),
                        "doppler_address": self.entry_doppler_address.get_text(),
