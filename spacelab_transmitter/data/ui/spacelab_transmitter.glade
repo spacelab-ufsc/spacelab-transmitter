@@ -350,7 +350,7 @@ Author: Vitória Beatriz Bianchin <vitoriabbianchin@gmail.com>
                         <property name="can-focus">False</property>
                         <property name="left-padding">12</property>
                         <child>
-                          <!-- n-columns=2 n-rows=4 -->
+                          <!-- n-columns=2 n-rows=5 -->
                           <object class="GtkGrid">
                             <property name="width-request">-1</property>
                             <property name="height-request">-1</property>
@@ -364,49 +364,6 @@ Author: Vitória Beatriz Bianchin <vitoriabbianchin@gmail.com>
                             <property name="row-spacing">5</property>
                             <property name="column-spacing">5</property>
                             <child>
-                              <object class="GtkLabel" id="label_gain">
-                                <property name="width-request">-1</property>
-                                <property name="height-request">-1</property>
-                                <property name="visible">True</property>
-                                <property name="can-focus">False</property>
-                                <property name="tooltip-markup" translatable="yes">Gain must be between 0 and 100</property>
-                                <property name="halign">start</property>
-                                <property name="label" translatable="yes">Gain [dB]</property>
-                              </object>
-                              <packing>
-                                <property name="left-attach">0</property>
-                                <property name="top-attach">3</property>
-                              </packing>
-                            </child>
-                            <child>
-                              <object class="GtkSpinButton" id="spinbutton_tx_gain">
-                                <property name="name">spinbutton_tx_gain</property>
-                                <property name="visible">True</property>
-                                <property name="can-focus">False</property>
-                                <property name="max-length">100</property>
-                                <property name="input-purpose">number</property>
-                                <property name="adjustment">gain_adjustment</property>
-                                <property name="value">40</property>
-                              </object>
-                              <packing>
-                                <property name="left-attach">1</property>
-                                <property name="top-attach">3</property>
-                              </packing>
-                            </child>
-                            <child>
-                              <object class="GtkLabel" id="label_samps">
-                                <property name="width-request">-1</property>
-                                <property name="height-request">-1</property>
-                                <property name="visible">True</property>
-                                <property name="can-focus">False</property>
-                                <property name="label" translatable="yes">Samp. [S/s]</property>
-                              </object>
-                              <packing>
-                                <property name="left-attach">0</property>
-                                <property name="top-attach">2</property>
-                              </packing>
-                            </child>
-                            <child>
                               <object class="GtkLabel" id="label_freq">
                                 <property name="width-request">-1</property>
                                 <property name="height-request">-1</property>
@@ -418,18 +375,6 @@ Author: Vitória Beatriz Bianchin <vitoriabbianchin@gmail.com>
                               <packing>
                                 <property name="left-attach">0</property>
                                 <property name="top-attach">1</property>
-                              </packing>
-                            </child>
-                            <child>
-                              <object class="GtkEntry" id="entry_sample_rate">
-                                <property name="visible">True</property>
-                                <property name="can-focus">True</property>
-                                <property name="text" translatable="yes">1000000</property>
-                                <property name="primary-icon-tooltip-text" translatable="yes">1000000</property>
-                              </object>
-                              <packing>
-                                <property name="left-attach">1</property>
-                                <property name="top-attach">2</property>
                               </packing>
                             </child>
                             <child>
@@ -465,6 +410,85 @@ Author: Vitória Beatriz Bianchin <vitoriabbianchin@gmail.com>
                               <packing>
                                 <property name="left-attach">1</property>
                                 <property name="top-attach">0</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <object class="GtkLabel" id="label_gain">
+                                <property name="width-request">-1</property>
+                                <property name="height-request">-1</property>
+                                <property name="visible">True</property>
+                                <property name="can-focus">False</property>
+                                <property name="tooltip-markup" translatable="yes">Gain must be between 0 and 100</property>
+                                <property name="halign">start</property>
+                                <property name="label" translatable="yes">Gain [dB]</property>
+                              </object>
+                              <packing>
+                                <property name="left-attach">0</property>
+                                <property name="top-attach">4</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <object class="GtkSpinButton" id="spinbutton_tx_gain">
+                                <property name="name">spinbutton_tx_gain</property>
+                                <property name="visible">True</property>
+                                <property name="can-focus">False</property>
+                                <property name="max-length">100</property>
+                                <property name="input-purpose">number</property>
+                                <property name="adjustment">gain_adjustment</property>
+                                <property name="value">40</property>
+                              </object>
+                              <packing>
+                                <property name="left-attach">1</property>
+                                <property name="top-attach">4</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <object class="GtkLabel" id="label_samps">
+                                <property name="width-request">-1</property>
+                                <property name="height-request">-1</property>
+                                <property name="visible">True</property>
+                                <property name="can-focus">False</property>
+                                <property name="label" translatable="yes">Samp. [S/s]</property>
+                              </object>
+                              <packing>
+                                <property name="left-attach">0</property>
+                                <property name="top-attach">3</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <object class="GtkEntry" id="entry_sample_rate">
+                                <property name="visible">True</property>
+                                <property name="can-focus">True</property>
+                                <property name="text" translatable="yes">1000000</property>
+                                <property name="primary-icon-tooltip-text" translatable="yes">1000000</property>
+                              </object>
+                              <packing>
+                                <property name="left-attach">1</property>
+                                <property name="top-attach">3</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <object class="GtkLabel">
+                                <property name="visible">True</property>
+                                <property name="can-focus">False</property>
+                                <property name="halign">start</property>
+                                <property name="label" translatable="yes">Offset [Hz]:</property>
+                              </object>
+                              <packing>
+                                <property name="left-attach">0</property>
+                                <property name="top-attach">2</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <object class="GtkEntry" id="entry_sdr_freq_offset">
+                                <property name="visible">True</property>
+                                <property name="can-focus">True</property>
+                                <property name="hexpand">True</property>
+                                <property name="text" translatable="yes">0</property>
+                              </object>
+                              <packing>
+                                <property name="left-attach">1</property>
+                                <property name="top-attach">2</property>
                               </packing>
                             </child>
                           </object>

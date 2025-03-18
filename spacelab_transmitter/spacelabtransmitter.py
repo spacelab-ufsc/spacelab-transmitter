@@ -75,6 +75,7 @@ _DEFAULT_ALTITUDE               = '15'
 _DEFAULT_DOPPLER_ADDRESS        = '127.0.0.1'
 _DEFAULT_DOPPLER_PORT           = 7356
 _DEFAULT_FREQUENCY              = 437000000
+_DEFAULT_FREQ_OFFSET            = 0
 _DEFAULT_SAMPLE_RATE            = 1000000
 _DEFAULT_GAIN_USRP              = 40
 _DEFAULT_GAIN_PLUTO             = -30
@@ -215,6 +216,7 @@ class SpaceLabTransmitter:
         self.combobox_sdr.add_attribute(cell, "text", 0)
         self.combobox_sdr.connect("changed", self.on_combobox_sdr_changed)
         self.entry_carrier_frequency = self.builder.get_object("entry_carrier_frequency")
+        self.entry_sdr_freq_offset = self.builder.get_object("entry_sdr_freq_offset")
         self.entry_sample_rate = self.builder.get_object("entry_sample_rate")
         self.spinbutton_tx_gain = self.builder.get_object("spinbutton_tx_gain")
 
@@ -1318,7 +1320,7 @@ class SpaceLabTransmitter:
             error_dialog.destroy()
 
     def _transmit_tc(self, pkt, tc_name):
-        carrier_frequency = self.entry_carrier_frequency.get_text()
+        carrier_frequency = int(self.entry_carrier_frequency.get_text())
         tx_gain = self.spinbutton_tx_gain.get_text()
         callsign = self.entry_preferences_general_callsign.get_text()
 
@@ -1383,12 +1385,13 @@ class SpaceLabTransmitter:
                     if tle_file != "":
                         doppler.set_tle_from_file(tle_file)
                         doppler.set_observer_position(lat, lon, alt)
-                        doppler.set_frequency(int(carrier_frequency))
+                        doppler.set_frequency(carrier_frequency)
 
                         carrier_frequency = doppler.get_shifted_frequency()
                     else:
                         raise RuntimeError("No TLE file provided!")
 
+            carrier_frequency += int(self.entry_sdr_freq_offset.get_text())
             if sdr.transmit(samples, duration_s, sample_rate, carrier_frequency):
                 self.write_log(tc_name + " transmitted to " + self._satellite.get_name() + " from " + callsign + " in " + str(carrier_frequency) + " Hz with a gain of " + tx_gain + " dB")
             else:
@@ -1451,6 +1454,7 @@ class SpaceLabTransmitter:
             self.logfile_chooser_button.set_filename(config["logfile_path"])
             self.combobox_sdr.set_active(config["sdr_dev"])
             self.entry_carrier_frequency.set_text(config["sdr_freq"])
+            self.entry_sdr_freq_offset.set_text(config["sdr_freq_offset"])
             self.entry_sample_rate.set_text(config["sdr_sample_rate"])
         except:
             self._load_default_preferences()
@@ -1473,6 +1477,7 @@ class SpaceLabTransmitter:
 
         self.combobox_sdr.set_active(0)
         self.entry_carrier_frequency.set_text(str(_DEFAULT_FREQUENCY))
+        self.entry_sdr_freq_offset.set_text(str(_DEFAULT_FREQ_OFFSET))
         self.entry_sample_rate.set_text(str(_DEFAULT_SAMPLE_RATE))
 
     def _save_preferences(self):
@@ -1496,6 +1501,7 @@ class SpaceLabTransmitter:
                        "logfile_path": self.logfile_chooser_button.get_filename(),
                        "sdr_dev": self.combobox_sdr.get_active(),
                        "sdr_freq": self.entry_carrier_frequency.get_text(),
+                       "sdr_freq_offset": self.entry_sdr_freq_offset.get_text(),
                        "sdr_sample_rate": self.entry_sample_rate.get_text()}, f, ensure_ascii=False, indent=4)
 
     def on_toolbutton_about_clicked(self, toolbutton):

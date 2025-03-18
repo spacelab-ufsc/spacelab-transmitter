@@ -59,6 +59,7 @@ def test_ui():
     combobox_sdr                    = builder.get_object("combobox_sdr")
     liststore_sdr_devices           = builder.get_object("liststore_sdr_devices")
     entry_carrier_frequency         = builder.get_object("entry_carrier_frequency")
+    entry_sdr_freq_offset           = builder.get_object("entry_sdr_freq_offset")
     entry_sample_rate               = builder.get_object("entry_sample_rate")
     spinbutton_tx_gain              = builder.get_object("spinbutton_tx_gain")
     entry_tcp_address               = builder.get_object("entry_tcp_address")
@@ -97,6 +98,7 @@ def test_ui():
     assert combobox_sdr                     != None
     assert liststore_sdr_devices            != None
     assert entry_carrier_frequency          != None
+    assert entry_sdr_freq_offset            != None
     assert entry_sample_rate                != None
     assert spinbutton_tx_gain               != None
     assert entry_tcp_address                != None
