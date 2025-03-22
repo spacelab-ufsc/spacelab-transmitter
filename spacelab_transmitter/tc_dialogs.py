@@ -506,13 +506,19 @@ class DialogUpdateTLE(Gtk.Dialog):
 
         self.add_buttons(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK)
 
-        label = Gtk.Label(label="Line Number:")
+        label = Gtk.Label(label="TLE Line 1:")
         label.set_halign(Gtk.Align.START)
-        self.entry_tle_line_num = Gtk.Entry()
+        self.entry_tle_line_1 = Gtk.Entry()
+        self.entry_tle_line_1.set_max_length(69)
+        self.entry_tle_line_1.set_width_chars(69)
+        self.entry_tle_line_1.set_max_width_chars(69)
 
-        label2 = Gtk.Label(label="TLE Line:")
+        label2 = Gtk.Label(label="TLE Line 2:")
         label2.set_halign(Gtk.Align.START)
-        self.entry_tle_line = Gtk.Entry()
+        self.entry_tle_line_2 = Gtk.Entry()
+        self.entry_tle_line_2.set_max_length(69)
+        self.entry_tle_line_2.set_width_chars(69)
+        self.entry_tle_line_2.set_max_width_chars(69)
 
         grid = Gtk.Grid()
         grid.set_row_spacing(5)
@@ -523,9 +529,9 @@ class DialogUpdateTLE(Gtk.Dialog):
         grid.set_margin_bottom(5)
 
         grid.add(label)
-        grid.attach(self.entry_tle_line_num, 1, 0, 1, 1)
+        grid.attach(self.entry_tle_line_1, 1, 0, 1, 1)
         grid.attach(label2, 0, 1, 1, 1)
-        grid.attach(self.entry_tle_line, 1, 1, 1, 1)
+        grid.attach(self.entry_tle_line_2, 1, 1, 1, 1)
 
         box_content = self.get_content_area()
         box_content.add(grid)
@@ -538,11 +544,11 @@ class DialogUpdateTLE(Gtk.Dialog):
 
         self.show_all()
 
-    def get_tle_line_num(self):
-        return int(self.entry_tle_line_num.get_text())
+    def get_tle_line_1(self):
+        return self.entry_tle_line_1.get_text()
 
-    def get_tle_line(self):
-        return self.entry_tle_line.get_text()
+    def get_tle_line_2(self):
+        return self.entry_tle_line_2.get_text()
 
 class DialogCSPPeek(Gtk.Dialog):
     def __init__(self, parent):

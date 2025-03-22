@@ -28,6 +28,7 @@ import json
 import csv
 import socket
 import time
+import struct
 
 import gi
 gi.require_version('Gtk', '3.0')
@@ -1009,20 +1010,30 @@ class SpaceLabTransmitter:
         response = dialog.run()
         if response == Gtk.ResponseType.OK:
             try:
-                line_num = dialog.get_tle_line_num()
-                tle_line = dialog.get_tle_line()
-                if line_num < 0 or line_num > 2:
-                    raise ValueError("The TLE line number must be between 0 and 2!")
-
-                if len(tle_line) != 69:
-                    raise ValueError("The TLE line must be 69 characters long!")
+                line1 = dialog.get_tle_line_1()
+                line2 = dialog.get_tle_line_2()
+                if (len(line1) != 69) or (len(line2) != 69):
+                    raise ValueError("The TLE lines must have 69 characters!")
 
                 dialog_pw = DialogPassword(self.window)
 
                 response_key = dialog_pw.run()
                 if response_key == Gtk.ResponseType.OK:
-                    pl = [line_num]
-                    pl += [ord(i) for i in tle_line]
+                    epoch_year          = int(line1[18:20])         # Extract last two digits of the year
+                    epoch_day           = float(line1[20:32])       # Fractional day of the year
+                    eccentricity_str    = line2[26:33].lstrip("0")  # Remove leading zeros
+                    eccentricity        = int(eccentricity_str) if eccentricity_str else 0  # Convert to int
+                    mean_anomaly        = float(line2[43:51])
+                    argument_of_perigee = float(line2[34:42])
+                    bstar_drag_term     = (1.0e-5 * float(line1[53:59])) / (10 ** int(line1[60]))  # Convert scientific notation
+                    inclination         = float(line2[8:16])
+                    right_ascension     = float(line2[17:25])
+                    mean_motion         = float(line2[52:63])
+                    packed_data = struct.pack('>H d I f f f d d d',
+                        epoch_year, epoch_day, eccentricity,
+                        mean_anomaly, argument_of_perigee, bstar_drag_term,
+                        inclination, right_ascension, mean_motion)
+                    pl = list(packed_data)
                     pkt = list()
                     if self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_SLP:
                         slp = SLP()
