@@ -1758,6 +1758,110 @@ Gabriel Mariano Marcelino - PU5GMA &lt;gabriel.mm8@gmail.com&gt;</property>
               </packing>
             </child>
             <child>
+              <!-- n-columns=3 n-rows=3 -->
+              <object class="GtkGrid">
+                <property name="visible">True</property>
+                <property name="can-focus">False</property>
+                <property name="valign">start</property>
+                <property name="margin-start">10</property>
+                <property name="margin-end">10</property>
+                <property name="margin-top">5</property>
+                <property name="margin-bottom">5</property>
+                <property name="row-spacing">8</property>
+                <property name="column-spacing">5</property>
+                <child>
+                  <object class="GtkLabel">
+                    <property name="visible">True</property>
+                    <property name="can-focus">False</property>
+                    <property name="halign">start</property>
+                    <property name="label" translatable="yes">My address:</property>
+                  </object>
+                  <packing>
+                    <property name="left-attach">1</property>
+                    <property name="top-attach">1</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkEntry" id="entry_preferences_protocols_csp_dst_adr">
+                    <property name="visible">True</property>
+                    <property name="can-focus">True</property>
+                    <property name="halign">end</property>
+                    <property name="hexpand">True</property>
+                    <property name="max-length">2</property>
+                    <property name="text" translatable="yes">1</property>
+                    <property name="input-purpose">number</property>
+                  </object>
+                  <packing>
+                    <property name="left-attach">2</property>
+                    <property name="top-attach">2</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkEntry" id="entry_preferences_protocols_csp_my_adr">
+                    <property name="visible">True</property>
+                    <property name="can-focus">True</property>
+                    <property name="halign">end</property>
+                    <property name="hexpand">True</property>
+                    <property name="max-length">2</property>
+                    <property name="text" translatable="yes">10</property>
+                    <property name="input-purpose">number</property>
+                  </object>
+                  <packing>
+                    <property name="left-attach">2</property>
+                    <property name="top-attach">1</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkLabel">
+                    <property name="visible">True</property>
+                    <property name="can-focus">False</property>
+                    <property name="halign">start</property>
+                    <property name="label" translatable="yes">Destination address:</property>
+                  </object>
+                  <packing>
+                    <property name="left-attach">1</property>
+                    <property name="top-attach">2</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkLabel">
+                    <property name="visible">True</property>
+                    <property name="can-focus">False</property>
+                    <property name="halign">start</property>
+                    <property name="label" translatable="yes">CSP</property>
+                    <attributes>
+                      <attribute name="weight" value="heavy"/>
+                    </attributes>
+                  </object>
+                  <packing>
+                    <property name="left-attach">0</property>
+                    <property name="top-attach">0</property>
+                    <property name="width">3</property>
+                  </packing>
+                </child>
+                <child>
+                  <placeholder/>
+                </child>
+                <child>
+                  <placeholder/>
+                </child>
+              </object>
+              <packing>
+                <property name="position">2</property>
+              </packing>
+            </child>
+            <child type="tab">
+              <object class="GtkLabel">
+                <property name="visible">True</property>
+                <property name="can-focus">False</property>
+                <property name="label" translatable="yes">Protocols</property>
+              </object>
+              <packing>
+                <property name="position">2</property>
+                <property name="tab-fill">False</property>
+              </packing>
+            </child>
+            <child>
               <placeholder/>
             </child>
             <child type="tab">
@@ -1824,7 +1928,7 @@ Gabriel Mariano Marcelino - PU5GMA &lt;gabriel.mm8@gmail.com&gt;</property>
                 </child>
               </object>
               <packing>
-                <property name="position">3</property>
+                <property name="position">4</property>
               </packing>
             </child>
             <child type="tab">
@@ -1835,7 +1939,7 @@ Gabriel Mariano Marcelino - PU5GMA &lt;gabriel.mm8@gmail.com&gt;</property>
                 <property name="label" translatable="yes">Logfile</property>
               </object>
               <packing>
-                <property name="position">3</property>
+                <property name="position">4</property>
                 <property name="tab-fill">False</property>
               </packing>
             </child>

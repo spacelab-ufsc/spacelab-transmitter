@@ -72,6 +72,8 @@ _DEFAULT_COUNTRY                = 'Brazil'
 _DEFAULT_LATITUDE               = '-27.600719'
 _DEFAULT_LONGITUDE              = '-48.517392'
 _DEFAULT_ALTITUDE               = '15'
+_DEFAULT_CSP_MY_ADDRESS         = 10
+_DEFAULT_CSP_DST_ADDRESS        = 1
 _DEFAULT_DOPPLER_ADDRESS        = '127.0.0.1'
 _DEFAULT_DOPPLER_PORT           = 7356
 _DEFAULT_FREQUENCY              = 437000000
@@ -111,8 +113,6 @@ _TELECOMMANDS                   = ["ping", "data_request", "broadcast_msg", "ent
 
 # SDRs
 _SDR_MODELS                     = ['USRP', 'Pluto SDR']
-
-_CSP_MY_ADDRESS                 = 10
 
 # SLP IDs
 SLP_ID_PING                     = 0x40
@@ -263,6 +263,9 @@ class SpaceLabTransmitter:
         self.entry_preferences_general_latitude = self.builder.get_object("entry_preferences_general_latitude")
         self.entry_preferences_general_longitude = self.builder.get_object("entry_preferences_general_longitude")
         self.entry_preferences_general_altitude = self.builder.get_object("entry_preferences_general_altitude")
+
+        self.entry_preferences_protocols_csp_my_adr = self.builder.get_object("entry_preferences_protocols_csp_my_adr")
+        self.entry_preferences_protocols_csp_dst_adr = self.builder.get_object("entry_preferences_protocols_csp_dst_adr")
 
         self.radiobutton_doppler_tle_file = self.builder.get_object("radiobutton_doppler_tle_file")
         self.filechooser_doppler_tle_file = self.builder.get_object("filechooser_doppler_tle_file")
@@ -1095,8 +1098,8 @@ class SpaceLabTransmitter:
 
     def on_button_csp_ping_clicked(self, button):
         try:
-            csp = CSP(_CSP_MY_ADDRESS)
-            csp_pkt = csp.encode_ping(1)    # 1 = Satellite (OBDH) address
+            csp = CSP(int(self.entry_preferences_protocols_csp_my_adr.get_text()))
+            csp_pkt = csp.encode_ping(int(self.entry_preferences_protocols_csp_dst_adr.get_text()))
             self._transmit_tc(csp_pkt, "CSP Ping")
         except Exception as err:
             error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error generating the \"CSP Ping\" telecommand!")
@@ -1106,8 +1109,8 @@ class SpaceLabTransmitter:
 
     def on_button_csp_ps_clicked(self, button):
         try:
-            csp = CSP(_CSP_MY_ADDRESS)
-            csp_pkt = csp.encode_ps(1)  # 1 = Satellite (OBDH) address
+            csp = CSP(int(self.entry_preferences_protocols_csp_my_adr.get_text()))
+            csp_pkt = csp.encode_ps(int(self.entry_preferences_protocols_csp_dst_adr.get_text()))
             self._transmit_tc(csp_pkt, "CSP PS")
         except Exception as err:
             error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error generating the \"CSP PS\" telecommand!")
@@ -1117,8 +1120,8 @@ class SpaceLabTransmitter:
 
     def on_button_csp_memfree_clicked(self, button):
         try:
-            csp = CSP(_CSP_MY_ADDRESS)
-            csp_pkt = csp.encode_memfree(1) # 1 = Satellite (OBDH) address
+            csp = CSP(int(self.entry_preferences_protocols_csp_my_adr.get_text()))
+            csp_pkt = csp.encode_memfree(int(self.entry_preferences_protocols_csp_dst_adr.get_text()))
             self._transmit_tc(csp_pkt, "CSP Mem. Free")
         except Exception as err:
             error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error generating the \"CSP Mem. Free\" telecommand!")
@@ -1128,8 +1131,8 @@ class SpaceLabTransmitter:
 
     def on_button_csp_bufferfree_clicked(self, button):
         try:
-            csp = CSP(_CSP_MY_ADDRESS)
-            csp_pkt = csp.encode_buf_free(1)    # 1 = Satellite (OBDH) address
+            csp = CSP(int(self.entry_preferences_protocols_csp_my_adr.get_text()))
+            csp_pkt = csp.encode_buf_free(int(self.entry_preferences_protocols_csp_dst_adr.get_text()))
             self._transmit_tc(csp_pkt, "CSP Buffer Free")
         except Exception as err:
             error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error generating the \"CSP Buffer Free\" telecommand!")
@@ -1139,8 +1142,8 @@ class SpaceLabTransmitter:
 
     def on_button_csp_uptime_clicked(self, button):
         try:
-            csp = CSP(_CSP_MY_ADDRESS)
-            csp_pkt = csp.encode_uptime(1)  # 1 = Satellite (OBDH) address
+            csp = CSP(int(self.entry_preferences_protocols_csp_my_adr.get_text()))
+            csp_pkt = csp.encode_uptime(int(self.entry_preferences_protocols_csp_dst_adr.get_text()))
             self._transmit_tc(csp_pkt, "CSP Uptime")
         except Exception as err:
             error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error generating the \"CSP Uptime\" telecommand!")
@@ -1150,8 +1153,8 @@ class SpaceLabTransmitter:
 
     def on_button_csp_cmp_ident_clicked(self, button):
         try:
-            csp = CSP(_CSP_MY_ADDRESS)
-            csp_pkt = csp.encode_cmp_ident(1)   # 1 = Satellite (OBDH) address
+            csp = CSP(int(self.entry_preferences_protocols_csp_my_adr.get_text()))
+            csp_pkt = csp.encode_cmp_ident(int(self.entry_preferences_protocols_csp_dst_adr.get_text()))
             self._transmit_tc(csp_pkt, "CSP CMP Ident")
         except Exception as err:
             error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error generating the \"CSP CMP Ident\" telecommand!")
@@ -1174,8 +1177,8 @@ class SpaceLabTransmitter:
                 if len(dialog.get_if_name()) > 11:
                     raise ValueError("The IF name must have up to 11 characters!")
 
-                csp = CSP(_CSP_MY_ADDRESS)
-                csp_pkt = csp.encode_cmp_set_route(1, dialog.get_dest_node(), dialog.get_next_hop_mac(), dialog.get_if_name())  # 1 = Satellite (OBDH) address
+                csp = CSP(int(self.entry_preferences_protocols_csp_my_adr.get_text()))
+                csp_pkt = csp.encode_cmp_set_route(int(self.entry_preferences_protocols_csp_dst_adr.get_text()), dialog.get_dest_node(), dialog.get_next_hop_mac(), dialog.get_if_name())
                 self._transmit_tc(csp_pkt, "CSP CMP Route Set")
             except Exception as err:
                 error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error generating the \"CSP CMP Route Set\" telecommand!")
@@ -1200,8 +1203,8 @@ class SpaceLabTransmitter:
                 if len(dialog.get_csp_if_name()) > 11:
                     raise ValueError("The IF name must have up to 11 characters!")
 
-                csp = CSP(_CSP_MY_ADDRESS)
-                csp_pkt = csp.encode_cmp_if_stat(1, dialog.get_csp_if_name()) # 1 = Satellite (OBDH) address
+                csp = CSP(int(self.entry_preferences_protocols_csp_my_adr.get_text()))
+                csp_pkt = csp.encode_cmp_if_stat(int(self.entry_preferences_protocols_csp_dst_adr.get_text()), dialog.get_csp_if_name())
                 self._transmit_tc(csp_pkt, "CSP CMP IF Status")
             except Exception as err:
                 error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error generating the \"CSP CMP IF Stat\" telecommand!")
@@ -1229,8 +1232,8 @@ class SpaceLabTransmitter:
                 if dialog.get_csp_mem_len() < 0 or dialog.get_csp_mem_len() > 2**32-1:
                     raise ValueError("The memory length must be between 0 and 4294967295!")
 
-                csp = CSP(_CSP_MY_ADDRESS)
-                csp_pkt = csp.encode_cmp_peek(1, dialog.get_csp_mem_adr(), dialog.get_csp_mem_len()) # 1 = Satellite (OBDH) address
+                csp = CSP(int(self.entry_preferences_protocols_csp_my_adr.get_text()))
+                csp_pkt = csp.encode_cmp_peek(int(self.entry_preferences_protocols_csp_dst_adr.get_text()), dialog.get_csp_mem_adr(), dialog.get_csp_mem_len())
                 self._transmit_tc(csp_pkt, "CSP Peek")
             except ValueError as err:
                 error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error generating the \"CSP Peek\" telecommand!")
@@ -1258,8 +1261,8 @@ class SpaceLabTransmitter:
                 if len(dialog.get_csp_mem_data()) > 200:
                     raise ValueError("The memory length must be between 0 and 200!")
 
-                csp = CSP(_CSP_MY_ADDRESS)
-                csp_pkt = csp.encode_cmp_poke(1, dialog.get_csp_mem_adr(), dialog.get_csp_mem_data()) # 1 = Satellite (OBDH) address
+                csp = CSP(int(self.entry_preferences_protocols_csp_my_adr.get_text()))
+                csp_pkt = csp.encode_cmp_poke(int(self.entry_preferences_protocols_csp_dst_adr.get_text()), dialog.get_csp_mem_adr(), dialog.get_csp_mem_data())
                 self._transmit_tc(csp_pkt, "CSP Poke")
             except ValueError as err:
                 error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error generating the \"CSP Poke\" telecommand!")
@@ -1277,8 +1280,8 @@ class SpaceLabTransmitter:
 
     def on_button_csp_cmp_set_clock_clicked(self, button):
         try:
-            csp = CSP(_CSP_MY_ADDRESS)
-            csp_pkt = csp.encode_cmp_set_clock(1, int(time.time()), 0)  # 1 = Satellite (OBDH) address
+            csp = CSP(int(self.entry_preferences_protocols_csp_my_adr.get_text()))
+            csp_pkt = csp.encode_cmp_set_clock(int(self.entry_preferences_protocols_csp_dst_adr.get_text()), int(time.time()), 0)
             self._transmit_tc(csp_pkt, "CSP CMP Set Clock")
         except Exception as err:
             error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error generating the \"CSP CMP Set Clock\" telecommand!")
@@ -1288,8 +1291,8 @@ class SpaceLabTransmitter:
 
     def on_button_csp_cmp_get_clock_clicked(self, button):
         try:
-            csp = CSP(_CSP_MY_ADDRESS)
-            csp_pkt = csp.encode_cmp_get_clock(1)   # 1 = Satellite (OBDH) address
+            csp = CSP(int(self.entry_preferences_protocols_csp_my_adr.get_text()))
+            csp_pkt = csp.encode_cmp_get_clock(int(self.entry_preferences_protocols_csp_dst_adr.get_text()))
             self._transmit_tc(csp_pkt, "CSP CMP Get Clock")
         except Exception as err:
             error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error generating the \"CSP CMP Get Clock\" telecommand!")
@@ -1299,8 +1302,8 @@ class SpaceLabTransmitter:
 
     def on_button_csp_reboot_clicked(self, button):
         try:
-            csp = CSP(_CSP_MY_ADDRESS)
-            csp_pkt = csp.encode_reboot(1)  # 1 = Satellite (OBDH) address
+            csp = CSP(int(self.entry_preferences_protocols_csp_my_adr.get_text()))
+            csp_pkt = csp.encode_reboot(int(self.entry_preferences_protocols_csp_dst_adr.get_text()))
             self._transmit_tc(csp_pkt, "CSP Reboot")
         except Exception as err:
             error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error generating the \"CSP Reboot\" telecommand!")
@@ -1310,8 +1313,8 @@ class SpaceLabTransmitter:
 
     def on_button_csp_shutdown_clicked(self, button):
         try:
-            csp = CSP(_CSP_MY_ADDRESS)
-            csp_pkt = csp.encode_shutdown(1)    # 1 = Satellite (OBDH) address
+            csp = CSP(int(self.entry_preferences_protocols_csp_my_adr.get_text()))
+            csp_pkt = csp.encode_shutdown(int(self.entry_preferences_protocols_csp_dst_adr.get_text()))
             self._transmit_tc(csp_pkt, "CSP Shutdown")
         except Exception as err:
             error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error generating the \"CSP Shutdown\" telecommand!")
@@ -1444,6 +1447,8 @@ class SpaceLabTransmitter:
             self.entry_preferences_general_latitude.set_text(config["latitude"])
             self.entry_preferences_general_longitude.set_text(config["longitude"])
             self.entry_preferences_general_altitude.set_text(config["altitude"])
+            self.entry_preferences_protocols_csp_my_adr.set_text(config["csp_my_adr"]),
+            self.entry_preferences_protocols_csp_dst_adr.set_text(config["csp_dst_adr"]),
             if config["doppler_from_network"]:
                 self.radiobutton_doppler_network.set_active(True)
             else:
@@ -1467,6 +1472,9 @@ class SpaceLabTransmitter:
         self.entry_preferences_general_latitude.set_text(_DEFAULT_LATITUDE)
         self.entry_preferences_general_longitude.set_text(_DEFAULT_LONGITUDE)
         self.entry_preferences_general_altitude.set_text(_DEFAULT_ALTITUDE)
+
+        self.entry_preferences_protocols_csp_my_adr.set_text(str(_DEFAULT_CSP_MY_ADDRESS))
+        self.entry_preferences_protocols_csp_dst_adr.set_text(str(_DEFAULT_CSP_DST_ADDRESS))
 
         self.filechooser_doppler_tle_file.set_filename("")
         self.radiobutton_doppler_network.set_active(True)
@@ -1494,6 +1502,8 @@ class SpaceLabTransmitter:
                        "latitude": self.entry_preferences_general_latitude.get_text(),
                        "longitude": self.entry_preferences_general_longitude.get_text(),
                        "altitude": self.entry_preferences_general_altitude.get_text(),
+                       "csp_my_adr": self.entry_preferences_protocols_csp_my_adr.get_text(),
+                       "csp_dst_adr": self.entry_preferences_protocols_csp_dst_adr.get_text(),
                        "doppler_from_network": self.radiobutton_doppler_network.get_active(),
                        "tle_file": self.filechooser_doppler_tle_file.get_filename(),
                        "doppler_address": self.entry_doppler_address.get_text(),
