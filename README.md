@@ -73,7 +73,7 @@ This program will support the satellites below:
 ### Dependencies
 
 * Sphinx
-* sphinx-redactor-theme
+* sphinx-rtd-theme
 
 ### Building the Documentation
 
