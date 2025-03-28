@@ -136,8 +136,8 @@ SLP_ID_UPDATE_TLE               = 0x4F
 # CSP Ports
 CSP_PORT_DATA_REQUEST           = 35
 CSP_PORT_BROADCAST_MSG          = 36
-CSP_PORT_ENTER_HIBERNATION      = 37
-CSP_PORT_LEAVE_HIBERNATION      = 38
+CSP_PORT_ENTER_HIBERNATION      = 40
+CSP_PORT_LEAVE_HIBERNATION      = 41
 CSP_PORT_ERASE_MEMORY           = 43
 CSP_PORT_FORCE_RESET            = 44
 CSP_PORT_GET_PAYLOAD_DATA       = 45
@@ -411,12 +411,13 @@ class SpaceLabTransmitter:
                 if response_key == Gtk.ResponseType.OK:
                     pkt = list()
                     if self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_SLP:
-                        pl = [(hbn_hours >> 8) & 0xFF, (hbn_hours >> 0) & 0xFF]
+                        pl = struct.pack('>H', hbn_hours)
                         slp = SLP()
                         pkt = slp.encode_private(SLP_ID_ENTER_HIBERNATION, self.entry_preferences_general_callsign.get_text(), dialog_pw.get_key(), pl)
-#                    elif self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_CSP:
-#                        csp = CSP()
-#                        pkt = csp.encode()
+                    elif self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_CSP:
+                        pl = struct.pack('>I', hbn_hours)
+                        csp = CSP(int(self.entry_preferences_protocols_csp_my_adr.get_text()))
+                        pkt = csp.encode(CSP_PRIO_NORM, int(self.entry_preferences_protocols_csp_dst_adr.get_text()), CSP_PORT_ENTER_HIBERNATION, CSP_PORT_ENTER_HIBERNATION, False, True, False, False, False, pl, dialog_pw.get_key())
                     self._transmit_tc(pkt, "Enter Hibernation")
                     dialog_pw.destroy()
                 elif response_key == Gtk.ResponseType.CANCEL:
@@ -694,8 +695,8 @@ class SpaceLabTransmitter:
                         pl.append((param_val >> 8) & 0xFF)
                         pl.append(param_val & 0xFF)
 
-                        csp = CSP(_CSP_MY_ADDRESS)
-                        pkt = csp.encode(CSP_PRIO_NORM, 1, CSP_PORT_SET_PARAM, CSP_PORT_SET_PARAM, False, True, False, False, False, pl, dialog_pw.get_key())  # 1 = Satellite (OBDH) address
+                        csp = CSP(int(self.entry_preferences_protocols_csp_my_adr.get_text()))
+                        pkt = csp.encode(CSP_PRIO_NORM, int(self.entry_preferences_protocols_csp_dst_adr.get_text()), CSP_PORT_SET_PARAM, CSP_PORT_SET_PARAM, False, True, False, False, False, pl, dialog_pw.get_key())
                     self._transmit_tc(pkt, "Set Parameter")
                     dialog_pw.destroy()
                 elif response_key == Gtk.ResponseType.CANCEL:
@@ -788,9 +789,9 @@ class SpaceLabTransmitter:
             if self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_SLP:
                 slp = SLP()
                 pkt = slp.encode_private(SLP_ID_LEAVE_HIBERNATION, self.entry_preferences_general_callsign.get_text(), dialog.get_key(), list())
-#            elif self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_CSP:
-#                csp = CSP()
-#                pkt = csp.encode()
+            elif self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_CSP:
+                csp = CSP(int(self.entry_preferences_protocols_csp_my_adr.get_text()))
+                pkt = csp.encode(CSP_PRIO_NORM, int(self.entry_preferences_protocols_csp_dst_adr.get_text()), CSP_PORT_LEAVE_HIBERNATION, CSP_PORT_LEAVE_HIBERNATION, False, True, False, False, False, list(), dialog.get_key())
             self._transmit_tc(pkt, "Leave Hibernation")
             dialog.destroy()
         elif response == Gtk.ResponseType.CANCEL:
@@ -1084,8 +1085,8 @@ class SpaceLabTransmitter:
                     slp = SLP()
                     pkt = slp.encode_private(SLP_ID_SET_PARAMETER, self.entry_preferences_general_callsign.get_text(), dialog.get_key(), pl)
                 elif self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_CSP:
-                    csp = CSP(_CSP_MY_ADDRESS)
-                    pkt = csp.encode(CSP_PRIO_NORM, 1, CSP_PORT_TIME_SYNC, CSP_PORT_TIME_SYNC, False, True, False, False, False, pl, dialog.get_key())  # 1 = Satellite (OBDH) address
+                    csp = CSP(int(self.entry_preferences_protocols_csp_my_adr.get_text()))
+                    pkt = csp.encode(CSP_PRIO_NORM, int(self.entry_preferences_protocols_csp_dst_adr.get_text()), CSP_PORT_TIME_SYNC, CSP_PORT_TIME_SYNC, False, True, False, False, False, pl, dialog.get_key())
                 self._transmit_tc(pkt, "Time Sync")
             except ValueError as err:
                 error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error generating the \"Time Sync\" telecommand!")
