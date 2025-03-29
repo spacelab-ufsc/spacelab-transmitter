@@ -25,7 +25,6 @@
 import os
 from datetime import datetime
 import json
-import csv
 import socket
 import time
 import struct
@@ -48,6 +47,7 @@ from spacelab_transmitter.satellite import Satellite
 from spacelab_transmitter.link import Link
 from spacelab_transmitter.slp import SLP
 from spacelab_transmitter.dopplershift import DopplerShift
+from spacelab_transmitter.log import Log
 
 from pyngham import PyNGHam
 
@@ -162,6 +162,7 @@ class SpaceLabTransmitter:
         self.builder.connect_signals(self)
 
         self._build_widgets()
+        self._log = Log(_DEFAULT_LOGFILE, _DEFAULT_LOGFILE_PATH)
         self.write_log("SpaceLab Transmitter initialized!")
         self._load_preferences()
 
@@ -1537,12 +1538,7 @@ class SpaceLabTransmitter:
 
         self.listmodel_events.append(event)
 
-        if not os.path.exists(_DEFAULT_LOGFILE_PATH):
-            os.mkdir(_DEFAULT_LOGFILE_PATH)
-
-        with open(self.logfile_chooser_button.get_filename() + '/' + _DEFAULT_LOGFILE, 'a') as logfile:
-            writer = csv.writer(logfile, delimiter='\t')
-            writer.writerow(event)
+        self._log.write(msg, event[0])
 
     def on_switch_button_clicked(self, false, button):
         if self.switch_button.get_active() == False:
