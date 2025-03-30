@@ -512,7 +512,10 @@ class CSP:
         else:
             pkt4hmac = pkt[4:].copy()
 
+        # Compute the SHA1 hash of the key
+        key_hash = hashlib.sha1(key.encode('utf-8'))
+
         # Compute the HMAC hash
-        hashed = hmac.new(key.encode('utf-8'), bytes(pkt4hmac), hashlib.sha1)
+        hashed = hmac.new(key_hash.digest()[:16], bytes(pkt4hmac), hashlib.sha1) # Only the first 16 bytes of the SHA1 hashed key digest are used as the HMAC key
 
         return pkt + list(hashed.digest())[:4]  # Only the four first bytes are used in the CSP implementation
