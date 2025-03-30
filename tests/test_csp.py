@@ -433,7 +433,8 @@ def test_encode_with_hmac():
         pl.append(random.randint(0, 2**8-1))
 
     key = ''.join(random.choices(string.ascii_uppercase + string.ascii_lowercase + string.digits, k=16))
-    hashed = hmac.new(key.encode('utf-8'), bytes(pl), hashlib.sha1)
+    key_hash = hashlib.sha1(key.encode('utf-8'))
+    hashed = hmac.new(key_hash.digest()[:16], bytes(pl), hashlib.sha1)
     pl_hash = list(hashed.digest())
 
     csp = CSP(src_adr)
@@ -493,7 +494,8 @@ def test_append_hmac():
         pl.append(random.randint(0, 2**8-1))
 
     key = ''.join(random.choices(string.ascii_uppercase + string.ascii_lowercase + string.digits, k=16))
-    hashed = hmac.new(key.encode('utf-8'), bytes(pl), hashlib.sha1)
+    key_hash = hashlib.sha1(key.encode('utf-8'))
+    hashed = hmac.new(key_hash.digest()[:16], bytes(pl), hashlib.sha1)
     pl_hash = list(hashed.digest())
 
     csp = CSP(src_adr)
