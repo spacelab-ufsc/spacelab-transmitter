@@ -268,6 +268,7 @@ class SpaceLabTransmitter:
 
         self.entry_preferences_protocols_csp_my_adr = self.builder.get_object("entry_preferences_protocols_csp_my_adr")
         self.entry_preferences_protocols_csp_dst_adr = self.builder.get_object("entry_preferences_protocols_csp_dst_adr")
+        self.switch_preferences_protocols_csp_hmac = self.builder.get_object("switch_preferences_protocols_csp_hmac")
 
         self.radiobutton_doppler_tle_file = self.builder.get_object("radiobutton_doppler_tle_file")
         self.filechooser_doppler_tle_file = self.builder.get_object("filechooser_doppler_tle_file")
@@ -698,6 +699,7 @@ class SpaceLabTransmitter:
 
                         csp = CSP(int(self.entry_preferences_protocols_csp_my_adr.get_text()))
                         pkt = csp.encode(CSP_PRIO_NORM, int(self.entry_preferences_protocols_csp_dst_adr.get_text()), CSP_PORT_SET_PARAM, CSP_PORT_SET_PARAM, False, True, False, False, False, pl, dialog_pw.get_key())
+
                     self._transmit_tc(pkt, "Set Parameter")
                     dialog_pw.destroy()
                 elif response_key == Gtk.ResponseType.CANCEL:
@@ -1088,6 +1090,16 @@ class SpaceLabTransmitter:
                 elif self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_CSP:
                     csp = CSP(int(self.entry_preferences_protocols_csp_my_adr.get_text()))
                     pkt = csp.encode(CSP_PRIO_NORM, int(self.entry_preferences_protocols_csp_dst_adr.get_text()), CSP_PORT_TIME_SYNC, CSP_PORT_TIME_SYNC, False, True, False, False, False, pl, dialog.get_key())
+
+                    if self.switch_preferences_protocols_csp_hmac.get_active():
+                        dialog_pw = DialogPassword(self.window)
+
+                        response_key = dialog_pw.run()
+                        if response_key == Gtk.ResponseType.OK:
+                            pkt = csp.append_hmac(pkt, dialog_pw.get_key())
+
+                        dialog_pw.destroy()
+
                 self._transmit_tc(pkt, "Time Sync")
             except ValueError as err:
                 error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error generating the \"Time Sync\" telecommand!")
@@ -1113,6 +1125,16 @@ class SpaceLabTransmitter:
         try:
             csp = CSP(int(self.entry_preferences_protocols_csp_my_adr.get_text()))
             csp_pkt = csp.encode_ping(int(self.entry_preferences_protocols_csp_dst_adr.get_text()))
+
+            if self.switch_preferences_protocols_csp_hmac.get_active():
+                dialog_pw = DialogPassword(self.window)
+
+                response_key = dialog_pw.run()
+                if response_key == Gtk.ResponseType.OK:
+                    csp_pkt = csp.append_hmac(csp_pkt, dialog_pw.get_key())
+
+                dialog_pw.destroy()
+
             self._transmit_tc(csp_pkt, "CSP Ping")
         except Exception as err:
             error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error generating the \"CSP Ping\" telecommand!")
@@ -1124,6 +1146,16 @@ class SpaceLabTransmitter:
         try:
             csp = CSP(int(self.entry_preferences_protocols_csp_my_adr.get_text()))
             csp_pkt = csp.encode_ps(int(self.entry_preferences_protocols_csp_dst_adr.get_text()))
+
+            if self.switch_preferences_protocols_csp_hmac.get_active():
+                dialog_pw = DialogPassword(self.window)
+
+                response_key = dialog_pw.run()
+                if response_key == Gtk.ResponseType.OK:
+                    csp_pkt = csp.append_hmac(csp_pkt, dialog_pw.get_key())
+
+                dialog_pw.destroy()
+
             self._transmit_tc(csp_pkt, "CSP PS")
         except Exception as err:
             error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error generating the \"CSP PS\" telecommand!")
@@ -1135,6 +1167,16 @@ class SpaceLabTransmitter:
         try:
             csp = CSP(int(self.entry_preferences_protocols_csp_my_adr.get_text()))
             csp_pkt = csp.encode_memfree(int(self.entry_preferences_protocols_csp_dst_adr.get_text()))
+
+            if self.switch_preferences_protocols_csp_hmac.get_active():
+                dialog_pw = DialogPassword(self.window)
+
+                response_key = dialog_pw.run()
+                if response_key == Gtk.ResponseType.OK:
+                    csp_pkt = csp.append_hmac(csp_pkt, dialog_pw.get_key())
+
+                dialog_pw.destroy()
+
             self._transmit_tc(csp_pkt, "CSP Mem. Free")
         except Exception as err:
             error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error generating the \"CSP Mem. Free\" telecommand!")
@@ -1146,6 +1188,16 @@ class SpaceLabTransmitter:
         try:
             csp = CSP(int(self.entry_preferences_protocols_csp_my_adr.get_text()))
             csp_pkt = csp.encode_buf_free(int(self.entry_preferences_protocols_csp_dst_adr.get_text()))
+
+            if self.switch_preferences_protocols_csp_hmac.get_active():
+                dialog_pw = DialogPassword(self.window)
+
+                response_key = dialog_pw.run()
+                if response_key == Gtk.ResponseType.OK:
+                    csp_pkt = csp.append_hmac(csp_pkt, dialog_pw.get_key())
+
+                dialog_pw.destroy()
+
             self._transmit_tc(csp_pkt, "CSP Buffer Free")
         except Exception as err:
             error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error generating the \"CSP Buffer Free\" telecommand!")
@@ -1157,6 +1209,16 @@ class SpaceLabTransmitter:
         try:
             csp = CSP(int(self.entry_preferences_protocols_csp_my_adr.get_text()))
             csp_pkt = csp.encode_uptime(int(self.entry_preferences_protocols_csp_dst_adr.get_text()))
+
+            if self.switch_preferences_protocols_csp_hmac.get_active():
+                dialog_pw = DialogPassword(self.window)
+
+                response_key = dialog_pw.run()
+                if response_key == Gtk.ResponseType.OK:
+                    csp_pkt = csp.append_hmac(csp_pkt, dialog_pw.get_key())
+
+                dialog_pw.destroy()
+
             self._transmit_tc(csp_pkt, "CSP Uptime")
         except Exception as err:
             error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error generating the \"CSP Uptime\" telecommand!")
@@ -1168,6 +1230,16 @@ class SpaceLabTransmitter:
         try:
             csp = CSP(int(self.entry_preferences_protocols_csp_my_adr.get_text()))
             csp_pkt = csp.encode_cmp_ident(int(self.entry_preferences_protocols_csp_dst_adr.get_text()))
+
+            if self.switch_preferences_protocols_csp_hmac.get_active():
+                dialog_pw = DialogPassword(self.window)
+
+                response_key = dialog_pw.run()
+                if response_key == Gtk.ResponseType.OK:
+                    csp_pkt = csp.append_hmac(csp_pkt, dialog_pw.get_key())
+
+                dialog_pw.destroy()
+
             self._transmit_tc(csp_pkt, "CSP CMP Ident")
         except Exception as err:
             error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error generating the \"CSP CMP Ident\" telecommand!")
@@ -1192,6 +1264,16 @@ class SpaceLabTransmitter:
 
                 csp = CSP(int(self.entry_preferences_protocols_csp_my_adr.get_text()))
                 csp_pkt = csp.encode_cmp_set_route(int(self.entry_preferences_protocols_csp_dst_adr.get_text()), dialog.get_dest_node(), dialog.get_next_hop_mac(), dialog.get_if_name())
+
+                if self.switch_preferences_protocols_csp_hmac.get_active():
+                    dialog_pw = DialogPassword(self.window)
+
+                    response_key = dialog_pw.run()
+                    if response_key == Gtk.ResponseType.OK:
+                        csp_pkt = csp.append_hmac(csp_pkt, dialog_pw.get_key())
+
+                    dialog_pw.destroy()
+
                 self._transmit_tc(csp_pkt, "CSP CMP Route Set")
             except Exception as err:
                 error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error generating the \"CSP CMP Route Set\" telecommand!")
@@ -1218,6 +1300,16 @@ class SpaceLabTransmitter:
 
                 csp = CSP(int(self.entry_preferences_protocols_csp_my_adr.get_text()))
                 csp_pkt = csp.encode_cmp_if_stat(int(self.entry_preferences_protocols_csp_dst_adr.get_text()), dialog.get_csp_if_name())
+
+                if self.switch_preferences_protocols_csp_hmac.get_active():
+                    dialog_pw = DialogPassword(self.window)
+
+                    response_key = dialog_pw.run()
+                    if response_key == Gtk.ResponseType.OK:
+                        csp_pkt = csp.append_hmac(csp_pkt, dialog_pw.get_key())
+
+                    dialog_pw.destroy()
+
                 self._transmit_tc(csp_pkt, "CSP CMP IF Status")
             except Exception as err:
                 error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error generating the \"CSP CMP IF Stat\" telecommand!")
@@ -1247,6 +1339,16 @@ class SpaceLabTransmitter:
 
                 csp = CSP(int(self.entry_preferences_protocols_csp_my_adr.get_text()))
                 csp_pkt = csp.encode_cmp_peek(int(self.entry_preferences_protocols_csp_dst_adr.get_text()), dialog.get_csp_mem_adr(), dialog.get_csp_mem_len())
+
+                if self.switch_preferences_protocols_csp_hmac.get_active():
+                    dialog_pw = DialogPassword(self.window)
+
+                    response_key = dialog_pw.run()
+                    if response_key == Gtk.ResponseType.OK:
+                        csp_pkt = csp.append_hmac(csp_pkt, dialog_pw.get_key())
+
+                    dialog_pw.destroy()
+
                 self._transmit_tc(csp_pkt, "CSP Peek")
             except ValueError as err:
                 error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error generating the \"CSP Peek\" telecommand!")
@@ -1276,6 +1378,16 @@ class SpaceLabTransmitter:
 
                 csp = CSP(int(self.entry_preferences_protocols_csp_my_adr.get_text()))
                 csp_pkt = csp.encode_cmp_poke(int(self.entry_preferences_protocols_csp_dst_adr.get_text()), dialog.get_csp_mem_adr(), dialog.get_csp_mem_data())
+
+                if self.switch_preferences_protocols_csp_hmac.get_active():
+                    dialog_pw = DialogPassword(self.window)
+
+                    response_key = dialog_pw.run()
+                    if response_key == Gtk.ResponseType.OK:
+                        csp_pkt = csp.append_hmac(csp_pkt, dialog_pw.get_key())
+
+                    dialog_pw.destroy()
+
                 self._transmit_tc(csp_pkt, "CSP Poke")
             except ValueError as err:
                 error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error generating the \"CSP Poke\" telecommand!")
@@ -1295,6 +1407,16 @@ class SpaceLabTransmitter:
         try:
             csp = CSP(int(self.entry_preferences_protocols_csp_my_adr.get_text()))
             csp_pkt = csp.encode_cmp_set_clock(int(self.entry_preferences_protocols_csp_dst_adr.get_text()), int(time.time()), 0)
+
+            if self.switch_preferences_protocols_csp_hmac.get_active():
+                dialog_pw = DialogPassword(self.window)
+
+                response_key = dialog_pw.run()
+                if response_key == Gtk.ResponseType.OK:
+                    csp_pkt = csp.append_hmac(csp_pkt, dialog_pw.get_key())
+
+                dialog_pw.destroy()
+
             self._transmit_tc(csp_pkt, "CSP CMP Set Clock")
         except Exception as err:
             error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error generating the \"CSP CMP Set Clock\" telecommand!")
@@ -1306,6 +1428,16 @@ class SpaceLabTransmitter:
         try:
             csp = CSP(int(self.entry_preferences_protocols_csp_my_adr.get_text()))
             csp_pkt = csp.encode_cmp_get_clock(int(self.entry_preferences_protocols_csp_dst_adr.get_text()))
+
+            if self.switch_preferences_protocols_csp_hmac.get_active():
+                dialog_pw = DialogPassword(self.window)
+
+                response_key = dialog_pw.run()
+                if response_key == Gtk.ResponseType.OK:
+                    csp_pkt = csp.append_hmac(csp_pkt, dialog_pw.get_key())
+
+                dialog_pw.destroy()
+
             self._transmit_tc(csp_pkt, "CSP CMP Get Clock")
         except Exception as err:
             error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error generating the \"CSP CMP Get Clock\" telecommand!")
@@ -1317,6 +1449,16 @@ class SpaceLabTransmitter:
         try:
             csp = CSP(int(self.entry_preferences_protocols_csp_my_adr.get_text()))
             csp_pkt = csp.encode_reboot(int(self.entry_preferences_protocols_csp_dst_adr.get_text()))
+
+            if self.switch_preferences_protocols_csp_hmac.get_active():
+                dialog_pw = DialogPassword(self.window)
+
+                response_key = dialog_pw.run()
+                if response_key == Gtk.ResponseType.OK:
+                    csp_pkt = csp.append_hmac(csp_pkt, dialog_pw.get_key())
+
+                dialog_pw.destroy()
+
             self._transmit_tc(csp_pkt, "CSP Reboot")
         except Exception as err:
             error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error generating the \"CSP Reboot\" telecommand!")
@@ -1328,6 +1470,16 @@ class SpaceLabTransmitter:
         try:
             csp = CSP(int(self.entry_preferences_protocols_csp_my_adr.get_text()))
             csp_pkt = csp.encode_shutdown(int(self.entry_preferences_protocols_csp_dst_adr.get_text()))
+
+            if self.switch_preferences_protocols_csp_hmac.get_active():
+                dialog_pw = DialogPassword(self.window)
+
+                response_key = dialog_pw.run()
+                if response_key == Gtk.ResponseType.OK:
+                    csp_pkt = csp.append_hmac(csp_pkt, dialog_pw.get_key())
+
+                dialog_pw.destroy()
+
             self._transmit_tc(csp_pkt, "CSP Shutdown")
         except Exception as err:
             error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error generating the \"CSP Shutdown\" telecommand!")
@@ -1462,6 +1614,7 @@ class SpaceLabTransmitter:
             self.entry_preferences_general_altitude.set_text(config["altitude"])
             self.entry_preferences_protocols_csp_my_adr.set_text(config["csp_my_adr"]),
             self.entry_preferences_protocols_csp_dst_adr.set_text(config["csp_dst_adr"]),
+            self.switch_preferences_protocols_csp_hmac.set_active(config["csp_hmac"])
             if config["doppler_from_network"]:
                 self.radiobutton_doppler_network.set_active(True)
             else:
@@ -1488,6 +1641,7 @@ class SpaceLabTransmitter:
 
         self.entry_preferences_protocols_csp_my_adr.set_text(str(_DEFAULT_CSP_MY_ADDRESS))
         self.entry_preferences_protocols_csp_dst_adr.set_text(str(_DEFAULT_CSP_DST_ADDRESS))
+        self.switch_preferences_protocols_csp_hmac.set_active(False)
 
         self.filechooser_doppler_tle_file.set_filename("")
         self.radiobutton_doppler_network.set_active(True)
@@ -1517,6 +1671,7 @@ class SpaceLabTransmitter:
                        "altitude": self.entry_preferences_general_altitude.get_text(),
                        "csp_my_adr": self.entry_preferences_protocols_csp_my_adr.get_text(),
                        "csp_dst_adr": self.entry_preferences_protocols_csp_dst_adr.get_text(),
+                       "csp_hmac": self.switch_preferences_protocols_csp_hmac.get_active(),
                        "doppler_from_network": self.radiobutton_doppler_network.get_active(),
                        "tle_file": self.filechooser_doppler_tle_file.get_filename(),
                        "doppler_address": self.entry_doppler_address.get_text(),

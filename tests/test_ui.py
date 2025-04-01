@@ -125,6 +125,7 @@ def test_ui():
     entry_preferences_general_altitude      = builder.get_object("entry_preferences_general_altitude")
     entry_preferences_protocols_csp_my_adr  = builder.get_object("entry_preferences_protocols_csp_my_adr")
     entry_preferences_protocols_csp_dst_adr = builder.get_object("entry_preferences_protocols_csp_dst_adr")
+    switch_preferences_protocols_csp_hmac   = builder.get_object("switch_preferences_protocols_csp_hmac")
     radiobutton_doppler_tle_file            = builder.get_object("radiobutton_doppler_tle_file")
     filechooser_doppler_tle_file            = builder.get_object("filechooser_doppler_tle_file")
     radiobutton_doppler_network             = builder.get_object("radiobutton_doppler_network")
@@ -144,6 +145,7 @@ def test_ui():
     assert entry_preferences_general_altitude       != None
     assert entry_preferences_protocols_csp_my_adr   != None
     assert entry_preferences_protocols_csp_dst_adr  != None
+    assert switch_preferences_protocols_csp_hmac    != None
     assert radiobutton_doppler_tle_file             != None
     assert filechooser_doppler_tle_file             != None
     assert radiobutton_doppler_network              != None
