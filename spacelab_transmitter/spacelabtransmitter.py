@@ -135,7 +135,7 @@ SLP_ID_UPDATE_TLE               = 0x4F
 
 # CSP Ports
 CSP_PORT_DATA_REQUEST           = 35
-CSP_PORT_BROADCAST_MSG          = 36
+CSP_PORT_BROADCAST_MSG          = 39
 CSP_PORT_ENTER_HIBERNATION      = 40
 CSP_PORT_LEAVE_HIBERNATION      = 41
 CSP_PORT_ERASE_MEMORY           = 43
@@ -461,7 +461,7 @@ class SpaceLabTransmitter:
                         slp = SLP()
                         pkt = slp.encode_private(SLP_ID_ACTIVATE_MODULE, self.entry_preferences_general_callsign.get_text(), dialog_pw.get_key(), [mod_id])
 #                    elif self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_CSP:
-#                        csp = CSP()
+#                        csp = CSP(int(self.entry_preferences_protocols_csp_my_adr.get_text()))
 #                        pkt = csp.encode()
                     self._transmit_tc(pkt, "Activate Module")
                     dialog_pw.destroy()
@@ -504,7 +504,7 @@ class SpaceLabTransmitter:
                         slp = SLP()
                         pkt = slp.encode_private(SLP_ID_DEACTIVATE_MODULE, self.entry_preferences_general_callsign.get_text(), dialog_pw.get_key(), [mod_id])
 #                    elif self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_CSP:
-#                        csp = CSP()
+#                        csp = CSP(int(self.entry_preferences_protocols_csp_my_adr.get_text()))
 #                        pkt = csp.encode()
                     self._transmit_tc(pkt, "Deactivate Module")
                     dialog_pw.destroy()
@@ -547,7 +547,7 @@ class SpaceLabTransmitter:
                         slp = SLP()
                         pkt = slp.encode_private(SLP_ID_DEACTIVATE_PAYLOAD, self.entry_preferences_general_callsign.get_text(), dialog_pw.get_key(), [pl_id])
 #                    elif self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_CSP:
-#                        csp = CSP()
+#                        csp = CSP(int(self.entry_preferences_protocols_csp_my_adr.get_text()))
 #                        pkt = csp.encode()
                     self._transmit_tc(pkt, "Deactivate Payload")
                     dialog_pw.destroy()
@@ -590,7 +590,7 @@ class SpaceLabTransmitter:
                         slp = SLP()
                         pkt = slp.encode_private(SLP_ID_ACTIVATE_PAYLOAD, self.entry_preferences_general_callsign.get_text(), dialog_pw.get_key(), [pl_id])
 #                    elif self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_CSP:
-#                        csp = CSP()
+#                        csp = CSP(int(self.entry_preferences_protocols_csp_my_adr.get_text()))
 #                        pkt = csp.encode()
                     self._transmit_tc(pkt, "Activate Payload")
                     dialog_pw.destroy()
@@ -632,9 +632,9 @@ class SpaceLabTransmitter:
                     if self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_SLP:
                         slp = SLP()
                         pkt = slp.encode_private(SLP_ID_ERASE_MEMORY, self.entry_preferences_general_callsign.get_text(), dialog_pw.get_key(), [mem_id])
-#                    elif self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_CSP:
-#                        csp = CSP()
-#                        pkt = csp.encode()
+                    elif self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_CSP:
+                        csp = CSP(int(self.entry_preferences_protocols_csp_my_adr.get_text()))
+                        pkt = csp.encode(CSP_PRIO_NORM, int(self.entry_preferences_protocols_csp_dst_adr.get_text()), CSP_PORT_ERASE_MEMORY, CSP_PORT_ERASE_MEMORY, False, True, False, False, False, [], dialog_pw.get_key())
                     self._transmit_tc(pkt, "Erase Memory")
                     dialog_pw.destroy()
                 elif response_key == Gtk.ResponseType.CANCEL:
@@ -759,7 +759,7 @@ class SpaceLabTransmitter:
                         slp = SLP()
                         pkt = slp.encode_private(SLP_ID_DATA_REQUEST, self.entry_preferences_general_callsign.get_text(), dialog_pw.get_key(), pl)
 #                    elif self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_CSP:
-#                        csp = CSP()
+#                        csp = CSP(int(self.entry_preferences_protocols_csp_my_adr.get_text()))
 #                        pkt = csp.encode()
                     self._transmit_tc(pkt, "Data Request")
                     dialog_pw.destroy()
@@ -814,7 +814,7 @@ class SpaceLabTransmitter:
                 slp = SLP()
                 pkt = slp.encode_private(SLP_ID_FORCE_RESET, self.entry_preferences_general_callsign.get_text(), dialog.get_key(), list())
 #            elif self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_CSP:
-#                csp = CSP()
+#                csp = CSP(int(self.entry_preferences_protocols_csp_my_adr.get_text()))
 #                pkt = csp.encode()
             self._transmit_tc(pkt, "Force Reset")
             dialog.destroy()
@@ -849,7 +849,7 @@ class SpaceLabTransmitter:
                         slp = SLP()
                         pkt = slp.encode_private(SLP_ID_GET_PARAMETER, self.entry_preferences_general_callsign.get_text(), dialog_pw.get_key(), pl)
 #                    elif self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_CSP:
-#                        csp = CSP()
+#                        csp = CSP(int(self.entry_preferences_protocols_csp_my_adr.get_text()))
 #                        pkt = csp.encode()
                     self._transmit_tc(pkt, "Get Parameter")
                     dialog_pw.destroy()
@@ -898,7 +898,7 @@ class SpaceLabTransmitter:
                         slp = SLP()
                         pkt = slp.encode_private(SLP_ID_GET_PAYLOAD_DATA, self.entry_preferences_general_callsign.get_text(), dialog_pw.get_key(), pl)
 #                    elif self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_CSP:
-#                        csp = CSP()
+#                        csp = CSP(int(self.entry_preferences_protocols_csp_my_adr.get_text()))
 #                        pkt = csp.encode()
                     self._transmit_tc(pkt, "Get Payload Data")
                     dialog_pw.destroy()
@@ -946,9 +946,21 @@ class SpaceLabTransmitter:
                 if self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_SLP:
                     slp = SLP()
                     pkt = slp.encode(SLP_ID_BROADCAST_MESSAGE, self.entry_preferences_general_callsign.get_text(), pl)
-#                elif self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_CSP:
-#                    csp = CSP()
-#                    pkt = csp.encode()
+                elif self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_CSP:
+                    pl.clear()
+                    pl += list(struct.pack('>I', len(msg)))
+                    pl += [ord(i) for i in msg]
+                    csp = CSP(int(self.entry_preferences_protocols_csp_my_adr.get_text()))
+                    pkt = csp.encode(CSP_PRIO_NORM, int(self.entry_preferences_protocols_csp_dst_adr.get_text()), CSP_PORT_BROADCAST_MSG, CSP_PORT_BROADCAST_MSG, False, False, False, False, False, pl)
+
+                    dialog_pw = DialogPassword(self.window)
+
+                    response_key = dialog_pw.run()
+                    if response_key == Gtk.ResponseType.OK:
+                        pkt = csp.append_hmac(pkt, dialog_pw.get_key())
+
+                    dialog_pw.destroy()
+
                 self._transmit_tc(pkt, "Broadcast Message")
                 dialog.destroy()
             except ValueError as err:
@@ -984,7 +996,7 @@ class SpaceLabTransmitter:
                         slp = SLP()
                         pkt = slp.encode_private(SLP_ID_TRANSMIT_PACKET, self.entry_preferences_general_callsign.get_text(), dialog_pw.get_key(), data)
 #                    elif self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_CSP:
-#                        csp = CSP()
+#                        csp = CSP(int(self.entry_preferences_protocols_csp_my_adr.get_text()))
 #                        pkt = csp.encode()
                     self._transmit_tc(pkt, "Transmit Packet")
                     dialog_pw.destroy()
@@ -1043,7 +1055,7 @@ class SpaceLabTransmitter:
                         slp = SLP()
                         pkt = slp.encode_private(SLP_ID_UPDATE_TLE, self.entry_preferences_general_callsign.get_text(), dialog_pw.get_key(), pl)
 #                    elif self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_CSP:
-#                        csp = CSP()
+#                        csp = CSP(int(self.entry_preferences_protocols_csp_my_adr.get_text()))
 #                        pkt = csp.encode()
                     self._transmit_tc(pkt, "Update TLE")
                     dialog_pw.destroy()
