@@ -421,13 +421,8 @@ class SpaceLabTransmitter:
                         csp = CSP(int(self.entry_preferences_protocols_csp_my_adr.get_text()))
                         pkt = csp.encode(CSP_PRIO_NORM, int(self.entry_preferences_protocols_csp_dst_adr.get_text()), CSP_PORT_ENTER_HIBERNATION, CSP_PORT_ENTER_HIBERNATION, False, True, False, False, False, pl, dialog_pw.get_key())
                     self._transmit_tc(pkt, "Enter Hibernation")
-                    dialog_pw.destroy()
-                elif response_key == Gtk.ResponseType.CANCEL:
-                    dialog_pw.destroy()
-                elif response_key == Gtk.ResponseType.DELETE_EVENT:
-                    dialog_pw.destroy()
-                else:
-                    dialog_pw.destroy()
+
+                dialog_pw.destroy()
             except ValueError as err:
                 error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error generating the \"Enter Hibernation\" telecommand!")
                 error_dialog.format_secondary_text(str(err))
@@ -435,12 +430,8 @@ class SpaceLabTransmitter:
                 error_dialog.destroy()
             finally:
                 dialog.destroy()
-        elif response == Gtk.ResponseType.CANCEL:
-            dialog.destroy()
-        elif response == Gtk.ResponseType.DELETE_EVENT:
-            dialog.destroy()
-        else:
-            dialog.destroy()
+
+        dialog.destroy()
 
     def on_button_activate_module_clicked(self, button):
         dialog = DialogActivateModule(self.window)
@@ -464,13 +455,8 @@ class SpaceLabTransmitter:
 #                        csp = CSP(int(self.entry_preferences_protocols_csp_my_adr.get_text()))
 #                        pkt = csp.encode()
                     self._transmit_tc(pkt, "Activate Module")
-                    dialog_pw.destroy()
-                elif response_key == Gtk.ResponseType.CANCEL:
-                    dialog_pw.destroy()
-                elif response_key == Gtk.ResponseType.DELETE_EVENT:
-                    dialog_pw.destroy()
-                else:
-                    dialog_pw.destroy()
+
+                dialog_pw.destroy()
             except ValueError as err:
                 error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error generating the \"Activate Module\" telecommand!")
                 error_dialog.format_secondary_text(str(err))
@@ -478,12 +464,8 @@ class SpaceLabTransmitter:
                 error_dialog.destroy()
             finally:
                 dialog.destroy()
-        elif response == Gtk.ResponseType.CANCEL:
-            dialog.destroy()
-        elif response == Gtk.ResponseType.DELETE_EVENT:
-            dialog.destroy()
-        else:
-            dialog.destroy()
+
+        dialog.destroy()
 
     def on_button_deactivate_module_clicked(self, button):
         dialog = DialogDeactivateModule(self.window)
@@ -507,13 +489,8 @@ class SpaceLabTransmitter:
 #                        csp = CSP(int(self.entry_preferences_protocols_csp_my_adr.get_text()))
 #                        pkt = csp.encode()
                     self._transmit_tc(pkt, "Deactivate Module")
-                    dialog_pw.destroy()
-                elif response_key == Gtk.ResponseType.CANCEL:
-                    dialog_pw.destroy()
-                elif response_key == Gtk.ResponseType.DELETE_EVENT:
-                    dialog_pw.destroy()
-                else:
-                    dialog_pw.destroy()
+
+                dialog_pw.destroy()
             except ValueError as err:
                 error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error generating the \"Deactivate Module\" telecommand!")
                 error_dialog.format_secondary_text(str(err))
@@ -521,12 +498,8 @@ class SpaceLabTransmitter:
                 error_dialog.destroy()
             finally:
                 dialog.destroy()
-        elif response == Gtk.ResponseType.CANCEL:
-            dialog.destroy()
-        elif response == Gtk.ResponseType.DELETE_EVENT:
-            dialog.destroy()
-        else:
-            dialog.destroy()
+
+        dialog.destroy()
 
     def on_button_deactivate_payload_clicked(self, button):
         dialog = DialogDeactivatePayload(self.window)
@@ -550,13 +523,8 @@ class SpaceLabTransmitter:
 #                        csp = CSP(int(self.entry_preferences_protocols_csp_my_adr.get_text()))
 #                        pkt = csp.encode()
                     self._transmit_tc(pkt, "Deactivate Payload")
-                    dialog_pw.destroy()
-                elif response_key == Gtk.ResponseType.CANCEL:
-                    dialog_pw.destroy()
-                elif response_key == Gtk.ResponseType.DELETE_EVENT:
-                    dialog_pw.destroy()
-                else:
-                    dialog_pw.destroy()
+
+                dialog_pw.destroy()
             except ValueError as err:
                 error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error generating the \"Deactivate Payload\" telecommand!")
                 error_dialog.format_secondary_text(str(err))
@@ -564,12 +532,8 @@ class SpaceLabTransmitter:
                 error_dialog.destroy()
             finally:
                 dialog.destroy()
-        elif response == Gtk.ResponseType.CANCEL:
-            dialog.destroy()
-        elif response == Gtk.ResponseType.DELETE_EVENT:
-            dialog.destroy()
-        else:
-            dialog.destroy()
+
+        dialog.destroy()
 
     def on_button_activate_payload_clicked(self, button):
         dialog = DialogActivatePayload(self.window)
@@ -593,13 +557,8 @@ class SpaceLabTransmitter:
 #                        csp = CSP(int(self.entry_preferences_protocols_csp_my_adr.get_text()))
 #                        pkt = csp.encode()
                     self._transmit_tc(pkt, "Activate Payload")
-                    dialog_pw.destroy()
-                elif response_key == Gtk.ResponseType.CANCEL:
-                    dialog_pw.destroy()
-                elif response_key == Gtk.ResponseType.DELETE_EVENT:
-                    dialog_pw.destroy()
-                else:
-                    dialog_pw.destroy()
+
+                dialog_pw.destroy()
             except ValueError as err:
                 error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error generating the \"Activate Module\" telecommand!")
                 error_dialog.format_secondary_text(str(err))
@@ -607,12 +566,8 @@ class SpaceLabTransmitter:
                 error_dialog.destroy()
             finally:
                 dialog.destroy()
-        elif response == Gtk.ResponseType.CANCEL:
-            dialog.destroy()
-        elif response == Gtk.ResponseType.DELETE_EVENT:
-            dialog.destroy()
-        else:
-            dialog.destroy()
+
+        dialog.destroy()
 
     def on_button_erase_memory_clicked(self, button):
         dialog = DialogEraseMemory(self.window)
@@ -636,13 +591,8 @@ class SpaceLabTransmitter:
                         csp = CSP(int(self.entry_preferences_protocols_csp_my_adr.get_text()))
                         pkt = csp.encode(CSP_PRIO_NORM, int(self.entry_preferences_protocols_csp_dst_adr.get_text()), CSP_PORT_ERASE_MEMORY, CSP_PORT_ERASE_MEMORY, False, True, False, False, False, [], dialog_pw.get_key())
                     self._transmit_tc(pkt, "Erase Memory")
-                    dialog_pw.destroy()
-                elif response_key == Gtk.ResponseType.CANCEL:
-                    dialog_pw.destroy()
-                elif response_key == Gtk.ResponseType.DELETE_EVENT:
-                    dialog_pw.destroy()
-                else:
-                    dialog_pw.destroy()
+
+                dialog_pw.destroy()
             except ValueError as err:
                 error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error generating the \"Erase Memory\" telecommand!")
                 error_dialog.format_secondary_text(str(err))
@@ -650,12 +600,8 @@ class SpaceLabTransmitter:
                 error_dialog.destroy()
             finally:
                 dialog.destroy()
-        elif response == Gtk.ResponseType.CANCEL:
-            dialog.destroy()
-        elif response == Gtk.ResponseType.DELETE_EVENT:
-            dialog.destroy()
-        else:
-            dialog.destroy()
+
+        dialog.destroy()
 
     def on_button_set_parameter_clicked(self, button):
         dialog = DialogSetParameter(self.window)
@@ -701,13 +647,8 @@ class SpaceLabTransmitter:
                         pkt = csp.encode(CSP_PRIO_NORM, int(self.entry_preferences_protocols_csp_dst_adr.get_text()), CSP_PORT_SET_PARAM, CSP_PORT_SET_PARAM, False, True, False, False, False, pl, dialog_pw.get_key())
 
                     self._transmit_tc(pkt, "Set Parameter")
-                    dialog_pw.destroy()
-                elif response_key == Gtk.ResponseType.CANCEL:
-                    dialog_pw.destroy()
-                elif response_key == Gtk.ResponseType.DELETE_EVENT:
-                    dialog_pw.destroy()
-                else:
-                    dialog_pw.destroy()
+
+                dialog_pw.destroy()
             except ValueError as err:
                 error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error generating the \"Set Parameter\" telecommand!")
                 error_dialog.format_secondary_text(str(err))
@@ -715,12 +656,8 @@ class SpaceLabTransmitter:
                 error_dialog.destroy()
             finally:
                 dialog.destroy()
-        elif response == Gtk.ResponseType.CANCEL:
-            dialog.destroy()
-        elif response == Gtk.ResponseType.DELETE_EVENT:
-            dialog.destroy()
-        else:
-            dialog.destroy()
+
+        dialog.destroy()
 
     def on_button_data_request_clicked(self, button):
         dialog = DialogDataRequest(self.window)
@@ -762,13 +699,8 @@ class SpaceLabTransmitter:
 #                        csp = CSP(int(self.entry_preferences_protocols_csp_my_adr.get_text()))
 #                        pkt = csp.encode()
                     self._transmit_tc(pkt, "Data Request")
-                    dialog_pw.destroy()
-                elif response_key == Gtk.ResponseType.CANCEL:
-                    dialog_pw.destroy()
-                elif response_key == Gtk.ResponseType.DELETE_EVENT:
-                    dialog_pw.destroy()
-                else:
-                    dialog_pw.destroy()
+
+                dialog_pw.destroy()
             except ValueError as err:
                 error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error generating the \"Data Request\" telecommand!")
                 error_dialog.format_secondary_text(str(err))
@@ -776,12 +708,8 @@ class SpaceLabTransmitter:
                 error_dialog.destroy()
             finally:
                 dialog.destroy()
-        elif response == Gtk.ResponseType.CANCEL:
-            dialog.destroy()
-        elif response == Gtk.ResponseType.DELETE_EVENT:
-            dialog.destroy()
-        else:
-            dialog.destroy()
+
+        dialog.destroy()
     
     def on_button_leave_hibernation_clicked(self, button):
         dialog = DialogPassword(self.window)
@@ -796,13 +724,8 @@ class SpaceLabTransmitter:
                 csp = CSP(int(self.entry_preferences_protocols_csp_my_adr.get_text()))
                 pkt = csp.encode(CSP_PRIO_NORM, int(self.entry_preferences_protocols_csp_dst_adr.get_text()), CSP_PORT_LEAVE_HIBERNATION, CSP_PORT_LEAVE_HIBERNATION, False, True, False, False, False, list(), dialog.get_key())
             self._transmit_tc(pkt, "Leave Hibernation")
-            dialog.destroy()
-        elif response == Gtk.ResponseType.CANCEL:
-            dialog.destroy()
-        elif response == Gtk.ResponseType.DELETE_EVENT:
-            dialog.destroy()
-        else:
-            dialog.destroy()
+
+        dialog.destroy()
 
     def on_button_force_reset_clicked(self, button):
         dialog = DialogPassword(self.window)
@@ -817,13 +740,8 @@ class SpaceLabTransmitter:
 #                csp = CSP(int(self.entry_preferences_protocols_csp_my_adr.get_text()))
 #                pkt = csp.encode()
             self._transmit_tc(pkt, "Force Reset")
-            dialog.destroy()
-        elif response == Gtk.ResponseType.CANCEL:
-            dialog.destroy()
-        elif response == Gtk.ResponseType.DELETE_EVENT:
-            dialog.destroy()
-        else:
-            dialog.destroy()
+
+        dialog.destroy()
 
     def on_button_get_parameter_clicked(self, button):
         dialog = DialogGetParameter(self.window)
@@ -852,13 +770,8 @@ class SpaceLabTransmitter:
 #                        csp = CSP(int(self.entry_preferences_protocols_csp_my_adr.get_text()))
 #                        pkt = csp.encode()
                     self._transmit_tc(pkt, "Get Parameter")
-                    dialog_pw.destroy()
-                elif response_key == Gtk.ResponseType.CANCEL:
-                    dialog_pw.destroy()
-                elif response_key == Gtk.ResponseType.DELETE_EVENT:
-                    dialog_pw.destroy()
-                else:
-                    dialog_pw.destroy()
+
+                dialog_pw.destroy()
             except ValueError as err:
                 error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error generating the \"Get Parameter\" telecommand!")
                 error_dialog.format_secondary_text(str(err))
@@ -866,12 +779,8 @@ class SpaceLabTransmitter:
                 error_dialog.destroy()
             finally:
                 dialog.destroy()
-        elif response == Gtk.ResponseType.CANCEL:
-            dialog.destroy()
-        elif response == Gtk.ResponseType.DELETE_EVENT:
-            dialog.destroy()
-        else:
-            dialog.destroy()
+
+        dialog.destroy()
 
     def on_button_get_payload_data_clicked(self, button):
         dialog = DialogGetPayloadData(self.window)
@@ -901,13 +810,8 @@ class SpaceLabTransmitter:
 #                        csp = CSP(int(self.entry_preferences_protocols_csp_my_adr.get_text()))
 #                        pkt = csp.encode()
                     self._transmit_tc(pkt, "Get Payload Data")
-                    dialog_pw.destroy()
-                elif response_key == Gtk.ResponseType.CANCEL:
-                    dialog_pw.destroy()
-                elif response_key == Gtk.ResponseType.DELETE_EVENT:
-                    dialog_pw.destroy()
-                else:
-                    dialog_pw.destroy()
+
+                dialog_pw.destroy()
             except (ValueError, SyntaxError) as err:
                 error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error generating the \"Get Payload\" telecommand!")
                 error_dialog.format_secondary_text(str(err))
@@ -915,12 +819,8 @@ class SpaceLabTransmitter:
                 error_dialog.destroy()
             finally:
                 dialog.destroy()
-        elif response == Gtk.ResponseType.CANCEL:
-            dialog.destroy()
-        elif response == Gtk.ResponseType.DELETE_EVENT:
-            dialog.destroy()
-        else:
-            dialog.destroy()
+
+        dialog.destroy()
 
     def on_button_broadcast_message_clicked(self, button):
         dialog = DialogBroadcastMessage(self.window)
@@ -962,7 +862,6 @@ class SpaceLabTransmitter:
                     dialog_pw.destroy()
 
                 self._transmit_tc(pkt, "Broadcast Message")
-                dialog.destroy()
             except ValueError as err:
                 error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error generating the \"Broadcast Message\" telecommand!")
                 error_dialog.format_secondary_text(str(err))
@@ -970,12 +869,8 @@ class SpaceLabTransmitter:
                 error_dialog.destroy()
             finally:
                 dialog.destroy()
-        elif response == Gtk.ResponseType.CANCEL:
-            dialog.destroy()
-        elif response == Gtk.ResponseType.DELETE_EVENT:
-            dialog.destroy()
-        else:
-            dialog.destroy()
+
+        dialog.destroy()
 
     def on_button_tx_pkt_clicked(self, button):
         dialog = DialogTransmitPacket(self.window)
@@ -999,13 +894,8 @@ class SpaceLabTransmitter:
 #                        csp = CSP(int(self.entry_preferences_protocols_csp_my_adr.get_text()))
 #                        pkt = csp.encode()
                     self._transmit_tc(pkt, "Transmit Packet")
-                    dialog_pw.destroy()
-                elif response_key == Gtk.ResponseType.CANCEL:
-                    dialog_pw.destroy()
-                elif response_key == Gtk.ResponseType.DELETE_EVENT:
-                    dialog_pw.destroy()
-                else:
-                    dialog_pw.destroy()
+
+                dialog_pw.destroy()
             except ValueError as err:
                 error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error generating the \"Transmit Packet\" telecommand!")
                 error_dialog.format_secondary_text(str(err))
@@ -1013,12 +903,8 @@ class SpaceLabTransmitter:
                 error_dialog.destroy()
             finally:
                 dialog.destroy()
-        elif response == Gtk.ResponseType.CANCEL:
-            dialog.destroy()
-        elif response == Gtk.ResponseType.DELETE_EVENT:
-            dialog.destroy()
-        else:
-            dialog.destroy()
+
+        dialog.destroy()
 
     def on_button_update_tle_clicked(self, button):
         dialog = DialogUpdateTLE(self.window)
@@ -1058,13 +944,8 @@ class SpaceLabTransmitter:
 #                        csp = CSP(int(self.entry_preferences_protocols_csp_my_adr.get_text()))
 #                        pkt = csp.encode()
                     self._transmit_tc(pkt, "Update TLE")
-                    dialog_pw.destroy()
-                elif response_key == Gtk.ResponseType.CANCEL:
-                    dialog_pw.destroy()
-                elif response_key == Gtk.ResponseType.DELETE_EVENT:
-                    dialog_pw.destroy()
-                else:
-                    dialog_pw.destroy()
+
+                dialog_pw.destroy()
             except ValueError as err:
                 error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error generating the \"Update TLE\" telecommand!")
                 error_dialog.format_secondary_text(str(err))
@@ -1072,12 +953,8 @@ class SpaceLabTransmitter:
                 error_dialog.destroy()
             finally:
                 dialog.destroy()
-        elif response == Gtk.ResponseType.CANCEL:
-            dialog.destroy()
-        elif response == Gtk.ResponseType.DELETE_EVENT:
-            dialog.destroy()
-        else:
-            dialog.destroy()
+
+        dialog.destroy()
 
     def on_button_time_sync_clicked(self, button):
         dialog = DialogPassword(self.window)
@@ -1103,15 +980,6 @@ class SpaceLabTransmitter:
                     csp = CSP(int(self.entry_preferences_protocols_csp_my_adr.get_text()))
                     pkt = csp.encode(CSP_PRIO_NORM, int(self.entry_preferences_protocols_csp_dst_adr.get_text()), CSP_PORT_TIME_SYNC, CSP_PORT_TIME_SYNC, False, True, False, False, False, pl, dialog.get_key())
 
-                    if self.switch_preferences_protocols_csp_hmac.get_active():
-                        dialog_pw = DialogPassword(self.window)
-
-                        response_key = dialog_pw.run()
-                        if response_key == Gtk.ResponseType.OK:
-                            pkt = csp.append_hmac(pkt, dialog_pw.get_key())
-
-                        dialog_pw.destroy()
-
                 self._transmit_tc(pkt, "Time Sync")
             except ValueError as err:
                 error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error generating the \"Time Sync\" telecommand!")
@@ -1120,12 +988,8 @@ class SpaceLabTransmitter:
                 error_dialog.destroy()
             finally:
                 dialog.destroy()
-        elif response == Gtk.ResponseType.CANCEL:
-            dialog.destroy()
-        elif response == Gtk.ResponseType.DELETE_EVENT:
-            dialog.destroy()
-        else:
-            dialog.destroy()
+
+        dialog.destroy()
 
     def on_button_csp_services_clicked(self, button):
         response = self.dialog_csp_services.run()
@@ -1294,12 +1158,8 @@ class SpaceLabTransmitter:
                 error_dialog.destroy()
             finally:
                 dialog.destroy()
-        elif response == Gtk.ResponseType.CANCEL:
-            dialog.destroy()
-        elif response == Gtk.ResponseType.DELETE_EVENT:
-            dialog.destroy()
-        else:
-            dialog.destroy()
+
+        dialog.destroy()
 
     def on_button_csp_cmp_if_stat_clicked(self, button):
         dialog = DialogCSPIFStat(self.window)
@@ -1330,12 +1190,8 @@ class SpaceLabTransmitter:
                 error_dialog.destroy()
             finally:
                 dialog.destroy()
-        elif response == Gtk.ResponseType.CANCEL:
-            dialog.destroy()
-        elif response == Gtk.ResponseType.DELETE_EVENT:
-            dialog.destroy()
-        else:
-            dialog.destroy()
+
+        dialog.destroy()
 
     def on_button_csp_cmp_peek_clicked(self, button):
         dialog = DialogCSPPeek(self.window)
@@ -1369,12 +1225,8 @@ class SpaceLabTransmitter:
                 error_dialog.destroy()
             finally:
                 dialog.destroy()
-        elif response == Gtk.ResponseType.CANCEL:
-            dialog.destroy()
-        elif response == Gtk.ResponseType.DELETE_EVENT:
-            dialog.destroy()
-        else:
-            dialog.destroy()
+
+        dialog.destroy()
 
     def on_button_csp_cmp_poke_clicked(self, button):
         dialog = DialogCSPPoke(self.window)
@@ -1408,12 +1260,8 @@ class SpaceLabTransmitter:
                 error_dialog.destroy()
             finally:
                 dialog.destroy()
-        elif response == Gtk.ResponseType.CANCEL:
-            dialog.destroy()
-        elif response == Gtk.ResponseType.DELETE_EVENT:
-            dialog.destroy()
-        else:
-            dialog.destroy()
+
+        dialog.destroy()
 
     def on_button_csp_cmp_set_clock_clicked(self, button):
         try:
