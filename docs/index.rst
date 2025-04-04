@@ -12,7 +12,8 @@ Spacelab Transmitter's documentation!
    overview
    installation
    usage_guide
+   protocols
    telecommands
    telecommands_transmissions
    logfile
-   packaging
+   dev

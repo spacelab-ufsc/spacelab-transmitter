@@ -131,24 +131,12 @@ The telecommand "Get Parameter" complements the "Set Parameter" telecommand. It 
 Authentication
 ==============
 
-All the telecommands classified as private use an HMAC authentication scheme. Every type of private telecommand has a unique 16-digit ASCII character key that with the telecommand sequence (or message) generates an 160-bits (20-bytes) hash sequence to be transmitted together with the packet payload. The used hash algorithm is the SHA-1. [3]_. The below illustrates this authentication method.
+All the telecommands classified as private use an HMAC authentication scheme. Every type of private telecommand has a unique 16-digit ASCII character key that with the telecommand sequence (or message) generates an 160-bits (20-bytes) hash sequence to be transmitted together with the packet payload. The used hash algorithm is the SHA-1. [1]_. The below illustrates this authentication method.
 
 .. image:: img/hmac.png
    :width: 500
 
-Structure of the packets
-========================
-
-Every package payload countains its ID (1 byte), the source callsign (source address of the ground station, 7 bytes) and the package content (data, up to 212 bytes). This last one can either have none or many parameters depending on the function of the telecommand.
-
-The used communication protocol is a python variation of the NGHam [1]_: the PyNGHam [2]_.
-
-.. image:: img/ngham.png
-   :width: 300
-
 References
 ==========
 
-.. [1] https://github.com/skagmo/ngham
-.. [2] https://github.com/mgm8/pyngham
-.. [3] https://github.com/spacelab-ufsc/floripasat2-doc
+.. [1] https://github.com/spacelab-ufsc/floripasat2-doc
