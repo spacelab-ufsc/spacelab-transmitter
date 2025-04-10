@@ -129,7 +129,7 @@ class AX100Mode5:
         # Golay24
         gol = Golay24()
 
-        pkt += gol.encode(len(self.get_sync_word()) + len(data) + 32)   # 32 = Reed-Solomon parity block
+        pkt += gol.encode(len(data) + 32)   # 32 = Reed-Solomon parity block
 
         # Data
         pkt += data

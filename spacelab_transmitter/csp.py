@@ -486,7 +486,7 @@ class CSP:
     def _decode_pl(self, pl):
         return {"payload": pl}
 
-    def append_hmac(self, pkt, key, inc_header=False):
+    def append_hmac(self, pkt, key, inc_header=True):
         """
         Enables the HMAC authentication to an existing packet.
 
