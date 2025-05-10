@@ -36,7 +36,7 @@ from gi.repository import GdkPixbuf
 
 import spacelab_transmitter.version
 
-from spacelab_transmitter.tc_dialogs import DialogDataRequest, DialogDeactivatePayload, DialogEnterHibernation, DialogActivatePayload, DialogGetPayloadData, DialogSetParameter, DialogDeactivateModule, DialogActivateModule, DialogGetParameter, DialogBroadcastMessage, DialogTransmitPacket, DialogEraseMemory, DialogUpdateTLE, DialogCSPPeek, DialogCSPPoke, DialogCSPIFStat, DialogCSPRouteSet, DialogPassword
+from spacelab_transmitter.tc_dialogs import DialogDataRequest, DialogDeactivatePayload, DialogEnterHibernation, DialogActivatePayload, DialogGetPayloadData, DialogSetParameter, DialogDeactivateModule, DialogActivateModule, DialogGetParameter, DialogBroadcastMessage, DialogTransmitPacket, DialogEraseMemory, DialogUpdateTLE, DialogCSPPeek, DialogCSPPoke, DialogCSPIFStat, DialogCSPRouteSet, DialogScheduleTC, DialogPassword
 
 from spacelab_transmitter.gmsk import GMSK
 from spacelab_transmitter.usrp import USRP
@@ -132,6 +132,7 @@ SLP_ID_SET_PARAMETER            = 0x4C
 SLP_ID_GET_PARAMETER            = 0x4D
 SLP_ID_TRANSMIT_PACKET          = 0x4E
 SLP_ID_UPDATE_TLE               = 0x4F
+SLP_ID_SCHEDULE_TC              = 0x50
 
 # CSP Ports
 CSP_PORT_DATA_REQUEST           = 35
@@ -380,8 +381,12 @@ class SpaceLabTransmitter:
         self.button_csp_shutdown = self.builder.get_object("button_csp_shutdown")
         self.button_csp_shutdown.connect("clicked", self.on_button_csp_shutdown_clicked)
 
+        # Schedule TC
+        self.button_schedule_tc = self.builder.get_object("button_schedule_tc")
+        self.button_schedule_tc.connect("clicked", self.on_button_schedule_tc_clicked)
+
     def run(self):
-        self.window.show_all()          
+        self.window.show_all()
         Gtk.main()
 
     def on_main_window_destroy(self, window):
@@ -1347,6 +1352,52 @@ class SpaceLabTransmitter:
             error_dialog.run()
             error_dialog.destroy()
 
+    def on_button_schedule_tc_clicked(self, button):
+        dialog = DialogScheduleTC(self.window)
+
+        response = dialog.run()
+        if response == Gtk.ResponseType.OK:
+            try:
+                tc_ts = dialog.get_ts()
+                tc_id = dialog.get_tc_id()
+                tc_par = dialog.get_params()
+                if tc_ts < 0 or tc_ts > 2**32-1:
+                    raise ValueError("The timestamp must be between 0 and "+ str(2**32-1) + "!")
+
+                if tc_id < 0 or tc_id > 255:
+                    raise ValueError("The telecommand ID must be between 0 and 255!")
+
+                dialog_pw = DialogPassword(self.window)
+
+                response_key = dialog_pw.run()
+                if response_key == Gtk.ResponseType.OK:
+                    pl = list(struct.pack('>I', tc_ts))
+                    pl += [tc_id]
+                    callsign = self.entry_preferences_general_callsign.get_text()
+                    for i in range(7 - len(callsign)):
+                        pl += [ord(' ')]
+                    pl += [ord(i) for i in callsign]
+                    pl += tc_par
+                    pkt = list()
+                    if self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_SLP:
+                        slp = SLP()
+                        pkt = slp.encode_private(SLP_ID_GET_PARAMETER, self.entry_preferences_general_callsign.get_text(), dialog_pw.get_key(), pl)
+#                    elif self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_CSP:
+#                        csp = CSP(int(self.entry_preferences_protocols_csp_my_adr.get_text()))
+#                        pkt = csp.encode()
+                    self._transmit_tc(pkt, "Schedule TC")
+
+                dialog_pw.destroy()
+            except ValueError as err:
+                error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error generating the \"Schedule TC\" telecommand!")
+                error_dialog.format_secondary_text(str(err))
+                error_dialog.run()
+                error_dialog.destroy()
+            finally:
+                dialog.destroy()
+
+        dialog.destroy()
+
     def _transmit_tc(self, pkt, tc_name):
         carrier_frequency = int(self.entry_carrier_frequency.get_text())
         tx_gain = self.spinbutton_tx_gain.get_text()
@@ -1594,6 +1645,7 @@ class SpaceLabTransmitter:
         self.button_csp_cmp_get_clock.set_sensitive(False)
         self.button_csp_reboot.set_sensitive(False)
         self.button_csp_shutdown.set_sensitive(False)
+        self.button_schedule_tc.set_sensitive(False)
 
         avail_pkts = self._satellite.get_active_link().get_packets()
 
@@ -1630,6 +1682,7 @@ class SpaceLabTransmitter:
             self.button_csp_cmp_get_clock.set_sensitive(state)
             self.button_csp_reboot.set_sensitive(state)
             self.button_csp_shutdown.set_sensitive(state)
+        if "schedule_tc" in avail_pkts:         self.button_schedule_tc.set_sensitive(state)
 
     def on_combobox_satellite_changed(self, combobox):
         sat_filename = _SATELLITES[self.combobox_satellite.get_active()][1]
@@ -1742,6 +1795,7 @@ class SpaceLabTransmitter:
         self.button_update_tle.set_tooltip_text("")
         self.button_time_sync.set_tooltip_text("")
         self.button_csp_services.set_tooltip_text("")
+        self.button_schedule_tc.set_tooltip_text("")
 
         with open(filename) as f:
             sat_info = json.load(f)
@@ -1785,3 +1839,5 @@ class SpaceLabTransmitter:
                         self.button_update_tle.set_tooltip_text(sat_info['links'][lk_idx]['tooltips']['time_sync'])
                     if 'csp_services' in sat_info['links'][lk_idx]['packets']:
                         self.button_csp_services.set_tooltip_text(sat_info['links'][lk_idx]['tooltips']['csp_services'])
+                    if 'schedule_tc' in sat_info['links'][lk_idx]['packets']:
+                        self.button_schedule_tc.set_tooltip_text(sat_info['links'][lk_idx]['tooltips']['schedule_tc'])
