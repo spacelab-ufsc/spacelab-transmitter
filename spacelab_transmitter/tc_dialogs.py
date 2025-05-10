@@ -21,6 +21,7 @@
 #
 
 import datetime
+import calendar
 
 import gi
 gi.require_version('Gtk', '3.0')
@@ -764,6 +765,7 @@ class DialogScheduleTC(Gtk.Dialog):
         self.spinbutton_year = Gtk.SpinButton()
         self.spinbutton_year.set_adjustment(adjustment_year)
         self.spinbutton_year.set_range(2025, 3000)
+        self.spinbutton_year.connect("changed", self.on_spinbutton_year_changed)
         self.label_month = Gtk.Label(label="Month:")
         self.combobox_month = Gtk.ComboBoxText()
         self.combobox_month.append_text("January")
@@ -831,33 +833,11 @@ class DialogScheduleTC(Gtk.Dialog):
 
         self.show_all()
 
+    def on_spinbutton_year_changed(self, spinbutton):
+        self.spinbutton_day.set_range(1, calendar.monthrange(int(self.spinbutton_year.get_value()), self.combobox_month.get_active() + 1)[1])
+
     def on_combobox_month_changed(self, combobox):
-        if self.combobox_month.get_active() == 0:
-            self.spinbutton_day.set_range(1, 31)
-        elif self.combobox_month.get_active() == 1:
-            self.spinbutton_day.set_range(1, 28)
-        elif self.combobox_month.get_active() == 2:
-            self.spinbutton_day.set_range(1, 31)
-        elif self.combobox_month.get_active() == 3:
-            self.spinbutton_day.set_range(1, 30)
-        elif self.combobox_month.get_active() == 4:
-            self.spinbutton_day.set_range(1, 31)
-        elif self.combobox_month.get_active() == 5:
-            self.spinbutton_day.set_range(1, 30)
-        elif self.combobox_month.get_active() == 6:
-            self.spinbutton_day.set_range(1, 31)
-        elif self.combobox_month.get_active() == 7:
-            self.spinbutton_day.set_range(1, 31)
-        elif self.combobox_month.get_active() == 8:
-            self.spinbutton_day.set_range(1, 30)
-        elif self.combobox_month.get_active() == 9:
-            self.spinbutton_day.set_range(1, 31)
-        elif self.combobox_month.get_active() == 10:
-            self.spinbutton_day.set_range(1, 30)
-        elif self.combobox_month.get_active() == 11:
-            self.spinbutton_day.set_range(1, 31)
-        else:
-            self.spinbutton_day.set_range(1, 31)
+        self.spinbutton_day.set_range(1, calendar.monthrange(int(self.spinbutton_year.get_value()), self.combobox_month.get_active() + 1)[1])
 
     def set_datetime(self, dt):
         self.spinbutton_hour.set_value(dt.hour)
