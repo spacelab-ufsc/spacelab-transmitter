@@ -20,6 +20,8 @@
 #  
 #
 
+import datetime
+
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
@@ -734,9 +736,54 @@ class DialogScheduleTC(Gtk.Dialog):
 
         self.add_buttons(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK)
 
-        label = Gtk.Label(label="Timestamp:")
+        label = Gtk.Label(label="Datetime:")
         label.set_halign(Gtk.Align.START)
         self.entry_ts = Gtk.Entry()
+
+        adjustment_hour = Gtk.Adjustment(lower=0, upper=23, step_increment=1, page_increment=10)
+        adjustment_min = Gtk.Adjustment(lower=0, upper=59, step_increment=1, page_increment=10)
+        adjustment_sec = Gtk.Adjustment(lower=0, upper=59, step_increment=1, page_increment=10)
+        adjustment_year = Gtk.Adjustment(lower=2025, upper=3000, step_increment=1, page_increment=10)
+        adjustment_day = Gtk.Adjustment(lower=1, upper=31, step_increment=1, page_increment=10)
+
+        self.spinbutton_hour = Gtk.SpinButton()
+        self.spinbutton_hour.set_adjustment(adjustment_hour)
+        self.spinbutton_hour.set_range(0, 23)
+        self.spinbutton_hour.set_orientation(Gtk.Orientation.VERTICAL)
+        self.label_hour_sep = Gtk.Label(label=":")
+        self.spinbutton_min = Gtk.SpinButton()
+        self.spinbutton_min.set_adjustment(adjustment_min)
+        self.spinbutton_min.set_range(0, 59)
+        self.spinbutton_min.set_orientation(Gtk.Orientation.VERTICAL)
+        self.label_min_sep = Gtk.Label(label=":")
+        self.spinbutton_sec = Gtk.SpinButton()
+        self.spinbutton_sec.set_adjustment(adjustment_sec)
+        self.spinbutton_sec.set_range(0, 59)
+        self.spinbutton_sec.set_orientation(Gtk.Orientation.VERTICAL)
+        self.label_year = Gtk.Label(label="Year:")
+        self.spinbutton_year = Gtk.SpinButton()
+        self.spinbutton_year.set_adjustment(adjustment_year)
+        self.spinbutton_year.set_range(2025, 3000)
+        self.label_month = Gtk.Label(label="Month:")
+        self.combobox_month = Gtk.ComboBoxText()
+        self.combobox_month.append_text("January")
+        self.combobox_month.append_text("February")
+        self.combobox_month.append_text("March")
+        self.combobox_month.append_text("April")
+        self.combobox_month.append_text("May")
+        self.combobox_month.append_text("June")
+        self.combobox_month.append_text("July")
+        self.combobox_month.append_text("August")
+        self.combobox_month.append_text("Septembe")
+        self.combobox_month.append_text("October")
+        self.combobox_month.append_text("November")
+        self.combobox_month.append_text("Dezember")
+        self.combobox_month.set_active(0)
+        self.combobox_month.connect("changed", self.on_combobox_month_changed)
+        self.label_day = Gtk.Label(label="Day:")
+        self.spinbutton_day = Gtk.SpinButton()
+        self.spinbutton_day.set_adjustment(adjustment_day)
+        self.spinbutton_day.set_range(1, 31)
 
         label2 = Gtk.Label(label="TC ID:")
         label2.set_halign(Gtk.Align.START)
@@ -754,12 +801,22 @@ class DialogScheduleTC(Gtk.Dialog):
         grid.set_margin_top(5)
         grid.set_margin_bottom(5)
 
-        grid.add(label)
-        grid.attach(label2, 0, 1, 1, 1)
-        grid.attach(label3, 0, 2, 1, 1)
-        grid.attach(self.entry_ts, 1, 0, 1, 1)
-        grid.attach(self.entry_tc_id, 1, 1, 1, 1)
-        grid.attach(self.entry_params, 1, 2, 1, 1)
+        grid.attach(label, 0, 0, 1, 3)
+        grid.attach(label2, 0, 3, 1, 1)
+        grid.attach(label3, 0, 4, 1, 1)
+        grid.attach(self.spinbutton_hour, 1, 0, 1, 3)
+        grid.attach(self.label_hour_sep, 2, 0, 1, 3)
+        grid.attach(self.spinbutton_min, 3, 0, 1, 3)
+        grid.attach(self.label_min_sep, 4, 0, 1, 3)
+        grid.attach(self.spinbutton_sec, 5, 0, 1, 3)
+        grid.attach(self.label_year, 6, 0, 1, 1)
+        grid.attach(self.label_month, 6, 1, 1, 1)
+        grid.attach(self.label_day, 6, 2, 1, 1)
+        grid.attach(self.spinbutton_year, 7, 0, 1, 1)
+        grid.attach(self.combobox_month, 7, 1, 1, 1)
+        grid.attach(self.spinbutton_day, 7, 2, 1, 1)
+        grid.attach(self.entry_tc_id, 1, 3, 7, 1)
+        grid.attach(self.entry_params, 1, 4, 7, 1)
 
         box_content = self.get_content_area()
         box_content.add(grid)
@@ -770,10 +827,55 @@ class DialogScheduleTC(Gtk.Dialog):
         box_buttons.set_margin_end(10)
         box_buttons.set_margin_bottom(5)
 
+        self.set_datetime(datetime.datetime.now())
+
         self.show_all()
 
+    def on_combobox_month_changed(self, combobox):
+        if self.combobox_month.get_active() == 0:
+            self.spinbutton_day.set_range(1, 31)
+        elif self.combobox_month.get_active() == 1:
+            self.spinbutton_day.set_range(1, 28)
+        elif self.combobox_month.get_active() == 2:
+            self.spinbutton_day.set_range(1, 31)
+        elif self.combobox_month.get_active() == 3:
+            self.spinbutton_day.set_range(1, 30)
+        elif self.combobox_month.get_active() == 4:
+            self.spinbutton_day.set_range(1, 31)
+        elif self.combobox_month.get_active() == 5:
+            self.spinbutton_day.set_range(1, 30)
+        elif self.combobox_month.get_active() == 6:
+            self.spinbutton_day.set_range(1, 31)
+        elif self.combobox_month.get_active() == 7:
+            self.spinbutton_day.set_range(1, 31)
+        elif self.combobox_month.get_active() == 8:
+            self.spinbutton_day.set_range(1, 30)
+        elif self.combobox_month.get_active() == 9:
+            self.spinbutton_day.set_range(1, 31)
+        elif self.combobox_month.get_active() == 10:
+            self.spinbutton_day.set_range(1, 30)
+        elif self.combobox_month.get_active() == 11:
+            self.spinbutton_day.set_range(1, 31)
+        else:
+            self.spinbutton_day.set_range(1, 31)
+
+    def set_datetime(self, dt):
+        self.spinbutton_hour.set_value(dt.hour)
+        self.spinbutton_min.set_value(dt.minute)
+        self.spinbutton_sec.set_value(dt.second)
+        self.spinbutton_year.set_value(dt.year)
+        self.combobox_month.set_active(dt.month-1)
+        self.spinbutton_day.set_value(dt.day)
+
     def get_ts(self):
-        return int(self.entry_ts.get_text())
+        dt = datetime.datetime(int(self.spinbutton_year.get_value()),
+                               self.combobox_month.get_active() + 1,
+                               int(self.spinbutton_day.get_value()),
+                               int(self.spinbutton_hour.get_value()),
+                               int(self.spinbutton_min.get_value()),
+                               int(self.spinbutton_sec.get_value()))
+
+        return int(dt.timestamp())
 
     def get_tc_id(self):
         return int(self.entry_tc_id.get_text())
