@@ -70,6 +70,8 @@ This program will support the satellites below:
 
 ## Documentation
 
+The documentation of this project is generated using the Sphinx tool, and it is available [here](https://spacelab-ufsc.github.io/spacelab-transmitter/).
+
 ### Dependencies
 
 * Sphinx
