@@ -1381,7 +1381,7 @@ class SpaceLabTransmitter:
                     pkt = list()
                     if self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_SLP:
                         slp = SLP()
-                        pkt = slp.encode_private(SLP_ID_GET_PARAMETER, self.entry_preferences_general_callsign.get_text(), dialog_pw.get_key(), pl)
+                        pkt = slp.encode_private(SLP_ID_SCHEDULE_TC, self.entry_preferences_general_callsign.get_text(), dialog_pw.get_key(), pl)
 #                    elif self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_CSP:
 #                        csp = CSP(int(self.entry_preferences_protocols_csp_my_adr.get_text()))
 #                        pkt = csp.encode()
