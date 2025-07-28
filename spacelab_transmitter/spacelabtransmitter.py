@@ -1749,6 +1749,7 @@ class SpaceLabTransmitter:
 
             self.combobox_sdr.set_sensitive(False)
             self.entry_carrier_frequency.set_sensitive(False)
+            self.entry_sdr_freq_offset.set_sensitive(False)
             self.entry_sample_rate.set_sensitive(False)
             self.spinbutton_tx_gain.set_sensitive(False)
             self.entry_tcp_address.set_sensitive(False)
@@ -1769,6 +1770,7 @@ class SpaceLabTransmitter:
 
         self.combobox_sdr.set_sensitive(True)
         self.entry_carrier_frequency.set_sensitive(True)
+        self.entry_sdr_freq_offset.set_sensitive(True)
         self.entry_sample_rate.set_sensitive(True)
         self.spinbutton_tx_gain.set_sensitive(True)
         self.entry_tcp_address.set_sensitive(True)
