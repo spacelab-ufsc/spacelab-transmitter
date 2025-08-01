@@ -31,8 +31,7 @@ import struct
 
 import gi
 gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk
-from gi.repository import GdkPixbuf
+from gi.repository import Gtk, GdkPixbuf, GLib
 
 import spacelab_transmitter.version
 
@@ -159,6 +158,7 @@ class SpaceLabTransmitter:
         self._satellite = Satellite()
 
         self._client_socket = None
+        self._tcp_cb_id = None
 
         self.builder.connect_signals(self)
 
@@ -1745,17 +1745,24 @@ class SpaceLabTransmitter:
             port = int(self.entry_tcp_port.get_text())
             self._client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self._client_socket.connect((adr, port))
-            self.write_log("Connected to " + adr + ":" + str(port))
 
-            self.combobox_sdr.set_sensitive(False)
-            self.entry_carrier_frequency.set_sensitive(False)
-            self.entry_sdr_freq_offset.set_sensitive(False)
-            self.entry_sample_rate.set_sensitive(False)
-            self.spinbutton_tx_gain.set_sensitive(False)
-            self.entry_tcp_address.set_sensitive(False)
-            self.entry_tcp_port.set_sensitive(False)
-            self.button_tcp_connect.set_sensitive(False)
-            self.button_tcp_disconnect.set_sensitive(True)
+            if self._client_socket:
+                self.write_log("Connected to " + adr + ":" + str(port))
+
+                # Create an IOChannel for the client socket and watch for incoming data
+                self._tcp_client_socket_io_channel = GLib.IOChannel(self._client_socket.fileno())
+                self._tcp_client_socket_io_channel.set_encoding(None)   # Binary mode
+                self._tcp_cb_id = GLib.io_add_watch(self._tcp_client_socket_io_channel, GLib.IO_IN, self._handle_tcp_data)
+
+                self.combobox_sdr.set_sensitive(False)
+                self.entry_carrier_frequency.set_sensitive(False)
+                self.entry_sdr_freq_offset.set_sensitive(False)
+                self.entry_sample_rate.set_sensitive(False)
+                self.spinbutton_tx_gain.set_sensitive(False)
+                self.entry_tcp_address.set_sensitive(False)
+                self.entry_tcp_port.set_sensitive(False)
+                self.button_tcp_connect.set_sensitive(False)
+                self.button_tcp_disconnect.set_sensitive(True)
         except socket.error as e:
             error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error connecting to server!")
             error_dialog.format_secondary_text(str(e))
@@ -1763,10 +1770,13 @@ class SpaceLabTransmitter:
             error_dialog.destroy()
 
     def on_button_tcp_disconnect_clicked(self, button):
-        self._client_socket.shutdown(socket.SHUT_RDWR)
-        self._client_socket.close()
+        self._close_tcp_socket()
 
+    def _close_tcp_socket(self):
         self.write_log("Disconnected from " + self.entry_tcp_address.get_text() + ":" + self.entry_tcp_port.get_text())
+
+        self._client_socket.close()
+        self._client_socket = None
 
         self.combobox_sdr.set_sensitive(True)
         self.entry_carrier_frequency.set_sensitive(True)
@@ -1777,6 +1787,23 @@ class SpaceLabTransmitter:
         self.entry_tcp_port.set_sensitive(True)
         self.button_tcp_connect.set_sensitive(True)
         self.button_tcp_disconnect.set_sensitive(False)
+
+    def _handle_tcp_data(self, source, condition):
+        if condition == GLib.IO_IN:
+            try:
+                data = self._client_socket.recv(1024)   # Receive data from the server
+                if data:
+                    self._write_log("Data received from TCP server!")
+                else:
+                    # Server has closed the connection
+                    self._write_log("TCP server closed the connection!")
+                    self._close_tcp_socket()
+                    return False    # Stop the IO watch for this socket
+            except socket.error as e:
+                self._write_log("Error receiving data from TCP server: " + str(e))
+                self._close_tcp_socket()
+                return False  # Stop the IO watch for this socket
+        return True  # Keep the handler active
 
     def _load_tooltips(self, filename):
         self.button_ping_request.set_tooltip_text("")
