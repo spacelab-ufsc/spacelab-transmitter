@@ -803,9 +803,9 @@ class SpaceLabTransmitter:
             if self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_SLP:
                 slp = SLP()
                 pkt = slp.encode_private(SLP_ID_FORCE_RESET, self.entry_preferences_general_callsign.get_text(), dialog.get_key(), list())
-#            elif self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_CSP:
-#                csp = CSP(int(self.entry_preferences_protocols_csp_my_adr.get_text()))
-#                pkt = csp.encode()
+            elif self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_CSP:
+                csp = CSP(int(self.entry_preferences_protocols_csp_my_adr.get_text()))
+                pkt = csp.encode(CSP_PRIO_NORM, int(self.entry_preferences_protocols_csp_dst_adr.get_text()), CSP_PORT_FORCE_RESET, CSP_PORT_FORCE_RESET, False, True, False, False, False, list(), dialog.get_key())
             self._transmit_tc(pkt, "Force Reset")
 
         dialog.destroy()
