@@ -143,7 +143,7 @@ CSP_PORT_ERASE_MEMORY           = 43
 CSP_PORT_FORCE_RESET            = 44
 CSP_PORT_GET_PAYLOAD_DATA       = 45
 CSP_PORT_SET_PARAM              = 46
-CSP_PORT_GET_PARAM              = 47
+CSP_PORT_SCHEDULE_TC            = 47
 CSP_PORT_TIME_SYNC              = 48
 
 class SpaceLabTransmitter:
@@ -1446,9 +1446,11 @@ class SpaceLabTransmitter:
                     if self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_SLP:
                         slp = SLP()
                         pkt = slp.encode_private(SLP_ID_SCHEDULE_TC, self.entry_preferences_general_callsign.get_text(), dialog_pw.get_key(), pl)
-#                    elif self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_CSP:
-#                        csp = CSP(int(self.entry_preferences_protocols_csp_my_adr.get_text()))
-#                        pkt = csp.encode()
+                    elif self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_CSP:
+                        pl = pl[:5] + [len(tc_par)] + tc_par
+                        csp = CSP(int(self.entry_preferences_protocols_csp_my_adr.get_text()))
+                        pkt = csp.encode(CSP_PRIO_NORM, int(self.entry_preferences_protocols_csp_dst_adr.get_text()), CSP_PORT_SCHEDULE_TC, CSP_PORT_SCHEDULE_TC, False, True, False, False, False, pl, dialog_pw.get_key())
+                        print(pkt)
                     self._transmit_tc(pkt, "Schedule TC")
 
                 dialog_pw.destroy()
