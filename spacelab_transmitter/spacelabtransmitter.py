@@ -616,15 +616,13 @@ class SpaceLabTransmitter:
             try:
                 subsys_id = dialog.get_subsys_id()
                 param_id = dialog.get_param_id()
-                param_val = dialog.get_param_val()
+                param_type = dialog.get_param_type()
+                param_val_str = dialog.get_param_val()
                 if subsys_id < 0 or subsys_id > 255:
                     raise ValueError("The subsystem ID must be between 0 and 255!")
 
                 if param_id < 0 or param_id > 255:
                     raise ValueError("The parameter ID must be between 0 and 255!")
-
-                if param_val < 0 or param_val > 2**32-1:
-                    raise ValueError("The payload value must be between 0 and 4294967295!")
 
                 dialog_pw = DialogPassword(self.window)
 
@@ -634,19 +632,82 @@ class SpaceLabTransmitter:
 
                     pkt = list()
                     if self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_SLP:
-                        pl.append((param_val >> 24) & 0xFF)
-                        pl.append((param_val >> 16) & 0xFF)
-                        pl.append((param_val >> 8) & 0xFF)
-                        pl.append(param_val & 0xFF)
+                        param_val = int(param_val_str)
+                        if param_val < 0 or param_val > 2**32-1:
+                            raise ValueError("The parameter value must be between 0 and 4294967295!")
+
+                        pl += list(struct.pack(">I", param_val))
 
                         slp = SLP()
                         pkt = slp.encode_private(SLP_ID_SET_PARAMETER, self.entry_preferences_general_callsign.get_text(), dialog_pw.get_key(), pl)
                     elif self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_CSP:
-                        pl.append(4)
-                        pl.append((param_val >> 24) & 0xFF)
-                        pl.append((param_val >> 16) & 0xFF)
-                        pl.append((param_val >> 8) & 0xFF)
-                        pl.append(param_val & 0xFF)
+                        if param_type == "bool":
+                            param_val = int(param_val_str)
+                            if param_val < 0 or param_val > 1:
+                                raise ValueError("The parameter value must be 0 or 1!")
+                            pl.append(1)
+                            pl.append(param_val)
+                        elif param_type == "uint8":
+                            param_val = int(param_val_str)
+                            if param_val < 0 or param_val > 2**8-1:
+                                raise ValueError("The parameter value must be between 0 and 255!")
+                            pl.append(1)
+                            pl += list(struct.pack(">B", param_val))
+                        elif param_type == "int8":
+                            param_val = int(param_val_str)
+                            if param_val < -128 or param_val > 127:
+                                raise ValueError("The parameter value must be between -128 and 127!")
+                            pl.append(1)
+                            pl += list(struct.pack(">b", param_val))
+                        elif param_type == "uint16":
+                            param_val = int(param_val_str)
+                            if param_val < 0 or param_val > 2**16-1:
+                                raise ValueError("The parameter value must be between 0 and 65535!")
+                            pl.append(2)
+                            pl += list(struct.pack(">H", param_val))
+                        elif param_type == "int16":
+                            param_val = int(param_val_str)
+                            if param_val < -32768 or param_val > 32767:
+                                raise ValueError("The parameter value must be between -32768 and 32767!")
+                            pl.append(2)
+                            pl += list(struct.pack(">h", param_val))
+                        elif param_type == "uint32":
+                            param_val = int(param_val_str)
+                            if param_val < 0 or param_val > 2**32-1:
+                                raise ValueError("The parameter value must be between 0 and 4294967295!")
+                            pl.append(4)
+                            pl += list(struct.pack(">I", param_val))
+                        elif param_type == "int32":
+                            param_val = int(param_val_str)
+                            if param_val < -2147483648 or param_val > 2147483647:
+                                raise ValueError("The parameter value must be between -2147483648 and 2147483647!")
+                            pl.append(4)
+                            pl += list(struct.pack(">i", param_val))
+                        elif param_type == "uint64":
+                            param_val = int(param_val_str)
+                            if param_val < 0 or param_val > 2**64-1:
+                                raise ValueError("The parameter value must be between 0 and 18446744073709551615!")
+                            pl.append(8)
+                            pl += list(struct.pack(">Q", param_val))
+                        elif param_type == "int64":
+                            param_val = int(param_val_str)
+                            if param_val < -9223372036854775808 or param_val > 9223372036854775807:
+                                raise ValueError("The parameter value must be between -9223372036854775808 and 9223372036854775807!")
+                            pl.append(8)
+                            pl += list(struct.pack(">q", param_val))
+                        elif param_type == "flt":
+                            param_val = float(param_val_str)
+                            pl.append(4)
+                            pl += list(struct.pack(">f", param_val))
+                        elif param_type == "dbl":
+                            param_val = float(param_val_str)
+                            pl.append(8)
+                            pl += list(struct.pack(">d", param_val))
+                        elif param_type == "str":
+                            pl.append(len(param_val_str))
+                            pl += [ord(c) for c in param_val_str]
+                        else:
+                            raise ValueError("Unknown parameter type!")
 
                         csp = CSP(int(self.entry_preferences_protocols_csp_my_adr.get_text()))
                         pkt = csp.encode(CSP_PRIO_NORM, int(self.entry_preferences_protocols_csp_dst_adr.get_text()), CSP_PORT_SET_PARAM, CSP_PORT_SET_PARAM, False, True, False, False, False, pl, dialog_pw.get_key())

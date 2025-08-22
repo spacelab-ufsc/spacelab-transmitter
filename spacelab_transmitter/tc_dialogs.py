@@ -255,8 +255,20 @@ class DialogSetParameter(Gtk.Dialog):
         label2.set_halign(Gtk.Align.START)
         self.entry_param_id = Gtk.Entry()
 
-        label3 = Gtk.Label(label="Parameter Value:")
+        liststore_types = Gtk.ListStore(str)
+        items = ["bool", "uint8", "int8", "uint16", "int16", "uint32", "int32", "uint64", "int64", "float", "double", "string"]
+        for item in items:
+            liststore_types.append([item])
+        label3 = Gtk.Label(label="Parameter Type:")
         label3.set_halign(Gtk.Align.START)
+        self.combobox_param_type = Gtk.ComboBox.new_with_model(liststore_types)
+        cell = Gtk.CellRendererText()
+        self.combobox_param_type.pack_start(cell, True)
+        self.combobox_param_type.add_attribute(cell, "text", 0)
+        self.combobox_param_type.set_active(3)
+
+        label4 = Gtk.Label(label="Parameter Value:")
+        label4.set_halign(Gtk.Align.START)
         self.entry_param_val = Gtk.Entry()
 
         grid = Gtk.Grid()
@@ -270,9 +282,11 @@ class DialogSetParameter(Gtk.Dialog):
         grid.add(label)
         grid.attach(label2, 0, 1, 1, 1)
         grid.attach(label3, 0, 2, 1, 1)
+        grid.attach(label4, 0, 3, 1, 1)
         grid.attach(self.entry_subsys_id, 1, 0, 1, 1)
         grid.attach(self.entry_param_id, 1, 1, 1, 1)
-        grid.attach(self.entry_param_val, 1, 2, 1, 1)
+        grid.attach(self.combobox_param_type, 1, 2, 1, 1)
+        grid.attach(self.entry_param_val, 1, 3, 1, 1)
 
         box_content = self.get_content_area()
         box_content.add(grid)
@@ -291,8 +305,38 @@ class DialogSetParameter(Gtk.Dialog):
     def get_param_id(self):
         return int(self.entry_param_id.get_text())
 
+    def get_param_type(self):
+        param_type = self.combobox_param_type.get_active()
+        if param_type is not None:
+            if param_type == 0:
+                return str("bool")
+            elif param_type == 1:
+                return str("uint8")
+            elif param_type == 2:
+                return str("int8")
+            elif param_type == 3:
+                return str("uint16")
+            elif param_type == 4:
+                return str("int16")
+            elif param_type == 5:
+                return str("uint32")
+            elif param_type == 6:
+                return str("int32")
+            elif param_type == 7:
+                return str("uint64")
+            elif param_type == 8:
+                return str("int64")
+            elif param_type == 9:
+                return str("flt")
+            elif param_type == 10:
+                return str("dbl")
+            elif param_type == 11:
+                return str("str")
+            else:
+                return str("ukn")
+
     def get_param_val(self):
-        return int(self.entry_param_val.get_text())
+        return self.entry_param_val.get_text()
 
 class DialogDataRequest(Gtk.Dialog):
     def __init__(self, parent):
