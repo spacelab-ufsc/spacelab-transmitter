@@ -135,6 +135,7 @@ SLP_ID_SCHEDULE_TC              = 0x50
 
 # CSP Ports
 CSP_PORT_DATA_REQUEST           = 35
+CSP_PORT_UPDATE_TLE             = 37
 CSP_PORT_BROADCAST_MSG          = 39
 CSP_PORT_ENTER_HIBERNATION      = 40
 CSP_PORT_LEAVE_HIBERNATION      = 41
@@ -987,28 +988,30 @@ class SpaceLabTransmitter:
 
                 response_key = dialog_pw.run()
                 if response_key == Gtk.ResponseType.OK:
-                    epoch_year          = int(line1[18:20])         # Extract last two digits of the year
-                    epoch_day           = float(line1[20:32])       # Fractional day of the year
-                    eccentricity_str    = line2[26:33].lstrip("0")  # Remove leading zeros
-                    eccentricity        = int(eccentricity_str) if eccentricity_str else 0  # Convert to int
-                    mean_anomaly        = float(line2[43:51])
-                    argument_of_perigee = float(line2[34:42])
-                    bstar_drag_term     = (1.0e-5 * float(line1[53:59])) / (10 ** int(line1[60]))  # Convert scientific notation
-                    inclination         = float(line2[8:16])
-                    right_ascension     = float(line2[17:25])
-                    mean_motion         = float(line2[52:63])
-                    packed_data = struct.pack('>H d I f f f d d d',
-                        epoch_year, epoch_day, eccentricity,
-                        mean_anomaly, argument_of_perigee, bstar_drag_term,
-                        inclination, right_ascension, mean_motion)
-                    pl = list(packed_data)
                     pkt = list()
                     if self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_SLP:
+                        epoch_year          = int(line1[18:20])         # Extract last two digits of the year
+                        epoch_day           = float(line1[20:32])       # Fractional day of the year
+                        eccentricity_str    = line2[26:33].lstrip("0")  # Remove leading zeros
+                        eccentricity        = int(eccentricity_str) if eccentricity_str else 0  # Convert to int
+                        mean_anomaly        = float(line2[43:51])
+                        argument_of_perigee = float(line2[34:42])
+                        bstar_drag_term     = (1.0e-5 * float(line1[53:59])) / (10 ** int(line1[60]))  # Convert scientific notation
+                        inclination         = float(line2[8:16])
+                        right_ascension     = float(line2[17:25])
+                        mean_motion         = float(line2[52:63])
+                        packed_data = struct.pack('>H d I f f f d d d',
+                            epoch_year, epoch_day, eccentricity,
+                            mean_anomaly, argument_of_perigee, bstar_drag_term,
+                            inclination, right_ascension, mean_motion)
+                        pl = list(packed_data)
                         slp = SLP()
                         pkt = slp.encode_private(SLP_ID_UPDATE_TLE, self.entry_preferences_general_callsign.get_text(), dialog_pw.get_key(), pl)
-#                    elif self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_CSP:
-#                        csp = CSP(int(self.entry_preferences_protocols_csp_my_adr.get_text()))
-#                        pkt = csp.encode()
+                    elif self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_CSP:
+                        pl = [ord(c) for c in line1]
+                        pl += [ord(c) for c in line2]
+                        csp = CSP(int(self.entry_preferences_protocols_csp_my_adr.get_text()))
+                        pkt = csp.encode(CSP_PRIO_NORM, int(self.entry_preferences_protocols_csp_dst_adr.get_text()), CSP_PORT_UPDATE_TLE, CSP_PORT_UPDATE_TLE, False, True, False, False, False, pl, dialog_pw.get_key())
                     self._transmit_tc(pkt, "Update TLE")
 
                 dialog_pw.destroy()
