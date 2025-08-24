@@ -139,6 +139,7 @@ CSP_PORT_DATA_REQUEST           = 38
 CSP_PORT_BROADCAST_MSG          = 39
 CSP_PORT_ENTER_HIBERNATION      = 40
 CSP_PORT_LEAVE_HIBERNATION      = 41
+CSP_PORT_DEFAULT_SATELLITE      = 42
 CSP_PORT_ERASE_MEMORY           = 43
 CSP_PORT_FORCE_RESET            = 44
 CSP_PORT_GET_PAYLOAD_DATA       = 45
@@ -386,6 +387,10 @@ class SpaceLabTransmitter:
         self.button_schedule_tc = self.builder.get_object("button_schedule_tc")
         self.button_schedule_tc.connect("clicked", self.on_button_schedule_tc_clicked)
 
+        # Default Satellite
+        self.button_default_satellite = self.builder.get_object("button_default_satellite")
+        self.button_default_satellite.connect("clicked", self.on_button_button_default_satellite_clicked)
+
     def run(self):
         self.window.show_all()
         Gtk.main()
@@ -419,11 +424,11 @@ class SpaceLabTransmitter:
                 if response_key == Gtk.ResponseType.OK:
                     pkt = list()
                     if self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_SLP:
-                        pl = struct.pack('>H', hbn_hours)
+                        pl = list(struct.pack('>H', hbn_hours))
                         slp = SLP()
                         pkt = slp.encode_private(SLP_ID_ENTER_HIBERNATION, self.entry_preferences_general_callsign.get_text(), dialog_pw.get_key(), pl)
                     elif self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_CSP:
-                        pl = struct.pack('>I', hbn_hours)
+                        pl = list(struct.pack('>I', hbn_hours))
                         csp = CSP(int(self.entry_preferences_protocols_csp_my_adr.get_text()))
                         pkt = csp.encode(CSP_PRIO_NORM, int(self.entry_preferences_protocols_csp_dst_adr.get_text()), CSP_PORT_ENTER_HIBERNATION, CSP_PORT_ENTER_HIBERNATION, False, True, False, False, False, pl, dialog_pw.get_key())
                     self._transmit_tc(pkt, "Enter Hibernation")
@@ -457,13 +462,12 @@ class SpaceLabTransmitter:
                     if self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_SLP:
                         slp = SLP()
                         pkt = slp.encode_private(SLP_ID_ACTIVATE_MODULE, self.entry_preferences_general_callsign.get_text(), dialog_pw.get_key(), [mod_id])
-#                    elif self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_CSP:
-#                        csp = CSP(int(self.entry_preferences_protocols_csp_my_adr.get_text()))
-#                        pkt = csp.encode()
+                    elif self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_CSP:
+                        raise RuntimeError("The \"Activate Module\" telecommand is not implemented for the CSP protocol!")
                     self._transmit_tc(pkt, "Activate Module")
 
                 dialog_pw.destroy()
-            except ValueError as err:
+            except (ValueError, RuntimeError) as err:
                 error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error generating the \"Activate Module\" telecommand!")
                 error_dialog.format_secondary_text(str(err))
                 error_dialog.run()
@@ -491,13 +495,12 @@ class SpaceLabTransmitter:
                     if self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_SLP:
                         slp = SLP()
                         pkt = slp.encode_private(SLP_ID_DEACTIVATE_MODULE, self.entry_preferences_general_callsign.get_text(), dialog_pw.get_key(), [mod_id])
-#                    elif self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_CSP:
-#                        csp = CSP(int(self.entry_preferences_protocols_csp_my_adr.get_text()))
-#                        pkt = csp.encode()
+                    elif self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_CSP:
+                        raise RuntimeError("The \"Deactivate Module\" telecommand is not implemented for the CSP protocol!")
                     self._transmit_tc(pkt, "Deactivate Module")
 
                 dialog_pw.destroy()
-            except ValueError as err:
+            except (ValueError, RuntimeError) as err:
                 error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error generating the \"Deactivate Module\" telecommand!")
                 error_dialog.format_secondary_text(str(err))
                 error_dialog.run()
@@ -525,13 +528,12 @@ class SpaceLabTransmitter:
                     if self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_SLP:
                         slp = SLP()
                         pkt = slp.encode_private(SLP_ID_DEACTIVATE_PAYLOAD, self.entry_preferences_general_callsign.get_text(), dialog_pw.get_key(), [pl_id])
-#                    elif self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_CSP:
-#                        csp = CSP(int(self.entry_preferences_protocols_csp_my_adr.get_text()))
-#                        pkt = csp.encode()
+                    elif self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_CSP:
+                        raise RuntimeError("The \"Deactivate Payload\" telecommand is not implemented for the CSP protocol!")
                     self._transmit_tc(pkt, "Deactivate Payload")
 
                 dialog_pw.destroy()
-            except ValueError as err:
+            except (ValueError, RuntimeError) as err:
                 error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error generating the \"Deactivate Payload\" telecommand!")
                 error_dialog.format_secondary_text(str(err))
                 error_dialog.run()
@@ -559,13 +561,12 @@ class SpaceLabTransmitter:
                     if self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_SLP:
                         slp = SLP()
                         pkt = slp.encode_private(SLP_ID_ACTIVATE_PAYLOAD, self.entry_preferences_general_callsign.get_text(), dialog_pw.get_key(), [pl_id])
-#                    elif self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_CSP:
-#                        csp = CSP(int(self.entry_preferences_protocols_csp_my_adr.get_text()))
-#                        pkt = csp.encode()
+                    elif self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_CSP:
+                        raise RuntimeError("The \"Activate Payload\" telecommand is not implemented for the CSP protocol!")
                     self._transmit_tc(pkt, "Activate Payload")
 
                 dialog_pw.destroy()
-            except ValueError as err:
+            except (ValueError, RuntimeError) as err:
                 error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error generating the \"Activate Module\" telecommand!")
                 error_dialog.format_secondary_text(str(err))
                 error_dialog.run()
@@ -749,8 +750,8 @@ class SpaceLabTransmitter:
                 response_key = dialog_pw.run()
                 if response_key == Gtk.ResponseType.OK:
                     pl = [data_id]
-                    pl.append(struct.pack('>I', start_page))
-                    pl.append(struct.pack('>I', end_page))
+                    pl += list(struct.pack('>I', start_page))
+                    pl += list(struct.pack('>I', end_page))
 
                     pkt = list()
                     if self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_SLP:
@@ -827,9 +828,8 @@ class SpaceLabTransmitter:
                     if self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_SLP:
                         slp = SLP()
                         pkt = slp.encode_private(SLP_ID_GET_PARAMETER, self.entry_preferences_general_callsign.get_text(), dialog_pw.get_key(), pl)
-#                    elif self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_CSP:
-#                        csp = CSP(int(self.entry_preferences_protocols_csp_my_adr.get_text()))
-#                        pkt = csp.encode()
+                    elif self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_CSP:
+                        raise RuntimeError("The \"Get Parameter\" telecommand is not implemented for the CSP protocol!")
                     self._transmit_tc(pkt, "Get Parameter")
 
                 dialog_pw.destroy()
@@ -867,9 +867,9 @@ class SpaceLabTransmitter:
                     if self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_SLP:
                         slp = SLP()
                         pkt = slp.encode_private(SLP_ID_GET_PAYLOAD_DATA, self.entry_preferences_general_callsign.get_text(), dialog_pw.get_key(), pl)
-#                    elif self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_CSP:
-#                        csp = CSP(int(self.entry_preferences_protocols_csp_my_adr.get_text()))
-#                        pkt = csp.encode()
+                    elif self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_CSP:
+                        csp = CSP(int(self.entry_preferences_protocols_csp_my_adr.get_text()))
+                        pkt = csp.encode(CSP_PRIO_NORM, int(self.entry_preferences_protocols_csp_dst_adr.get_text()), CSP_PORT_GET_PAYLOAD_DATA, CSP_PORT_GET_PAYLOAD_DATA, False, True, False, False, False, pl, dialog_pw.get_key())
                     self._transmit_tc(pkt, "Get Payload Data")
 
                 dialog_pw.destroy()
@@ -951,13 +951,12 @@ class SpaceLabTransmitter:
                     if self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_SLP:
                         slp = SLP()
                         pkt = slp.encode_private(SLP_ID_TRANSMIT_PACKET, self.entry_preferences_general_callsign.get_text(), dialog_pw.get_key(), data)
-#                    elif self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_CSP:
-#                        csp = CSP(int(self.entry_preferences_protocols_csp_my_adr.get_text()))
-#                        pkt = csp.encode()
+                    elif self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_CSP:
+                        raise RuntimeError("The \"Transmit Packet\" telecommand is not implemented for the CSP protocol!")
                     self._transmit_tc(pkt, "Transmit Packet")
 
                 dialog_pw.destroy()
-            except ValueError as err:
+            except (ValueError, RuntimeError) as err:
                 error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error generating the \"Transmit Packet\" telecommand!")
                 error_dialog.format_secondary_text(str(err))
                 error_dialog.run()
@@ -1431,25 +1430,49 @@ class SpaceLabTransmitter:
                 if response_key == Gtk.ResponseType.OK:
                     pl = list(struct.pack('>I', tc_ts))
                     pl += [tc_id]
-                    callsign = self.entry_preferences_general_callsign.get_text()
-                    for i in range(7 - len(callsign)):
-                        pl += [ord(' ')]
-                    pl += [ord(i) for i in callsign]
-                    pl += tc_par
                     pkt = list()
                     if self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_SLP:
+                        callsign = self.entry_preferences_general_callsign.get_text()
+                        for i in range(7 - len(callsign)):
+                            pl += [ord(' ')]
+                        pl += [ord(i) for i in callsign]
+                        pl += tc_par
                         slp = SLP()
                         pkt = slp.encode_private(SLP_ID_SCHEDULE_TC, self.entry_preferences_general_callsign.get_text(), dialog_pw.get_key(), pl)
                     elif self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_CSP:
-                        pl = pl[:5] + [len(tc_par)] + tc_par
+                        pl.append(len(tc_par))
+                        pl += tc_par
                         csp = CSP(int(self.entry_preferences_protocols_csp_my_adr.get_text()))
                         pkt = csp.encode(CSP_PRIO_NORM, int(self.entry_preferences_protocols_csp_dst_adr.get_text()), CSP_PORT_SCHEDULE_TC, CSP_PORT_SCHEDULE_TC, False, True, False, False, False, pl, dialog_pw.get_key())
-                        print(pkt)
                     self._transmit_tc(pkt, "Schedule TC")
 
                 dialog_pw.destroy()
             except ValueError as err:
                 error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error generating the \"Schedule TC\" telecommand!")
+                error_dialog.format_secondary_text(str(err))
+                error_dialog.run()
+                error_dialog.destroy()
+            finally:
+                dialog.destroy()
+
+        dialog.destroy()
+
+    def on_button_button_default_satellite_clicked(self, button):
+        dialog = DialogPassword(self.window)
+
+        response = dialog.run()
+        if response == Gtk.ResponseType.OK:
+            try:
+                pkt = list()
+                if self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_SLP:
+                    raise RuntimeError("The \"Default Satellite\" telecommand is not implemented for the SLP protocol!")
+                elif self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_CSP:
+                    csp = CSP(int(self.entry_preferences_protocols_csp_my_adr.get_text()))
+                    pkt = csp.encode(CSP_PRIO_NORM, int(self.entry_preferences_protocols_csp_dst_adr.get_text()), CSP_PORT_DEFAULT_SATELLITE, CSP_PORT_DEFAULT_SATELLITE, False, True, False, False, False, list(), dialog.get_key())
+
+                self._transmit_tc(pkt, "Default Satellite")
+            except (ValueError, RuntimeError) as err:
+                error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error generating the \"Default Satellite\" telecommand!")
                 error_dialog.format_secondary_text(str(err))
                 error_dialog.run()
                 error_dialog.destroy()
@@ -1706,6 +1729,7 @@ class SpaceLabTransmitter:
         self.button_csp_reboot.set_sensitive(False)
         self.button_csp_shutdown.set_sensitive(False)
         self.button_schedule_tc.set_sensitive(False)
+        self.button_default_satellite.set_sensitive(False)
 
         avail_pkts = self._satellite.get_active_link().get_packets()
 
@@ -1743,6 +1767,7 @@ class SpaceLabTransmitter:
             self.button_csp_reboot.set_sensitive(state)
             self.button_csp_shutdown.set_sensitive(state)
         if "schedule_tc" in avail_pkts:         self.button_schedule_tc.set_sensitive(state)
+        if "default_satellite" in avail_pkts:   self.button_default_satellite.set_sensitive(state)
 
     def on_combobox_satellite_changed(self, combobox):
         sat_filename = _SATELLITES[self.combobox_satellite.get_active()][1]
@@ -1885,6 +1910,7 @@ class SpaceLabTransmitter:
         self.button_time_sync.set_tooltip_text("")
         self.button_csp_services.set_tooltip_text("")
         self.button_schedule_tc.set_tooltip_text("")
+        self.button_default_satellite.set_tooltip_text("")
 
         with open(filename) as f:
             sat_info = json.load(f)
@@ -1930,3 +1956,5 @@ class SpaceLabTransmitter:
                         self.button_csp_services.set_tooltip_text(sat_info['links'][lk_idx]['tooltips']['csp_services'])
                     if 'schedule_tc' in sat_info['links'][lk_idx]['packets']:
                         self.button_schedule_tc.set_tooltip_text(sat_info['links'][lk_idx]['tooltips']['schedule_tc'])
+                    if 'default_satellite' in sat_info['links'][lk_idx]['packets']:
+                        self.button_default_satellite.set_tooltip_text(sat_info['links'][lk_idx]['tooltips']['default_satellite'])
