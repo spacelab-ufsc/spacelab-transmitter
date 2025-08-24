@@ -22,7 +22,7 @@ copyright = 'The SpaceLab-Transmitter Contributors'
 author = 'SpaceLab'
 
 # The full version, including alpha/beta/rc tags
-release = "0.5"
+release = "0.6"
 
 # -- General configuration ---------------------------------------------------
 
