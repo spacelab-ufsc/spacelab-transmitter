@@ -1,11 +1,15 @@
-*********************
-Packaging the Project
-*********************
+**************************
+Information for Developers
+**************************
+
+Packaging the project
+=====================
+
 
 This page presents the instructions to packaging the source files of the project.
 
 Generating an RPM package
-=========================
+-------------------------
 
 To generate an RPM package, execute the command below:
 
@@ -17,7 +21,7 @@ To generate an RPM package, execute the command below:
 If successful, the generated RPM package will be available in *dist/*.
 
 Generating a DEB package
-========================
+------------------------
 
 To generate a DEB package, execute the steps below:
 
