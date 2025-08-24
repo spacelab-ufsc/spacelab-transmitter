@@ -1,5 +1,19 @@
 ===========================================
 
+v0.6 - 2025/08/24
+
+- Adding support for CSP
+- Adding the telecommands "Transmit Packet", "Time Sync", "Schedule TC" and "Get Table"
+- Adding support for the AX100-Mode5 protocol
+- Refactoring JSON files structure
+- Adding tooltips for the TC buttons
+- Doppler shift compensation working
+- UI improvements
+- General improments and fixes
+
+===========================================
+===========================================
+
 v0.5 - 2025/03/01
 
 - Adding support for Adalm Pluto SDR
