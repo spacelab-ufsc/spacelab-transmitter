@@ -134,8 +134,8 @@ SLP_ID_UPDATE_TLE               = 0x4F
 SLP_ID_SCHEDULE_TC              = 0x50
 
 # CSP Ports
-CSP_PORT_DATA_REQUEST           = 35
 CSP_PORT_UPDATE_TLE             = 37
+CSP_PORT_DATA_REQUEST           = 38
 CSP_PORT_BROADCAST_MSG          = 39
 CSP_PORT_ENTER_HIBERNATION      = 40
 CSP_PORT_LEAVE_HIBERNATION      = 41
@@ -749,22 +749,16 @@ class SpaceLabTransmitter:
                 response_key = dialog_pw.run()
                 if response_key == Gtk.ResponseType.OK:
                     pl = [data_id]
-                    pl.append((start_page >> 24) & 0xFF)
-                    pl.append((start_page >> 16) & 0xFF)
-                    pl.append((start_page >> 8) & 0xFF)
-                    pl.append((start_page >> 0) & 0xFF)
-                    pl.append((end_page >> 24) & 0xFF)
-                    pl.append((end_page >> 16) & 0xFF)
-                    pl.append((end_page >> 8) & 0xFF)
-                    pl.append((end_page >> 0) & 0xFF)
+                    pl.append(struct.pack('>I', start_page))
+                    pl.append(struct.pack('>I', end_page))
 
                     pkt = list()
                     if self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_SLP:
                         slp = SLP()
                         pkt = slp.encode_private(SLP_ID_DATA_REQUEST, self.entry_preferences_general_callsign.get_text(), dialog_pw.get_key(), pl)
-#                    elif self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_CSP:
-#                        csp = CSP(int(self.entry_preferences_protocols_csp_my_adr.get_text()))
-#                        pkt = csp.encode()
+                    elif self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_CSP:
+                        csp = CSP(int(self.entry_preferences_protocols_csp_my_adr.get_text()))
+                        pkt = csp.encode(CSP_PRIO_NORM, int(self.entry_preferences_protocols_csp_dst_adr.get_text()), CSP_PORT_DATA_REQUEST, CSP_PORT_DATA_REQUEST, False, True, False, False, False, pl, dialog_pw.get_key())
                     self._transmit_tc(pkt, "Data Request")
 
                 dialog_pw.destroy()
