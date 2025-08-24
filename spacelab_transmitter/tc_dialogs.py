@@ -907,6 +907,50 @@ class DialogScheduleTC(Gtk.Dialog):
     def get_params(self):
         return eval(self.entry_params.get_text())
 
+class DialogGetTable(Gtk.Dialog):
+    def __init__(self, parent):
+        super().__init__(title="Get Table", transient_for=parent, flags=0)
+
+        self.add_buttons(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK)
+
+        label = Gtk.Label(label="Subsystem ID:")
+        label.set_halign(Gtk.Align.START)
+        self.entry_subsys_id = Gtk.Entry()
+
+        label2 = Gtk.Label(label="Table ID:")
+        label2.set_halign(Gtk.Align.START)
+        self.entry_table_id = Gtk.Entry()
+
+        grid = Gtk.Grid()
+        grid.set_row_spacing(5)
+        grid.set_column_spacing(10)
+        grid.set_margin_start(10)
+        grid.set_margin_end(10)
+        grid.set_margin_top(5)
+        grid.set_margin_bottom(5)
+
+        grid.add(label)
+        grid.attach(label2, 0, 1, 1, 1)
+        grid.attach(self.entry_subsys_id, 1, 0, 1, 1)
+        grid.attach(self.entry_table_id, 1, 1, 1, 1)
+
+        box_content = self.get_content_area()
+        box_content.add(grid)
+
+        box_buttons = self.get_action_area()
+        grid.set_column_spacing(10)
+        box_buttons.set_margin_start(10)
+        box_buttons.set_margin_end(10)
+        box_buttons.set_margin_bottom(5)
+
+        self.show_all()
+
+    def get_subsys_id(self):
+        return int(self.entry_subsys_id.get_text())
+
+    def get_table_id(self):
+        return int(self.entry_table_id.get_text())
+
 class DialogPassword(Gtk.Dialog):
     def __init__(self, parent):
         super().__init__(title="Authentication", transient_for=parent, flags=0)

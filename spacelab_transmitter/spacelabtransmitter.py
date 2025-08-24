@@ -35,7 +35,7 @@ from gi.repository import Gtk, GdkPixbuf, GLib
 
 import spacelab_transmitter.version
 
-from spacelab_transmitter.tc_dialogs import DialogDataRequest, DialogDeactivatePayload, DialogEnterHibernation, DialogActivatePayload, DialogGetPayloadData, DialogSetParameter, DialogDeactivateModule, DialogActivateModule, DialogGetParameter, DialogBroadcastMessage, DialogTransmitPacket, DialogEraseMemory, DialogUpdateTLE, DialogCSPPeek, DialogCSPPoke, DialogCSPIFStat, DialogCSPRouteSet, DialogScheduleTC, DialogPassword
+from spacelab_transmitter.tc_dialogs import DialogDataRequest, DialogDeactivatePayload, DialogEnterHibernation, DialogActivatePayload, DialogGetPayloadData, DialogSetParameter, DialogDeactivateModule, DialogActivateModule, DialogGetParameter, DialogBroadcastMessage, DialogTransmitPacket, DialogEraseMemory, DialogUpdateTLE, DialogCSPPeek, DialogCSPPoke, DialogCSPIFStat, DialogCSPRouteSet, DialogScheduleTC, DialogGetTable, DialogPassword
 
 from spacelab_transmitter.gmsk import GMSK
 from spacelab_transmitter.usrp import USRP
@@ -142,7 +142,7 @@ CSP_PORT_LEAVE_HIBERNATION      = 41
 CSP_PORT_DEFAULT_SATELLITE      = 42
 CSP_PORT_ERASE_MEMORY           = 43
 CSP_PORT_FORCE_RESET            = 44
-CSP_PORT_GET_PAYLOAD_DATA       = 45
+CSP_PORT_GET_TABLE              = 45
 CSP_PORT_SET_PARAM              = 46
 CSP_PORT_SCHEDULE_TC            = 47
 CSP_PORT_TIME_SYNC              = 48
@@ -389,7 +389,11 @@ class SpaceLabTransmitter:
 
         # Default Satellite
         self.button_default_satellite = self.builder.get_object("button_default_satellite")
-        self.button_default_satellite.connect("clicked", self.on_button_button_default_satellite_clicked)
+        self.button_default_satellite.connect("clicked", self.on_button_default_satellite_clicked)
+
+        # Get table
+        self.button_get_table = self.builder.get_object("button_get_table")
+        self.button_get_table.connect("clicked", self.on_button_get_table_clicked)
 
     def run(self):
         self.window.show_all()
@@ -1457,7 +1461,7 @@ class SpaceLabTransmitter:
 
         dialog.destroy()
 
-    def on_button_button_default_satellite_clicked(self, button):
+    def on_button_default_satellite_clicked(self, button):
         dialog = DialogPassword(self.window)
 
         response = dialog.run()
@@ -1473,6 +1477,48 @@ class SpaceLabTransmitter:
                 self._transmit_tc(pkt, "Default Satellite")
             except (ValueError, RuntimeError) as err:
                 error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error generating the \"Default Satellite\" telecommand!")
+                error_dialog.format_secondary_text(str(err))
+                error_dialog.run()
+                error_dialog.destroy()
+            finally:
+                dialog.destroy()
+
+        dialog.destroy()
+
+    def on_button_get_table_clicked(self, button):
+        dialog = DialogGetTable(self.window)
+
+        response = dialog.run()
+        if response == Gtk.ResponseType.OK:
+            try:
+                subsys_id = dialog.get_subsys_id()
+                table_id = dialog.get_table_id()
+
+                if subsys_id < 0 or subsys_id > 2**8-1:
+                    raise ValueError("The subsystem ID must be between 0 and " + str(2**8-1) + "!")
+
+                if table_id < 0 or table_id > 2**8-1:
+                    raise ValueError("The table ID must be between 0 and " + str(2**8-1) + "!")
+
+                dialog_pw = DialogPassword(self.window)
+
+                response_key = dialog_pw.run()
+                if response_key == Gtk.ResponseType.OK:
+                    pl = list()
+                    pkt = list()
+                    if self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_SLP:
+                        raise RuntimeError("The \"Get Table\" telecommand is not implemented for the SLP protocol!")
+                    elif self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_CSP:
+                        pl.append(subsys_id)
+                        pl.append(table_id)
+                        csp = CSP(int(self.entry_preferences_protocols_csp_my_adr.get_text()))
+                        pkt = csp.encode(CSP_PRIO_NORM, int(self.entry_preferences_protocols_csp_dst_adr.get_text()), CSP_PORT_GET_TABLE, CSP_PORT_GET_TABLE, False, True, False, False, False, pl, dialog_pw.get_key())
+
+                    self._transmit_tc(pkt, "Get Table")
+
+                dialog_pw.destroy()
+            except ValueError as err:
+                error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error generating the \"Get Table\" telecommand!")
                 error_dialog.format_secondary_text(str(err))
                 error_dialog.run()
                 error_dialog.destroy()
@@ -1730,6 +1776,7 @@ class SpaceLabTransmitter:
         self.button_csp_shutdown.set_sensitive(False)
         self.button_schedule_tc.set_sensitive(False)
         self.button_default_satellite.set_sensitive(False)
+        self.button_get_table.set_sensitive(False)
 
         avail_pkts = self._satellite.get_active_link().get_packets()
 
@@ -1768,6 +1815,7 @@ class SpaceLabTransmitter:
             self.button_csp_shutdown.set_sensitive(state)
         if "schedule_tc" in avail_pkts:         self.button_schedule_tc.set_sensitive(state)
         if "default_satellite" in avail_pkts:   self.button_default_satellite.set_sensitive(state)
+        if "get_table" in avail_pkts:           self.button_get_table.set_sensitive(state)
 
     def on_combobox_satellite_changed(self, combobox):
         sat_filename = _SATELLITES[self.combobox_satellite.get_active()][1]
@@ -1911,6 +1959,7 @@ class SpaceLabTransmitter:
         self.button_csp_services.set_tooltip_text("")
         self.button_schedule_tc.set_tooltip_text("")
         self.button_default_satellite.set_tooltip_text("")
+        self.button_get_table.set_tooltip_text("")
 
         with open(filename) as f:
             sat_info = json.load(f)
@@ -1958,3 +2007,5 @@ class SpaceLabTransmitter:
                         self.button_schedule_tc.set_tooltip_text(sat_info['links'][lk_idx]['tooltips']['schedule_tc'])
                     if 'default_satellite' in sat_info['links'][lk_idx]['packets']:
                         self.button_default_satellite.set_tooltip_text(sat_info['links'][lk_idx]['tooltips']['default_satellite'])
+                    if 'get_table' in sat_info['links'][lk_idx]['packets']:
+                        self.button_get_table.set_tooltip_text(sat_info['links'][lk_idx]['tooltips']['get_table'])
