@@ -34,11 +34,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v4
     # Standard drop-in approach that should work for most people.
     - uses: ammaraskar/sphinx-action@master
       with:
         docs-folder: "docs/"
+        pre-build-command: "pip install --upgrade pip"
     # Create an artifact of the html output.
     - uses: actions/upload-artifact@v4
       with:

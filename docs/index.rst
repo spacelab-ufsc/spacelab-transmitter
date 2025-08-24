@@ -4,7 +4,7 @@
    contain the root `toctree` directive.
 
 Spacelab Transmitter's documentation!
-================================================
+=====================================
 
 .. toctree::
    :maxdepth: 2
@@ -12,8 +12,8 @@ Spacelab Transmitter's documentation!
    overview
    installation
    usage_guide
+   protocols
    telecommands
    telecommands_transmissions
    logfile
-   packaging
-   implementation
+   dev

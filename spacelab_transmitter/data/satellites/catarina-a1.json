@@ -1,0 +1,19 @@
+{
+    "id": "cat-a1",
+    "name": "Catarina-A1",
+    "links": [
+        {
+            "id": "uplink",
+            "name": "Uplink",
+            "direction": "up",
+            "frequency": 402e6,
+            "modulation": "GMSK",
+            "baudrate": 4800,
+            "preamble": [170, 170, 170, 170],
+            "sync_word": [93, 230, 42, 126],
+            "protocol_link": "NGHam",
+            "protocol_network": "SLP",
+            "packets": ["ping", "data_request", "broadcast_msg", "enter_hibernation", "leave_hibernation", "activate_module", "deactivate_module", "activate_payload", "deactivate_payload", "erase_memory", "force_reset", "get_payload_data", "set_param", "get_param", "transmit_pkt", "update_tle", "schedule_tc"]
+        }
+    ]
+}

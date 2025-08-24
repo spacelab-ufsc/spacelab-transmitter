@@ -83,4 +83,3 @@ Turletti, Thierry. (1996). **GMSK in a nutshell**.
 .. [2] Turletti, Thierry & Bentzen, H.J. & Tennenhouse, David. (1999). Toward the software realization of a GSM base station. Selected Areas in Communications, IEEE Journal on. 17. 603 - 612. 10.1109/49.761039. 
 .. [3] IEEE Project 1900.1 - Standard Definitions and Concepts for Dynamic Spectrum Access: Terminology Relating to Emerging Wireless Networks, System Functionality, and Spectrum Management https://standards.ieee.org/develop/project/1900.1.html.
 .. [4] https://www.ettus.com/all-products/ub210-kit/
-.. [5] https://pysdr.org/content/usrp.html
