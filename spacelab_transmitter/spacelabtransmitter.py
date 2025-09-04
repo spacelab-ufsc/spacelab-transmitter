@@ -178,9 +178,6 @@ class SpaceLabTransmitter:
             self.window.set_icon_from_file(_ICON_FILE_LINUX_SYSTEM)
         self.window.connect("destroy", self.on_main_window_destroy)
 
-        # Entry_preferences_general_callsign builder
-        self.entry_preferences_general_callsign = self.builder.get_object("entry_preferences_general_callsign")
-
         # Events treeview
         self.treeview_events = self.builder.get_object("treeview_events")
         self.listmodel_events = Gtk.ListStore(str, str)
@@ -199,6 +196,9 @@ class SpaceLabTransmitter:
             self.aboutdialog.set_logo(GdkPixbuf.Pixbuf.new_from_file(_LOGO_FILE_LOCAL))
         else:
             self.aboutdialog.set_logo(GdkPixbuf.Pixbuf.new_from_file(_LOGO_FILE_LINUX_SYSTEM))
+
+        # Repeat last TC toolbutton
+        self.button_repeat_last_tc = self.builder.get_object("button_repeat_last_tc")
 
         # About toolbutton
         self.toolbutton_about = self.builder.get_object("toolbutton_about")
