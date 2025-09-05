@@ -169,6 +169,9 @@ class SpaceLabTransmitter:
         self.write_log("SpaceLab Transmitter initialized!")
         self._load_preferences()
 
+        self._last_transmitted_pkt = None
+        self._last_transmitted_tc_name = None
+
     def _build_widgets(self):
         # Main window
         self.window = self.builder.get_object("window_main")
@@ -198,7 +201,8 @@ class SpaceLabTransmitter:
             self.aboutdialog.set_logo(GdkPixbuf.Pixbuf.new_from_file(_LOGO_FILE_LINUX_SYSTEM))
 
         # Repeat last TC toolbutton
-        self.button_repeat_last_tc = self.builder.get_object("button_repeat_last_tc")
+        self.toolbutton_repeat_last_tc = self.builder.get_object("toolbutton_repeat_last_tc")
+        self.toolbutton_repeat_last_tc.connect("clicked", self.on_toolbutton_repeat_last_tc_clicked)
 
         # About toolbutton
         self.toolbutton_about = self.builder.get_object("toolbutton_about")
@@ -1528,6 +1532,11 @@ class SpaceLabTransmitter:
         dialog.destroy()
 
     def _transmit_tc(self, pkt, tc_name):
+        self.toolbutton_repeat_last_tc.set_sensitive(True)
+        self._last_transmitted_pkt = pkt
+        self._last_transmitted_tc_name = tc_name
+        self.toolbutton_repeat_last_tc.set_sensitive(True)
+
         carrier_frequency = int(self.entry_carrier_frequency.get_text())
         tx_gain = self.spinbutton_tx_gain.get_text()
         callsign = self.entry_preferences_general_callsign.get_text()
@@ -1722,6 +1731,9 @@ class SpaceLabTransmitter:
                        "sdr_freq_offset": self.entry_sdr_freq_offset.get_text(),
                        "sdr_sample_rate": self.entry_sample_rate.get_text()}, f, ensure_ascii=False, indent=4)
 
+    def on_toolbutton_repeat_last_tc_clicked(self, toolbutton):
+        self._transmit_tc(self._last_transmitted_pkt, self._last_transmitted_tc_name)
+
     def on_toolbutton_about_clicked(self, toolbutton):
         response = self.aboutdialog.run()
 
@@ -1779,6 +1791,9 @@ class SpaceLabTransmitter:
         self.button_get_table.set_sensitive(False)
 
         avail_pkts = self._satellite.get_active_link().get_packets()
+
+        if self._last_transmitted_pkt != None:
+            self.toolbutton_repeat_last_tc.set_sensitive(state)
 
         if "ping" in avail_pkts:                self.button_ping_request.set_sensitive(state)
         if "enter_hibernation" in avail_pkts:   self.button_enter_hibernation.set_sensitive(state)

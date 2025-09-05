@@ -31,7 +31,7 @@ def test_ui():
     # Main window
     window                          = builder.get_object("window_main")
     button_preferences              = builder.get_object("button_preferences")
-    button_repeat_last_tc           = builder.get_object("button_repeat_last_tc")
+    toolbutton_repeat_last_tc       = builder.get_object("toolbutton_repeat_last_tc")
     switch_button                   = builder.get_object("switch_button")
     switch_doppler                  = builder.get_object("switch_doppler")
     toolbutton_about                = builder.get_object("toolbutton_about")
@@ -72,7 +72,7 @@ def test_ui():
 
     assert window                           != None
     assert button_preferences               != None
-    assert button_repeat_last_tc            != None
+    assert toolbutton_repeat_last_tc        != None
     assert switch_button                    != None
     assert switch_doppler                   != None
     assert toolbutton_about                 != None
