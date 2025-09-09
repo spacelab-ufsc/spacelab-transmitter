@@ -38,7 +38,8 @@ Below, there is an image of the main window of the software:
 This program will support the satellites below:
 
 * FloripaSat-1 (launched in December 2019)
-* GOLDS-UFSC (to be launched on 2025)
+* FloripaSat-2
+* GOLDS-UFSC
 * Catarina-A1
 * Catarina-A2
 
