@@ -35,7 +35,7 @@ from gi.repository import Gtk, GdkPixbuf, GLib
 
 import spacelab_transmitter.version
 
-from spacelab_transmitter.tc_dialogs import DialogDataRequest, DialogDeactivatePayload, DialogEnterHibernation, DialogActivatePayload, DialogGetPayloadData, DialogSetParameter, DialogDeactivateModule, DialogActivateModule, DialogGetParameter, DialogBroadcastMessage, DialogTransmitPacket, DialogEraseMemory, DialogUpdateTLE, DialogCSPPeek, DialogCSPPoke, DialogCSPIFStat, DialogCSPRouteSet, DialogScheduleTC, DialogGetTable, DialogPassword
+from spacelab_transmitter.tc_dialogs import DialogDataRequest, DialogDeactivatePayload, DialogEnterHibernation, DialogActivatePayload, DialogGetPayloadData, DialogSetParameter, DialogDeactivateModule, DialogActivateModule, DialogGetParameter, DialogBroadcastMessage, DialogTransmitPacket, DialogEraseMemory, DialogUpdateTLE, DialogCSPPeek, DialogCSPPoke, DialogCSPIFStat, DialogCSPRouteSet, DialogScheduleTC, DialogGetTable, DialogUploadData, DialogPassword
 
 from spacelab_transmitter.gmsk import GMSK
 from spacelab_transmitter.usrp import USRP
@@ -1536,10 +1536,13 @@ class SpaceLabTransmitter:
         dialog.destroy()
 
     def on_button_upload_data_clicked(self, button):
-        error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error generating the \"Upload Data\" telecommand!")
-        error_dialog.format_secondary_text("Not implemented yet!")
-        error_dialog.run()
-        error_dialog.destroy()
+        dialog = DialogUploadData(self.window)
+
+        response = dialog.run()
+        if response == Gtk.ResponseType.OK:
+            dialog.destroy()
+
+        dialog.destroy()
 
     def _transmit_tc(self, pkt, tc_name):
         self.toolbutton_repeat_last_tc.set_sensitive(True)

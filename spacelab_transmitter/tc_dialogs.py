@@ -951,6 +951,49 @@ class DialogGetTable(Gtk.Dialog):
     def get_table_id(self):
         return int(self.entry_table_id.get_text())
 
+class DialogUploadData(Gtk.Dialog):
+    def __init__(self, parent):
+        super().__init__(title="Upload Data", transient_for=parent, flags=0)
+
+        self.add_buttons(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK)
+
+        label = Gtk.Label(label="File:")
+        label.set_halign(Gtk.Align.START)
+        self.filechooser_file = Gtk.FileChooserButton()
+        self.filechooser_file.set_title("File to upload")
+        self.filechooser_file.set_create_folders(False)
+
+        label2 = Gtk.Label(label="Chunk size (bytes):")
+        label2.set_halign(Gtk.Align.START)
+        self.label_num_chunks = Gtk.Label(label="0")
+
+        grid = Gtk.Grid()
+        grid.set_row_spacing(5)
+        grid.set_column_spacing(10)
+        grid.set_margin_start(10)
+        grid.set_margin_end(10)
+        grid.set_margin_top(5)
+        grid.set_margin_bottom(5)
+
+        grid.add(label)
+        grid.attach(label2, 0, 1, 1, 1)
+        grid.attach(self.filechooser_file, 1, 0, 1, 1)
+        grid.attach(self.label_num_chunks, 1, 1, 1, 1)
+
+        box_content = self.get_content_area()
+        box_content.add(grid)
+
+        box_buttons = self.get_action_area()
+        grid.set_column_spacing(10)
+        box_buttons.set_margin_start(10)
+        box_buttons.set_margin_end(10)
+        box_buttons.set_margin_bottom(5)
+
+        self.show_all()
+
+    def get_chunks(self):
+        return None
+
 class DialogPassword(Gtk.Dialog):
     def __init__(self, parent):
         super().__init__(title="Authentication", transient_for=parent, flags=0)
