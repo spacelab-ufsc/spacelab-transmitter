@@ -399,6 +399,10 @@ class SpaceLabTransmitter:
         self.button_get_table = self.builder.get_object("button_get_table")
         self.button_get_table.connect("clicked", self.on_button_get_table_clicked)
 
+        # Upload data
+        self.button_upload_data = self.builder.get_object("button_upload_data")
+        self.button_upload_data.connect("clicked", self.on_button_upload_data_clicked)
+
     def run(self):
         self.window.show_all()
         Gtk.main()
@@ -1531,6 +1535,12 @@ class SpaceLabTransmitter:
 
         dialog.destroy()
 
+    def on_button_upload_data_clicked(self, button):
+        error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error generating the \"Upload Data\" telecommand!")
+        error_dialog.format_secondary_text("Not implemented yet!")
+        error_dialog.run()
+        error_dialog.destroy()
+
     def _transmit_tc(self, pkt, tc_name):
         self.toolbutton_repeat_last_tc.set_sensitive(True)
         self._last_transmitted_pkt = pkt
@@ -1789,6 +1799,7 @@ class SpaceLabTransmitter:
         self.button_schedule_tc.set_sensitive(False)
         self.button_default_satellite.set_sensitive(False)
         self.button_get_table.set_sensitive(False)
+        self.button_upload_data.set_sensitive(False)
 
         avail_pkts = self._satellite.get_active_link().get_packets()
 
@@ -1831,6 +1842,7 @@ class SpaceLabTransmitter:
         if "schedule_tc" in avail_pkts:         self.button_schedule_tc.set_sensitive(state)
         if "default_satellite" in avail_pkts:   self.button_default_satellite.set_sensitive(state)
         if "get_table" in avail_pkts:           self.button_get_table.set_sensitive(state)
+        if "upload_data" in avail_pkts:         self.button_upload_data.set_sensitive(state)
 
     def on_combobox_satellite_changed(self, combobox):
         sat_filename = _SATELLITES[self.combobox_satellite.get_active()][1]
@@ -1975,6 +1987,7 @@ class SpaceLabTransmitter:
         self.button_schedule_tc.set_tooltip_text("")
         self.button_default_satellite.set_tooltip_text("")
         self.button_get_table.set_tooltip_text("")
+        self.button_upload_data.set_tooltip_text("")
 
         with open(filename) as f:
             sat_info = json.load(f)
@@ -2024,3 +2037,5 @@ class SpaceLabTransmitter:
                         self.button_default_satellite.set_tooltip_text(sat_info['links'][lk_idx]['tooltips']['default_satellite'])
                     if 'get_table' in sat_info['links'][lk_idx]['packets']:
                         self.button_get_table.set_tooltip_text(sat_info['links'][lk_idx]['tooltips']['get_table'])
+                    if 'upload_data' in sat_info['links'][lk_idx]['packets']:
+                        self.button_upload_data.set_tooltip_text(sat_info['links'][lk_idx]['tooltips']['upload_data'])

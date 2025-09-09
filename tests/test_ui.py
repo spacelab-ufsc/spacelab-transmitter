@@ -58,6 +58,8 @@ def test_ui():
     button_time_sync                = builder.get_object("button_time_sync")
     button_csp_services             = builder.get_object("button_csp_services")
     button_schedule_tc              = builder.get_object("button_schedule_tc")
+    button_get_table                = builder.get_object("button_get_table")
+    button_upload_data              = builder.get_object("button_upload_data")
     combobox_sdr                    = builder.get_object("combobox_sdr")
     liststore_sdr_devices           = builder.get_object("liststore_sdr_devices")
     entry_carrier_frequency         = builder.get_object("entry_carrier_frequency")
@@ -99,6 +101,8 @@ def test_ui():
     assert button_time_sync                 != None
     assert button_csp_services              != None
     assert button_schedule_tc               != None
+    assert button_get_table                 != None
+    assert button_upload_data               != None
     assert combobox_sdr                     != None
     assert liststore_sdr_devices            != None
     assert entry_carrier_frequency          != None
