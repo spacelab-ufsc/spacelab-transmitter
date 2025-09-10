@@ -1847,7 +1847,7 @@ Carlos Augusto Porto Freitas &lt;carlos.portof@hotmail.com&gt;</property>
               </packing>
             </child>
             <child>
-              <!-- n-columns=3 n-rows=4 -->
+              <!-- n-columns=3 n-rows=5 -->
               <object class="GtkGrid">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
@@ -2048,6 +2048,23 @@ Carlos Augusto Porto Freitas &lt;carlos.portof@hotmail.com&gt;</property>
                     <property name="left-attach">2</property>
                     <property name="top-attach">3</property>
                   </packing>
+                </child>
+                <child>
+                  <object class="GtkCheckButton" id="checkbutton_preferences_protocols_hmac_in_header">
+                    <property name="label" translatable="yes">Include HMAC flag in header</property>
+                    <property name="visible">True</property>
+                    <property name="can-focus">True</property>
+                    <property name="receives-default">False</property>
+                    <property name="draw-indicator">True</property>
+                  </object>
+                  <packing>
+                    <property name="left-attach">1</property>
+                    <property name="top-attach">4</property>
+                    <property name="width">2</property>
+                  </packing>
+                </child>
+                <child>
+                  <placeholder/>
                 </child>
                 <child>
                   <placeholder/>

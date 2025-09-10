@@ -68,6 +68,7 @@ class CSP:
         :rtype: None
         """
         self.set_address(adr)
+        self.set_hmac_flag_in_header(True)
 
     def set_address(self, adr):
         """
@@ -92,6 +93,26 @@ class CSP:
         :rtype: int
         """
         return self._my_adr
+
+    def set_hmac_flag_in_header(self, en):
+        """
+        Sets if the HMAC flag in header must be activated or not when HMAC is used.
+
+        :param en: True/False to activate of not.
+        :type: bool
+
+        :return: None
+        """
+        self._hmac_flag_in_header = en
+
+    def get_hmac_flag_in_header(self):
+        """
+        Gets the HMAC flag in header option state.
+
+        :return: The state of the HMAC flag in header option.
+        :rtype: bool
+        """
+        return self._hmac_flag_in_header
 
     def encode(self, prio, dst_adr, src_port, dst_port, sfp, hmac, xtea, rdp, crc, pl, hmac_key=str()):
         """
@@ -161,7 +182,7 @@ class CSP:
 
         # HMAC
         if hmac:
-            pkt = self.append_hmac(pkt, hmac_key, en_flag=False)
+            pkt = self.append_hmac(pkt, hmac_key)
 
         return pkt
 
@@ -486,7 +507,7 @@ class CSP:
     def _decode_pl(self, pl):
         return {"payload": pl}
 
-    def append_hmac(self, pkt, key, inc_header=True, en_flag=True):
+    def append_hmac(self, pkt, key, inc_header=True):
         """
         Enables the HMAC authentication to an existing packet.
 
@@ -499,14 +520,11 @@ class CSP:
         :param inc_header: A flag to indicate if the HMAC must be computed considering the CSP header or not.
         :type: bool
 
-        :param en_flag: A flag to indicate if the HMAC flag in header must be activated or not.
-        :type: bool
-
         :return: The given CSP packet with the HMAC hash enabled.
         :rtype: list
         """
         # Enabling HMAC flag in header
-        if en_flag:
+        if self.get_hmac_flag_in_header():
             pkt[3] |= (1 << 3)
 
         # Defining if the HMAC will be computed considering the CSP header or not
