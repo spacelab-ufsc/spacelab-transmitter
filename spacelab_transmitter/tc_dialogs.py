@@ -991,8 +991,14 @@ class DialogUploadData(Gtk.Dialog):
 
         self.show_all()
 
+    def get_chunk_size(self):
+        return 0
+
+    def get_num_chunks(self):
+        return 0
+
     def get_chunks(self):
-        return None
+        return list(list())
 
 class DialogPassword(Gtk.Dialog):
     def __init__(self, parent):

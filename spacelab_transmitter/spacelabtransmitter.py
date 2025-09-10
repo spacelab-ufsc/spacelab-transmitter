@@ -147,6 +147,7 @@ CSP_PORT_GET_TABLE              = 45
 CSP_PORT_SET_PARAM              = 46
 CSP_PORT_SCHEDULE_TC            = 47
 CSP_PORT_TIME_SYNC              = 48
+CSP_PORT_UPLOAD_DATA            = 50
 
 class SpaceLabTransmitter:
 
@@ -1569,7 +1570,34 @@ class SpaceLabTransmitter:
 
         response = dialog.run()
         if response == Gtk.ResponseType.OK:
-            dialog.destroy()
+            try:
+                file_chunks = dialog.get_chunks()
+
+                dialog_pw = DialogPassword(self.window)
+
+                response_key = dialog_pw.run()
+                if response_key == Gtk.ResponseType.OK:
+                    for ch in file_chunks:
+                        pl = list()
+                        pkt = list()
+                        if self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_SLP:
+                            raise RuntimeError("The \"Upload Data\" telecommand is not implemented for the SLP protocol!")
+                        elif self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_CSP:
+                            pl += ch
+                            csp = CSP(int(self.entry_preferences_protocols_csp_my_adr.get_text()))
+                            csp.set_hmac_flag_in_header(self.radiobutton_doppler_network.get_active())
+                            pkt = csp.encode(CSP_PRIO_NORM, int(self.entry_preferences_protocols_csp_dst_adr.get_text()), CSP_PORT_UPLOAD_DATA, CSP_PORT_UPLOAD_DATA, False, True, False, False, False, pl, dialog_pw.get_key())
+
+                        self._transmit_tc(pkt, "Upload Data")
+
+                dialog_pw.destroy()
+            except ValueError as err:
+                error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error generating the \"Upload Data\" telecommand!")
+                error_dialog.format_secondary_text(str(err))
+                error_dialog.run()
+                error_dialog.destroy()
+            finally:
+                dialog.destroy()
 
         dialog.destroy()
 
