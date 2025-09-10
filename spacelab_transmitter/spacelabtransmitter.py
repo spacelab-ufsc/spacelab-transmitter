@@ -931,7 +931,7 @@ class SpaceLabTransmitter:
 
                     response_key = dialog_pw.run()
                     if response_key == Gtk.ResponseType.OK:
-                        pkt = csp.append_hmac(pkt, dialog_pw.get_key())
+                        pkt = csp.append_hmac(pkt, dialog_pw.get_key(), en_flag=False)
 
                     dialog_pw.destroy()
 
@@ -1082,7 +1082,7 @@ class SpaceLabTransmitter:
 
                 response_key = dialog_pw.run()
                 if response_key == Gtk.ResponseType.OK:
-                    csp_pkt = csp.append_hmac(csp_pkt, dialog_pw.get_key())
+                    csp_pkt = csp.append_hmac(csp_pkt, dialog_pw.get_key(), en_flag=False)
 
                 dialog_pw.destroy()
 
@@ -1103,7 +1103,7 @@ class SpaceLabTransmitter:
 
                 response_key = dialog_pw.run()
                 if response_key == Gtk.ResponseType.OK:
-                    csp_pkt = csp.append_hmac(csp_pkt, dialog_pw.get_key())
+                    csp_pkt = csp.append_hmac(csp_pkt, dialog_pw.get_key(), en_flag=False)
 
                 dialog_pw.destroy()
 
@@ -1124,7 +1124,7 @@ class SpaceLabTransmitter:
 
                 response_key = dialog_pw.run()
                 if response_key == Gtk.ResponseType.OK:
-                    csp_pkt = csp.append_hmac(csp_pkt, dialog_pw.get_key())
+                    csp_pkt = csp.append_hmac(csp_pkt, dialog_pw.get_key(), en_flag=False)
 
                 dialog_pw.destroy()
 
@@ -1145,7 +1145,7 @@ class SpaceLabTransmitter:
 
                 response_key = dialog_pw.run()
                 if response_key == Gtk.ResponseType.OK:
-                    csp_pkt = csp.append_hmac(csp_pkt, dialog_pw.get_key())
+                    csp_pkt = csp.append_hmac(csp_pkt, dialog_pw.get_key(), en_flag=False)
 
                 dialog_pw.destroy()
 
@@ -1166,7 +1166,7 @@ class SpaceLabTransmitter:
 
                 response_key = dialog_pw.run()
                 if response_key == Gtk.ResponseType.OK:
-                    csp_pkt = csp.append_hmac(csp_pkt, dialog_pw.get_key())
+                    csp_pkt = csp.append_hmac(csp_pkt, dialog_pw.get_key(), en_flag=False)
 
                 dialog_pw.destroy()
 
@@ -1187,7 +1187,7 @@ class SpaceLabTransmitter:
 
                 response_key = dialog_pw.run()
                 if response_key == Gtk.ResponseType.OK:
-                    csp_pkt = csp.append_hmac(csp_pkt, dialog_pw.get_key())
+                    csp_pkt = csp.append_hmac(csp_pkt, dialog_pw.get_key(), en_flag=False)
 
                 dialog_pw.destroy()
 
@@ -1221,7 +1221,7 @@ class SpaceLabTransmitter:
 
                     response_key = dialog_pw.run()
                     if response_key == Gtk.ResponseType.OK:
-                        csp_pkt = csp.append_hmac(csp_pkt, dialog_pw.get_key())
+                        csp_pkt = csp.append_hmac(csp_pkt, dialog_pw.get_key(), en_flag=False)
 
                     dialog_pw.destroy()
 
@@ -1253,7 +1253,7 @@ class SpaceLabTransmitter:
 
                     response_key = dialog_pw.run()
                     if response_key == Gtk.ResponseType.OK:
-                        csp_pkt = csp.append_hmac(csp_pkt, dialog_pw.get_key())
+                        csp_pkt = csp.append_hmac(csp_pkt, dialog_pw.get_key(), en_flag=False)
 
                     dialog_pw.destroy()
 
@@ -1288,7 +1288,7 @@ class SpaceLabTransmitter:
 
                     response_key = dialog_pw.run()
                     if response_key == Gtk.ResponseType.OK:
-                        csp_pkt = csp.append_hmac(csp_pkt, dialog_pw.get_key())
+                        csp_pkt = csp.append_hmac(csp_pkt, dialog_pw.get_key(), en_flag=False)
 
                     dialog_pw.destroy()
 
@@ -1323,7 +1323,7 @@ class SpaceLabTransmitter:
 
                     response_key = dialog_pw.run()
                     if response_key == Gtk.ResponseType.OK:
-                        csp_pkt = csp.append_hmac(csp_pkt, dialog_pw.get_key())
+                        csp_pkt = csp.append_hmac(csp_pkt, dialog_pw.get_key(), en_flag=False)
 
                     dialog_pw.destroy()
 
@@ -1348,7 +1348,7 @@ class SpaceLabTransmitter:
 
                 response_key = dialog_pw.run()
                 if response_key == Gtk.ResponseType.OK:
-                    csp_pkt = csp.append_hmac(csp_pkt, dialog_pw.get_key())
+                    csp_pkt = csp.append_hmac(csp_pkt, dialog_pw.get_key(), en_flag=False)
 
                 dialog_pw.destroy()
 
@@ -1369,7 +1369,7 @@ class SpaceLabTransmitter:
 
                 response_key = dialog_pw.run()
                 if response_key == Gtk.ResponseType.OK:
-                    csp_pkt = csp.append_hmac(csp_pkt, dialog_pw.get_key())
+                    csp_pkt = csp.append_hmac(csp_pkt, dialog_pw.get_key(), en_flag=False)
 
                 dialog_pw.destroy()
 
@@ -1390,7 +1390,7 @@ class SpaceLabTransmitter:
 
                 response_key = dialog_pw.run()
                 if response_key == Gtk.ResponseType.OK:
-                    csp_pkt = csp.append_hmac(csp_pkt, dialog_pw.get_key())
+                    csp_pkt = csp.append_hmac(csp_pkt, dialog_pw.get_key(), en_flag=False)
 
                 dialog_pw.destroy()
 
@@ -1411,7 +1411,7 @@ class SpaceLabTransmitter:
 
                 response_key = dialog_pw.run()
                 if response_key == Gtk.ResponseType.OK:
-                    csp_pkt = csp.append_hmac(csp_pkt, dialog_pw.get_key())
+                    csp_pkt = csp.append_hmac(csp_pkt, dialog_pw.get_key(), en_flag=False)
 
                 dialog_pw.destroy()
 

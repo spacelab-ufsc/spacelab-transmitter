@@ -154,14 +154,14 @@ class CSP:
 
         pkt.append(((dst_port & 3) << 6) | src_port)
 
-        pkt.append((int(sfp) << 4) | (int(hmac) << 3) | (int(xtea) << 2) | (int(rdp) << 2) | int(crc))
+        pkt.append((int(sfp) << 4) | (int(xtea) << 2) | (int(rdp) << 2) | int(crc))
 
         # Payload
         pkt += pl
 
         # HMAC
         if hmac:
-            pkt = self.append_hmac(pkt, hmac_key)
+            pkt = self.append_hmac(pkt, hmac_key, en_flag=False)
 
         return pkt
 
@@ -486,7 +486,7 @@ class CSP:
     def _decode_pl(self, pl):
         return {"payload": pl}
 
-    def append_hmac(self, pkt, key, inc_header=True):
+    def append_hmac(self, pkt, key, inc_header=True, en_flag=True):
         """
         Enables the HMAC authentication to an existing packet.
 
@@ -499,11 +499,15 @@ class CSP:
         :param inc_header: A flag to indicate if the HMAC must be computed considering the CSP header or not.
         :type: bool
 
+        :param en_flag: A flag to indicate if the HMAC flag in header must be activated or not.
+        :type: bool
+
         :return: The given CSP packet with the HMAC hash enabled.
         :rtype: list
         """
         # Enabling HMAC flag in header
-        pkt[3] |= (1 << 3)
+        if en_flag:
+            pkt[3] |= (1 << 3)
 
         # Defining if the HMAC will be computed considering the CSP header or not
         pkt4hmac = list()
