@@ -445,7 +445,7 @@ class SpaceLabTransmitter:
                     elif self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_CSP:
                         pl = list(struct.pack('>I', hbn_hours))
                         csp = CSP(int(self.entry_preferences_protocols_csp_my_adr.get_text()))
-                        csp.set_hmac_flag_in_header(self.radiobutton_doppler_network.get_active())
+                        csp.set_hmac_flag_in_header(self.checkbutton_preferences_protocols_hmac_in_header.get_active())
                         pkt = csp.encode(CSP_PRIO_NORM, int(self.entry_preferences_protocols_csp_dst_adr.get_text()), CSP_PORT_ENTER_HIBERNATION, CSP_PORT_ENTER_HIBERNATION, False, True, False, False, False, pl, dialog_pw.get_key())
                     self._transmit_tc(pkt, "Enter Hibernation")
 
@@ -612,7 +612,7 @@ class SpaceLabTransmitter:
                         pkt = slp.encode_private(SLP_ID_ERASE_MEMORY, self.entry_preferences_general_callsign.get_text(), dialog_pw.get_key(), [mem_id])
                     elif self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_CSP:
                         csp = CSP(int(self.entry_preferences_protocols_csp_my_adr.get_text()))
-                        csp.set_hmac_flag_in_header(self.radiobutton_doppler_network.get_active())
+                        csp.set_hmac_flag_in_header(self.checkbutton_preferences_protocols_hmac_in_header.get_active())
                         pkt = csp.encode(CSP_PRIO_NORM, int(self.entry_preferences_protocols_csp_dst_adr.get_text()), CSP_PORT_ERASE_MEMORY, CSP_PORT_ERASE_MEMORY, False, True, False, False, False, [], dialog_pw.get_key())
                     self._transmit_tc(pkt, "Erase Memory")
 
@@ -729,7 +729,7 @@ class SpaceLabTransmitter:
                             raise ValueError("Unknown parameter type!")
 
                         csp = CSP(int(self.entry_preferences_protocols_csp_my_adr.get_text()))
-                        csp.set_hmac_flag_in_header(self.radiobutton_doppler_network.get_active())
+                        csp.set_hmac_flag_in_header(self.checkbutton_preferences_protocols_hmac_in_header.get_active())
                         pkt = csp.encode(CSP_PRIO_NORM, int(self.entry_preferences_protocols_csp_dst_adr.get_text()), CSP_PORT_SET_PARAM, CSP_PORT_SET_PARAM, False, True, False, False, False, pl, dialog_pw.get_key())
 
                     self._transmit_tc(pkt, "Set Parameter")
@@ -777,7 +777,7 @@ class SpaceLabTransmitter:
                         pkt = slp.encode_private(SLP_ID_DATA_REQUEST, self.entry_preferences_general_callsign.get_text(), dialog_pw.get_key(), pl)
                     elif self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_CSP:
                         csp = CSP(int(self.entry_preferences_protocols_csp_my_adr.get_text()))
-                        csp.set_hmac_flag_in_header(self.radiobutton_doppler_network.get_active())
+                        csp.set_hmac_flag_in_header(self.checkbutton_preferences_protocols_hmac_in_header.get_active())
                         pkt = csp.encode(CSP_PRIO_NORM, int(self.entry_preferences_protocols_csp_dst_adr.get_text()), CSP_PORT_DATA_REQUEST, CSP_PORT_DATA_REQUEST, False, True, False, False, False, pl, dialog_pw.get_key())
                     self._transmit_tc(pkt, "Data Request")
 
@@ -803,7 +803,7 @@ class SpaceLabTransmitter:
                 pkt = slp.encode_private(SLP_ID_LEAVE_HIBERNATION, self.entry_preferences_general_callsign.get_text(), dialog.get_key(), list())
             elif self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_CSP:
                 csp = CSP(int(self.entry_preferences_protocols_csp_my_adr.get_text()))
-                csp.set_hmac_flag_in_header(self.radiobutton_doppler_network.get_active())
+                csp.set_hmac_flag_in_header(self.checkbutton_preferences_protocols_hmac_in_header.get_active())
                 pkt = csp.encode(CSP_PRIO_NORM, int(self.entry_preferences_protocols_csp_dst_adr.get_text()), CSP_PORT_LEAVE_HIBERNATION, CSP_PORT_LEAVE_HIBERNATION, False, True, False, False, False, list(), dialog.get_key())
             self._transmit_tc(pkt, "Leave Hibernation")
 
@@ -820,7 +820,7 @@ class SpaceLabTransmitter:
                 pkt = slp.encode_private(SLP_ID_FORCE_RESET, self.entry_preferences_general_callsign.get_text(), dialog.get_key(), list())
             elif self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_CSP:
                 csp = CSP(int(self.entry_preferences_protocols_csp_my_adr.get_text()))
-                csp.set_hmac_flag_in_header(self.radiobutton_doppler_network.get_active())
+                csp.set_hmac_flag_in_header(self.checkbutton_preferences_protocols_hmac_in_header.get_active())
                 pkt = csp.encode(CSP_PRIO_NORM, int(self.entry_preferences_protocols_csp_dst_adr.get_text()), CSP_PORT_FORCE_RESET, CSP_PORT_FORCE_RESET, False, True, False, False, False, list(), dialog.get_key())
             self._transmit_tc(pkt, "Force Reset")
 
@@ -890,7 +890,7 @@ class SpaceLabTransmitter:
                         pkt = slp.encode_private(SLP_ID_GET_PAYLOAD_DATA, self.entry_preferences_general_callsign.get_text(), dialog_pw.get_key(), pl)
                     elif self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_CSP:
                         csp = CSP(int(self.entry_preferences_protocols_csp_my_adr.get_text()))
-                        csp.set_hmac_flag_in_header(self.radiobutton_doppler_network.get_active())
+                        csp.set_hmac_flag_in_header(self.checkbutton_preferences_protocols_hmac_in_header.get_active())
                         pkt = csp.encode(CSP_PRIO_NORM, int(self.entry_preferences_protocols_csp_dst_adr.get_text()), CSP_PORT_GET_PAYLOAD_DATA, CSP_PORT_GET_PAYLOAD_DATA, False, True, False, False, False, pl, dialog_pw.get_key())
                     self._transmit_tc(pkt, "Get Payload Data")
 
@@ -934,7 +934,7 @@ class SpaceLabTransmitter:
                     pl += list(struct.pack('>I', len(msg)))
                     pl += [ord(i) for i in msg]
                     csp = CSP(int(self.entry_preferences_protocols_csp_my_adr.get_text()))
-                    csp.set_hmac_flag_in_header(self.radiobutton_doppler_network.get_active())
+                    csp.set_hmac_flag_in_header(self.checkbutton_preferences_protocols_hmac_in_header.get_active())
                     pkt = csp.encode(CSP_PRIO_NORM, int(self.entry_preferences_protocols_csp_dst_adr.get_text()), CSP_PORT_BROADCAST_MSG, CSP_PORT_BROADCAST_MSG, False, False, False, False, False, pl)
 
                     dialog_pw = DialogPassword(self.window)
@@ -1027,7 +1027,7 @@ class SpaceLabTransmitter:
                         pl = [ord(c) for c in line1]
                         pl += [ord(c) for c in line2]
                         csp = CSP(int(self.entry_preferences_protocols_csp_my_adr.get_text()))
-                        csp.set_hmac_flag_in_header(self.radiobutton_doppler_network.get_active())
+                        csp.set_hmac_flag_in_header(self.checkbutton_preferences_protocols_hmac_in_header.get_active())
                         pkt = csp.encode(CSP_PRIO_NORM, int(self.entry_preferences_protocols_csp_dst_adr.get_text()), CSP_PORT_UPDATE_TLE, CSP_PORT_UPDATE_TLE, False, True, False, False, False, pl, dialog_pw.get_key())
                     self._transmit_tc(pkt, "Update TLE")
 
@@ -1064,7 +1064,7 @@ class SpaceLabTransmitter:
                     pkt = slp.encode_private(SLP_ID_SET_PARAMETER, self.entry_preferences_general_callsign.get_text(), dialog.get_key(), pl)
                 elif self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_CSP:
                     csp = CSP(int(self.entry_preferences_protocols_csp_my_adr.get_text()))
-                    csp.set_hmac_flag_in_header(self.radiobutton_doppler_network.get_active())
+                    csp.set_hmac_flag_in_header(self.checkbutton_preferences_protocols_hmac_in_header.get_active())
                     pkt = csp.encode(CSP_PRIO_NORM, int(self.entry_preferences_protocols_csp_dst_adr.get_text()), CSP_PORT_TIME_SYNC, CSP_PORT_TIME_SYNC, False, True, False, False, False, pl, dialog.get_key())
 
                 self._transmit_tc(pkt, "Time Sync")
@@ -1087,7 +1087,7 @@ class SpaceLabTransmitter:
     def on_button_csp_ping_clicked(self, button):
         try:
             csp = CSP(int(self.entry_preferences_protocols_csp_my_adr.get_text()))
-            csp.set_hmac_flag_in_header(self.radiobutton_doppler_network.get_active())
+            csp.set_hmac_flag_in_header(self.checkbutton_preferences_protocols_hmac_in_header.get_active())
             csp_pkt = csp.encode_ping(int(self.entry_preferences_protocols_csp_dst_adr.get_text()))
 
             if self.switch_preferences_protocols_csp_hmac.get_active():
@@ -1109,7 +1109,7 @@ class SpaceLabTransmitter:
     def on_button_csp_ps_clicked(self, button):
         try:
             csp = CSP(int(self.entry_preferences_protocols_csp_my_adr.get_text()))
-            csp.set_hmac_flag_in_header(self.radiobutton_doppler_network.get_active())
+            csp.set_hmac_flag_in_header(self.checkbutton_preferences_protocols_hmac_in_header.get_active())
             csp_pkt = csp.encode_ps(int(self.entry_preferences_protocols_csp_dst_adr.get_text()))
 
             if self.switch_preferences_protocols_csp_hmac.get_active():
@@ -1131,7 +1131,7 @@ class SpaceLabTransmitter:
     def on_button_csp_memfree_clicked(self, button):
         try:
             csp = CSP(int(self.entry_preferences_protocols_csp_my_adr.get_text()))
-            csp.set_hmac_flag_in_header(self.radiobutton_doppler_network.get_active())
+            csp.set_hmac_flag_in_header(self.checkbutton_preferences_protocols_hmac_in_header.get_active())
             csp_pkt = csp.encode_memfree(int(self.entry_preferences_protocols_csp_dst_adr.get_text()))
 
             if self.switch_preferences_protocols_csp_hmac.get_active():
@@ -1153,7 +1153,7 @@ class SpaceLabTransmitter:
     def on_button_csp_bufferfree_clicked(self, button):
         try:
             csp = CSP(int(self.entry_preferences_protocols_csp_my_adr.get_text()))
-            csp.set_hmac_flag_in_header(self.radiobutton_doppler_network.get_active())
+            csp.set_hmac_flag_in_header(self.checkbutton_preferences_protocols_hmac_in_header.get_active())
             csp_pkt = csp.encode_buf_free(int(self.entry_preferences_protocols_csp_dst_adr.get_text()))
 
             if self.switch_preferences_protocols_csp_hmac.get_active():
@@ -1175,7 +1175,7 @@ class SpaceLabTransmitter:
     def on_button_csp_uptime_clicked(self, button):
         try:
             csp = CSP(int(self.entry_preferences_protocols_csp_my_adr.get_text()))
-            csp.set_hmac_flag_in_header(self.radiobutton_doppler_network.get_active())
+            csp.set_hmac_flag_in_header(self.checkbutton_preferences_protocols_hmac_in_header.get_active())
             csp_pkt = csp.encode_uptime(int(self.entry_preferences_protocols_csp_dst_adr.get_text()))
 
             if self.switch_preferences_protocols_csp_hmac.get_active():
@@ -1197,7 +1197,7 @@ class SpaceLabTransmitter:
     def on_button_csp_cmp_ident_clicked(self, button):
         try:
             csp = CSP(int(self.entry_preferences_protocols_csp_my_adr.get_text()))
-            csp.set_hmac_flag_in_header(self.radiobutton_doppler_network.get_active())
+            csp.set_hmac_flag_in_header(self.checkbutton_preferences_protocols_hmac_in_header.get_active())
             csp_pkt = csp.encode_cmp_ident(int(self.entry_preferences_protocols_csp_dst_adr.get_text()))
 
             if self.switch_preferences_protocols_csp_hmac.get_active():
@@ -1232,7 +1232,7 @@ class SpaceLabTransmitter:
                     raise ValueError("The IF name must have up to 11 characters!")
 
                 csp = CSP(int(self.entry_preferences_protocols_csp_my_adr.get_text()))
-                csp.set_hmac_flag_in_header(self.radiobutton_doppler_network.get_active())
+                csp.set_hmac_flag_in_header(self.checkbutton_preferences_protocols_hmac_in_header.get_active())
                 csp_pkt = csp.encode_cmp_set_route(int(self.entry_preferences_protocols_csp_dst_adr.get_text()), dialog.get_dest_node(), dialog.get_next_hop_mac(), dialog.get_if_name())
 
                 if self.switch_preferences_protocols_csp_hmac.get_active():
@@ -1265,7 +1265,7 @@ class SpaceLabTransmitter:
                     raise ValueError("The IF name must have up to 11 characters!")
 
                 csp = CSP(int(self.entry_preferences_protocols_csp_my_adr.get_text()))
-                csp.set_hmac_flag_in_header(self.radiobutton_doppler_network.get_active())
+                csp.set_hmac_flag_in_header(self.checkbutton_preferences_protocols_hmac_in_header.get_active())
                 csp_pkt = csp.encode_cmp_if_stat(int(self.entry_preferences_protocols_csp_dst_adr.get_text()), dialog.get_csp_if_name())
 
                 if self.switch_preferences_protocols_csp_hmac.get_active():
@@ -1301,7 +1301,7 @@ class SpaceLabTransmitter:
                     raise ValueError("The memory length must be between 0 and 4294967295!")
 
                 csp = CSP(int(self.entry_preferences_protocols_csp_my_adr.get_text()))
-                csp.set_hmac_flag_in_header(self.radiobutton_doppler_network.get_active())
+                csp.set_hmac_flag_in_header(self.checkbutton_preferences_protocols_hmac_in_header.get_active())
                 csp_pkt = csp.encode_cmp_peek(int(self.entry_preferences_protocols_csp_dst_adr.get_text()), dialog.get_csp_mem_adr(), dialog.get_csp_mem_len())
 
                 if self.switch_preferences_protocols_csp_hmac.get_active():
@@ -1337,7 +1337,7 @@ class SpaceLabTransmitter:
                     raise ValueError("The memory length must be between 0 and 200!")
 
                 csp = CSP(int(self.entry_preferences_protocols_csp_my_adr.get_text()))
-                csp.set_hmac_flag_in_header(self.radiobutton_doppler_network.get_active())
+                csp.set_hmac_flag_in_header(self.checkbutton_preferences_protocols_hmac_in_header.get_active())
                 csp_pkt = csp.encode_cmp_poke(int(self.entry_preferences_protocols_csp_dst_adr.get_text()), dialog.get_csp_mem_adr(), dialog.get_csp_mem_data())
 
                 if self.switch_preferences_protocols_csp_hmac.get_active():
@@ -1363,7 +1363,7 @@ class SpaceLabTransmitter:
     def on_button_csp_cmp_set_clock_clicked(self, button):
         try:
             csp = CSP(int(self.entry_preferences_protocols_csp_my_adr.get_text()))
-            csp.set_hmac_flag_in_header(self.radiobutton_doppler_network.get_active())
+            csp.set_hmac_flag_in_header(self.checkbutton_preferences_protocols_hmac_in_header.get_active())
             csp_pkt = csp.encode_cmp_set_clock(int(self.entry_preferences_protocols_csp_dst_adr.get_text()), int(time.time()), 0)
 
             if self.switch_preferences_protocols_csp_hmac.get_active():
@@ -1385,7 +1385,7 @@ class SpaceLabTransmitter:
     def on_button_csp_cmp_get_clock_clicked(self, button):
         try:
             csp = CSP(int(self.entry_preferences_protocols_csp_my_adr.get_text()))
-            csp.set_hmac_flag_in_header(self.radiobutton_doppler_network.get_active())
+            csp.set_hmac_flag_in_header(self.checkbutton_preferences_protocols_hmac_in_header.get_active())
             csp_pkt = csp.encode_cmp_get_clock(int(self.entry_preferences_protocols_csp_dst_adr.get_text()))
 
             if self.switch_preferences_protocols_csp_hmac.get_active():
@@ -1407,7 +1407,7 @@ class SpaceLabTransmitter:
     def on_button_csp_reboot_clicked(self, button):
         try:
             csp = CSP(int(self.entry_preferences_protocols_csp_my_adr.get_text()))
-            csp.set_hmac_flag_in_header(self.radiobutton_doppler_network.get_active())
+            csp.set_hmac_flag_in_header(self.checkbutton_preferences_protocols_hmac_in_header.get_active())
             csp_pkt = csp.encode_reboot(int(self.entry_preferences_protocols_csp_dst_adr.get_text()))
 
             if self.switch_preferences_protocols_csp_hmac.get_active():
@@ -1429,7 +1429,7 @@ class SpaceLabTransmitter:
     def on_button_csp_shutdown_clicked(self, button):
         try:
             csp = CSP(int(self.entry_preferences_protocols_csp_my_adr.get_text()))
-            csp.set_hmac_flag_in_header(self.radiobutton_doppler_network.get_active())
+            csp.set_hmac_flag_in_header(self.checkbutton_preferences_protocols_hmac_in_header.get_active())
             csp_pkt = csp.encode_shutdown(int(self.entry_preferences_protocols_csp_dst_adr.get_text()))
 
             if self.switch_preferences_protocols_csp_hmac.get_active():
@@ -1482,7 +1482,7 @@ class SpaceLabTransmitter:
                         pl.append(len(tc_par))
                         pl += tc_par
                         csp = CSP(int(self.entry_preferences_protocols_csp_my_adr.get_text()))
-                        csp.set_hmac_flag_in_header(self.radiobutton_doppler_network.get_active())
+                        csp.set_hmac_flag_in_header(self.checkbutton_preferences_protocols_hmac_in_header.get_active())
                         pkt = csp.encode(CSP_PRIO_NORM, int(self.entry_preferences_protocols_csp_dst_adr.get_text()), CSP_PORT_SCHEDULE_TC, CSP_PORT_SCHEDULE_TC, False, True, False, False, False, pl, dialog_pw.get_key())
                     self._transmit_tc(pkt, "Schedule TC")
 
@@ -1508,7 +1508,7 @@ class SpaceLabTransmitter:
                     raise RuntimeError("The \"Default Satellite\" telecommand is not implemented for the SLP protocol!")
                 elif self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_CSP:
                     csp = CSP(int(self.entry_preferences_protocols_csp_my_adr.get_text()))
-                    csp.set_hmac_flag_in_header(self.radiobutton_doppler_network.get_active())
+                    csp.set_hmac_flag_in_header(self.checkbutton_preferences_protocols_hmac_in_header.get_active())
                     pkt = csp.encode(CSP_PRIO_NORM, int(self.entry_preferences_protocols_csp_dst_adr.get_text()), CSP_PORT_DEFAULT_SATELLITE, CSP_PORT_DEFAULT_SATELLITE, False, True, False, False, False, list(), dialog.get_key())
 
                 self._transmit_tc(pkt, "Default Satellite")
@@ -1549,7 +1549,7 @@ class SpaceLabTransmitter:
                         pl.append(subsys_id)
                         pl.append(table_id)
                         csp = CSP(int(self.entry_preferences_protocols_csp_my_adr.get_text()))
-                        csp.set_hmac_flag_in_header(self.radiobutton_doppler_network.get_active())
+                        csp.set_hmac_flag_in_header(self.checkbutton_preferences_protocols_hmac_in_header.get_active())
                         pkt = csp.encode(CSP_PRIO_NORM, int(self.entry_preferences_protocols_csp_dst_adr.get_text()), CSP_PORT_GET_TABLE, CSP_PORT_GET_TABLE, False, True, False, False, False, pl, dialog_pw.get_key())
 
                     self._transmit_tc(pkt, "Get Table")
@@ -1585,7 +1585,7 @@ class SpaceLabTransmitter:
                         elif self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_CSP:
                             pl += ch
                             csp = CSP(int(self.entry_preferences_protocols_csp_my_adr.get_text()))
-                            csp.set_hmac_flag_in_header(self.radiobutton_doppler_network.get_active())
+                            csp.set_hmac_flag_in_header(self.checkbutton_preferences_protocols_hmac_in_header.get_active())
                             pkt = csp.encode(CSP_PRIO_NORM, int(self.entry_preferences_protocols_csp_dst_adr.get_text()), CSP_PORT_UPLOAD_DATA, CSP_PORT_UPLOAD_DATA, False, True, False, False, False, pl, dialog_pw.get_key())
 
                         self._transmit_tc(pkt, "Upload Data")
