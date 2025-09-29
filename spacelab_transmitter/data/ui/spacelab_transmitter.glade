@@ -2268,7 +2268,6 @@ Carlos Augusto Porto Freitas &lt;carlos.portof@hotmail.com&gt;</property>
               <object class="GtkButton" id="button_upload_data_request_list_action">
                 <property name="label" translatable="yes">Request List</property>
                 <property name="visible">True</property>
-                <property name="sensitive">False</property>
                 <property name="can-focus">True</property>
                 <property name="receives-default">True</property>
               </object>
@@ -2293,7 +2292,6 @@ Carlos Augusto Porto Freitas &lt;carlos.portof@hotmail.com&gt;</property>
               <object class="GtkButton" id="button_upload_data_default_install_action">
                 <property name="label" translatable="yes">Default Install</property>
                 <property name="visible">True</property>
-                <property name="sensitive">False</property>
                 <property name="can-focus">True</property>
                 <property name="receives-default">True</property>
               </object>
