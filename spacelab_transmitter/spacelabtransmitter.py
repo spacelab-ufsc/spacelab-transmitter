@@ -28,12 +28,15 @@ import json
 import socket
 import time
 import struct
+import hashlib
+import time
 
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, GdkPixbuf, GLib
 
 import spacelab_transmitter.version
+from spacelab_transmitter.file_slicer import FileSlicer
 
 from spacelab_transmitter.tc_dialogs import DialogDataRequest, DialogDeactivatePayload, DialogEnterHibernation, DialogActivatePayload, DialogGetPayloadData, DialogSetParameter, DialogDeactivateModule, DialogActivateModule, DialogGetParameter, DialogBroadcastMessage, DialogTransmitPacket, DialogEraseMemory, DialogUpdateTLE, DialogCSPPeek, DialogCSPPoke, DialogCSPIFStat, DialogCSPRouteSet, DialogScheduleTC, DialogGetTable, DialogUploadData, DialogPassword
 
@@ -147,7 +150,7 @@ CSP_PORT_GET_TABLE              = 45
 CSP_PORT_SET_PARAM              = 46
 CSP_PORT_SCHEDULE_TC            = 47
 CSP_PORT_TIME_SYNC              = 48
-CSP_PORT_UPLOAD_DATA            = 50
+CSP_PORT_UPLOAD_DATA            = 10
 
 class SpaceLabTransmitter:
 
@@ -405,6 +408,17 @@ class SpaceLabTransmitter:
         # Upload data
         self.button_upload_data = self.builder.get_object("button_upload_data")
         self.button_upload_data.connect("clicked", self.on_button_upload_data_clicked)
+        self.dialog_upload_data = self.builder.get_object("dialog_upload_data")
+        self.filechooser_upload_data = self.builder.get_object("filechooser_upload_data")
+        self.entry_upload_data_file_id = self.builder.get_object("entry_upload_data_file_id")
+        self.button_upload_data_data_action = self.builder.get_object("button_upload_data_data_action")
+        self.button_upload_data_data_action.connect("clicked", self.on_button_upload_data_data_action_clicked)
+        self.button_upload_data_commit_action = self.builder.get_object("button_upload_data_commit_action")
+        self.button_upload_data_commit_action.connect("clicked", self.on_button_upload_data_commit_action_clicked)
+        self.button_upload_data_request_list_action = self.builder.get_object("button_upload_data_request_list_action")
+        self.button_upload_data_request_list_action.connect("clicked", self.on_button_upload_data_request_list_action_clicked)
+        self.button_upload_data_default_install_action= self.builder.get_object("button_upload_data_default_install_action")
+        self.button_upload_data_default_install_action.connect("clicked", self.on_button_upload_data_default_install_action_clicked)
 
     def run(self):
         self.window.show_all()
@@ -1566,40 +1580,89 @@ class SpaceLabTransmitter:
         dialog.destroy()
 
     def on_button_upload_data_clicked(self, button):
-        dialog = DialogUploadData(self.window)
+        response = self.dialog_upload_data.run()
 
-        response = dialog.run()
-        if response == Gtk.ResponseType.OK:
-            try:
-                file_chunks = dialog.get_chunks()
+        if response == Gtk.ResponseType.DELETE_EVENT:
+            self.dialog_upload_data.hide()
 
-                dialog_pw = DialogPassword(self.window)
+    def on_button_upload_data_data_action_clicked(self, button):
+        try:
+            slicer = FileSlicer(self.filechooser_upload_data.get_filename(), 200)
 
-                response_key = dialog_pw.run()
-                if response_key == Gtk.ResponseType.OK:
-                    for ch in file_chunks:
-                        pl = list()
-                        pkt = list()
-                        if self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_SLP:
-                            raise RuntimeError("The \"Upload Data\" telecommand is not implemented for the SLP protocol!")
-                        elif self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_CSP:
-                            pl += ch
-                            csp = CSP(int(self.entry_preferences_protocols_csp_my_adr.get_text()))
-                            csp.set_hmac_flag_in_header(self.checkbutton_preferences_protocols_hmac_in_header.get_active())
-                            pkt = csp.encode(CSP_PRIO_NORM, int(self.entry_preferences_protocols_csp_dst_adr.get_text()), CSP_PORT_UPLOAD_DATA, CSP_PORT_UPLOAD_DATA, False, True, False, False, False, pl, dialog_pw.get_key())
+            slicer.slice_file()
 
-                        self._transmit_tc(pkt, "Upload Data")
+            dialog_pw = DialogPassword(self.window)
 
-                dialog_pw.destroy()
-            except ValueError as err:
-                error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error generating the \"Upload Data\" telecommand!")
-                error_dialog.format_secondary_text(str(err))
-                error_dialog.run()
-                error_dialog.destroy()
-            finally:
-                dialog.destroy()
+            response_key = dialog_pw.run()
+            if response_key == Gtk.ResponseType.OK:
+                print("Total slices:", slicer.get_total_chunks())
+                for i in range(slicer.get_total_chunks()):
+                    pl = list()
+                    pkt = list()
+                    if self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_SLP:
+                        raise RuntimeError("The \"Upload Data\" telecommand is not implemented for the SLP protocol!")
+                    elif self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_CSP:
+                        pl.append(int(self.entry_upload_data_file_id.get_text()))        # File ID
+                        pl += list(struct.pack('<I', i))                            # Packet ID
+                        pl += list(struct.pack('<I', slicer.get_total_chunks()))    # Total number of packets
+                        pl.append(0)                                                # Action type = 0
+                        pl.append(len(slicer.get_chunk(i)))                         # Number of bytes in data field
+                        pl += slicer.get_chunk(i)                                   # Data
+                        print(pl)
+                        csp = CSP(int(self.entry_preferences_protocols_csp_my_adr.get_text()))
+                        csp.set_hmac_flag_in_header(self.checkbutton_preferences_protocols_hmac_in_header.get_active())
+                        pkt = csp.encode(CSP_PRIO_NORM, int(self.entry_preferences_protocols_csp_dst_adr.get_text()), CSP_PORT_UPLOAD_DATA, CSP_PORT_UPLOAD_DATA, False, True, False, False, False, pl, dialog_pw.get_key())
 
-        dialog.destroy()
+                    self._transmit_tc(pkt, "Upload Data")
+
+            dialog_pw.destroy()
+        except ValueError as err:
+            error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error generating the \"Upload Data\" telecommand!")
+            error_dialog.format_secondary_text(str(err))
+            error_dialog.run()
+            error_dialog.destroy()
+
+    def on_button_upload_data_commit_action_clicked(self, button):
+        try:
+            dialog_pw = DialogPassword(self.window)
+
+            response_key = dialog_pw.run()
+            if response_key == Gtk.ResponseType.OK:
+                md5_hash = hashlib.md5()
+                with open(self.filechooser_upload_data.get_filename(), "rb") as f:
+                    # Read and update hash in chunks of 4K (4096 bytes)
+                    for byte_block in iter(lambda: f.read(4096), b""):
+                        md5_hash.update(byte_block)
+                pl = list()
+                pkt = list()
+                if self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_SLP:
+                    raise RuntimeError("The \"Upload Data\" telecommand is not implemented for the SLP protocol!")
+                elif self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_CSP:
+                    pl.append(int(self.entry_upload_data_file_id.get_text()))        # File ID
+                    pl += [0, 0, 0, 0]                                          # Packet ID
+                    pl += [0, 0, 0, 0]                                          # Total number of packets
+                    pl.append(1)                                                # Action type = 1
+                    pl.append(40)                                               # Number of bytes in data field
+                    pl += [ord(x) for x in md5_hash.hexdigest()]                # MD5 hash
+                    print(pl)
+                    csp = CSP(int(self.entry_preferences_protocols_csp_my_adr.get_text()))
+                    csp.set_hmac_flag_in_header(self.checkbutton_preferences_protocols_hmac_in_header.get_active())
+                    pkt = csp.encode(CSP_PRIO_NORM, int(self.entry_preferences_protocols_csp_dst_adr.get_text()), CSP_PORT_UPLOAD_DATA, CSP_PORT_UPLOAD_DATA, False, True, False, False, False, pl, dialog_pw.get_key())
+
+                self._transmit_tc(pkt, "Upload Data")
+
+            dialog_pw.destroy()
+        except ValueError as err:
+            error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error generating the \"Upload Data\" telecommand!")
+            error_dialog.format_secondary_text(str(err))
+            error_dialog.run()
+            error_dialog.destroy()
+
+    def on_button_upload_data_request_list_action_clicked(self, button):
+        pass
+
+    def on_button_upload_data_default_install_action_clicked(self, button):
+        pass
 
     def _transmit_tc(self, pkt, tc_name):
         self.toolbutton_repeat_last_tc.set_sensitive(True)
