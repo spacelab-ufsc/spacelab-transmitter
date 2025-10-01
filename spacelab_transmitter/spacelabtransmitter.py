@@ -289,6 +289,9 @@ class SpaceLabTransmitter:
         self.entry_doppler_address = self.builder.get_object("entry_doppler_address")
         self.entry_doppler_port = self.builder.get_object("entry_doppler_port")
 
+        self.radiobutton_preferences_conn_tcp = self.builder.get_object("radiobutton_preferences_conn_tcp")
+        self.radiobutton_preferences_conn_zmq = self.builder.get_object("radiobutton_preferences_conn_zmq")
+
         self.logfile_chooser_button = self.builder.get_object("logfile_chooser_button")
         self.logfile_chooser_button.set_filename(_DEFAULT_LOGFILE_PATH)
 
@@ -1860,6 +1863,10 @@ class SpaceLabTransmitter:
             self.filechooser_doppler_tle_file.set_filename(config["tle_file"] if config["tle_file"] != None else "")
             self.entry_doppler_address.set_text(config["doppler_address"])
             self.entry_doppler_port.set_text(config["doppler_port"])
+            if config["output_zmq_socket"]:
+                self.radiobutton_preferences_conn_zmq.set_active(True)
+            else:
+                self.radiobutton_preferences_conn_tcp.set_active(True)
             self.logfile_chooser_button.set_filename(config["logfile_path"])
             self.combobox_sdr.set_active(config["sdr_dev"])
             self.entry_carrier_frequency.set_text(config["sdr_freq"])
@@ -1886,6 +1893,8 @@ class SpaceLabTransmitter:
         self.radiobutton_doppler_network.set_active(True)
         self.entry_doppler_address.set_text(_DEFAULT_DOPPLER_ADDRESS)
         self.entry_doppler_port.set_text(str(_DEFAULT_DOPPLER_PORT))
+
+        self.radiobutton_preferences_conn_tcp.set_active(True)
 
         self.logfile_chooser_button.set_filename(_DEFAULT_LOGFILE_PATH)
 
@@ -1916,6 +1925,7 @@ class SpaceLabTransmitter:
                        "tle_file": self.filechooser_doppler_tle_file.get_filename(),
                        "doppler_address": self.entry_doppler_address.get_text(),
                        "doppler_port": self.entry_doppler_port.get_text(),
+                       "output_zmq_socket": self.radiobutton_preferences_conn_zmq.get_active(),
                        "logfile_path": self.logfile_chooser_button.get_filename(),
                        "sdr_dev": self.combobox_sdr.get_active(),
                        "sdr_freq": self.entry_carrier_frequency.get_text(),

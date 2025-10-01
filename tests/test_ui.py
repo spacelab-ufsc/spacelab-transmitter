@@ -139,6 +139,8 @@ def test_ui():
     radiobutton_doppler_network             = builder.get_object("radiobutton_doppler_network")
     entry_doppler_address                   = builder.get_object("entry_doppler_address")
     entry_doppler_port                      = builder.get_object("entry_doppler_port")
+    radiobutton_preferences_conn_tcp        = builder.get_object("radiobutton_preferences_conn_tcp")
+    radiobutton_preferences_conn_zmq        = builder.get_object("radiobutton_preferences_conn_zmq")
     filechooserbutton_logfile               = builder.get_object("logfile_chooser_button")
 
     assert dialog_preferences                       != None
@@ -159,6 +161,8 @@ def test_ui():
     assert radiobutton_doppler_network              != None
     assert entry_doppler_address                    != None
     assert entry_doppler_port                       != None
+    assert radiobutton_preferences_conn_tcp         != None
+    assert radiobutton_preferences_conn_zmq         != None
     assert filechooserbutton_logfile                != None
 
     # CSP Services Dialog
