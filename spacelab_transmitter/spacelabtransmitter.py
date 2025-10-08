@@ -35,6 +35,8 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, GdkPixbuf, GLib
 
+import zmq
+
 import spacelab_transmitter.version
 from spacelab_transmitter.file_slicer import FileSlicer
 
@@ -176,6 +178,9 @@ class SpaceLabTransmitter:
 
         self._last_transmitted_pkt = None
         self._last_transmitted_tc_name = None
+
+        self._zmq_ctx = None
+        self._zmq_pub = None
 
     def _build_widgets(self):
         # Main window
@@ -1819,15 +1824,18 @@ class SpaceLabTransmitter:
             else:
                 self.write_log("Error transmitting a " + tc_name + " telecommand!")
         else:
-            if self._client_socket:
-                try:
-                    self._client_socket.send(bytearray(enc_pkt))  # Send message to server
-                    self.write_log(tc_name + " transmitted to " + self._satellite.get_name() + " from " + callsign + " via " + self.entry_tcp_address.get_text() + ":" + self.entry_tcp_port.get_text())
-                except socket.error as e:
-                    error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error transmitting a " + tc_name + " telecommand!")
-                    error_dialog.format_secondary_text(str(e))
-                    error_dialog.run()
-                    error_dialog.destroy()
+            if self.radiobutton_preferences_conn_tcp.get_active():
+                if self._client_socket:
+                    try:
+                        self._client_socket.send(bytearray(enc_pkt))  # Send message to server
+                        self.write_log(tc_name + " transmitted to " + self._satellite.get_name() + " from " + callsign + " via " + self.entry_tcp_address.get_text() + ":" + self.entry_tcp_port.get_text())
+                    except socket.error as e:
+                        error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error transmitting a " + tc_name + " telecommand!")
+                        error_dialog.format_secondary_text(str(e))
+                        error_dialog.run()
+                        error_dialog.destroy()
+            else:
+                self._zmq_pub.send(bytes(pkt))
 
     def on_button_preferences_clicked(self, button):
         response = self.dialog_preferences.run()
@@ -2108,40 +2116,68 @@ class SpaceLabTransmitter:
         try:
             adr = self.entry_tcp_address.get_text()
             port = int(self.entry_tcp_port.get_text())
-            self._client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            self._client_socket.connect((adr, port))
 
-            if self._client_socket:
-                self.write_log("Connected to " + adr + ":" + str(port))
+            if self.radiobutton_preferences_conn_tcp.get_active():
+                self._client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                self._client_socket.connect((adr, port))
 
-                # Create an IOChannel for the client socket and watch for incoming data
-                self._tcp_client_socket_io_channel = GLib.IOChannel(self._client_socket.fileno())
-                self._tcp_client_socket_io_channel.set_encoding(None)   # Binary mode
-                self._tcp_cb_id = GLib.io_add_watch(self._tcp_client_socket_io_channel, GLib.IO_IN, self._handle_tcp_data)
+                if self._client_socket:
+                    self.write_log("Connected to " + adr + ":" + str(port))
 
-                self.combobox_sdr.set_sensitive(False)
-                self.entry_carrier_frequency.set_sensitive(False)
-                self.entry_sdr_freq_offset.set_sensitive(False)
-                self.entry_sample_rate.set_sensitive(False)
-                self.spinbutton_tx_gain.set_sensitive(False)
-                self.entry_tcp_address.set_sensitive(False)
-                self.entry_tcp_port.set_sensitive(False)
-                self.button_tcp_connect.set_sensitive(False)
-                self.button_tcp_disconnect.set_sensitive(True)
+                    # Create an IOChannel for the client socket and watch for incoming data
+                    self._tcp_client_socket_io_channel = GLib.IOChannel(self._client_socket.fileno())
+                    self._tcp_client_socket_io_channel.set_encoding(None)   # Binary mode
+                    self._tcp_cb_id = GLib.io_add_watch(self._tcp_client_socket_io_channel, GLib.IO_IN, self._handle_tcp_data)
+            else:
+                self._zmq_ctx = zmq.Context()
+                self._zmq_pub = self._zmq_ctx.socket(zmq.PUB)
+                self._zmq_pub.bind("tcp://" + adr + ":" + str(port)) # Bind to a port
+
         except socket.error as e:
             error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error connecting to server!")
             error_dialog.format_secondary_text(str(e))
             error_dialog.run()
             error_dialog.destroy()
+        finally:
+            self.combobox_sdr.set_sensitive(False)
+            self.entry_carrier_frequency.set_sensitive(False)
+            self.entry_sdr_freq_offset.set_sensitive(False)
+            self.entry_sample_rate.set_sensitive(False)
+            self.spinbutton_tx_gain.set_sensitive(False)
+            self.entry_tcp_address.set_sensitive(False)
+            self.entry_tcp_port.set_sensitive(False)
+            self.button_tcp_connect.set_sensitive(False)
+            self.button_tcp_disconnect.set_sensitive(True)
 
     def on_button_tcp_disconnect_clicked(self, button):
-        self._close_tcp_socket()
+        if self.radiobutton_preferences_conn_tcp.get_active():
+            self._close_tcp_socket()
+        else:
+            self._close_zmq_pub()
 
     def _close_tcp_socket(self):
         self.write_log("Disconnected from " + self.entry_tcp_address.get_text() + ":" + self.entry_tcp_port.get_text())
 
         self._client_socket.close()
         self._client_socket = None
+
+        self.combobox_sdr.set_sensitive(True)
+        self.entry_carrier_frequency.set_sensitive(True)
+        self.entry_sdr_freq_offset.set_sensitive(True)
+        self.entry_sample_rate.set_sensitive(True)
+        self.spinbutton_tx_gain.set_sensitive(True)
+        self.entry_tcp_address.set_sensitive(True)
+        self.entry_tcp_port.set_sensitive(True)
+        self.button_tcp_connect.set_sensitive(True)
+        self.button_tcp_disconnect.set_sensitive(False)
+
+    def _close_zmq_pub(self):
+        self.write_log("Disconnected from " + self.entry_tcp_address.get_text() + ":" + self.entry_tcp_port.get_text())
+
+        self._zmq_pub.close()
+        self._zmq_ctx.term()
+        self._zmq_pub = None
+        self._zmq_ctx = None
 
         self.combobox_sdr.set_sensitive(True)
         self.entry_carrier_frequency.set_sensitive(True)

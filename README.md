@@ -52,16 +52,17 @@ This program will support the satellites below:
 * [PyEphem](https://pypi.org/project/ephem/)
 * [UHD](https://github.com/EttusResearch/uhd)
 * [PyADI-IIO](https://github.com/analogdevicesinc/pyadi-iio)
+* [ZeroMQ](https://zeromq.org/)
 
 ### Installation on Ubuntu
 
-```sudo apt install python3 python3-gi python3-numpy python3-scipy python3-ephem python3-uhd```
+```sudo apt install python3 python3-gi python3-numpy python3-scipy python3-ephem python3-pyzmq python3-uhd```
 
 ```pip install pyngham pyadi-iio```
 
 ### Installation on Fedora
 
-```sudo dnf install python3 python3-gobject python3-numpy python3-scipy python3-ephem uhd uhd-devel```
+```sudo dnf install python3 python3-gobject python3-numpy python3-scipy python3-ephem python3-pyzmq uhd uhd-devel```
 
 ```pip install pyngham pyadi-iio```
 
