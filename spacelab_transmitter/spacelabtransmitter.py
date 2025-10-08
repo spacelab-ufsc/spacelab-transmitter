@@ -296,6 +296,7 @@ class SpaceLabTransmitter:
 
         self.radiobutton_preferences_conn_tcp = self.builder.get_object("radiobutton_preferences_conn_tcp")
         self.radiobutton_preferences_conn_zmq = self.builder.get_object("radiobutton_preferences_conn_zmq")
+        self.switch_preferences_conn_inc_link_layer = self.builder.get_object("switch_preferences_conn_inc_link_layer")
 
         self.logfile_chooser_button = self.builder.get_object("logfile_chooser_button")
         self.logfile_chooser_button.set_filename(_DEFAULT_LOGFILE_PATH)
@@ -1827,7 +1828,10 @@ class SpaceLabTransmitter:
             if self.radiobutton_preferences_conn_tcp.get_active():
                 if self._client_socket:
                     try:
-                        self._client_socket.send(bytearray(enc_pkt))  # Send message to server
+                        if self.switch_preferences_conn_inc_link_layer.get_active():
+                            self._client_socket.send(bytearray(enc_pkt))
+                        else:
+                            self._client_socket.send(bytearray(pkt))
                         self.write_log(tc_name + " transmitted to " + self._satellite.get_name() + " from " + callsign + " via " + self.entry_tcp_address.get_text() + ":" + self.entry_tcp_port.get_text())
                     except socket.error as e:
                         error_dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error transmitting a " + tc_name + " telecommand!")
@@ -1835,7 +1839,12 @@ class SpaceLabTransmitter:
                         error_dialog.run()
                         error_dialog.destroy()
             else:
-                self._zmq_pub.send(bytes(pkt))
+                if self.switch_preferences_conn_inc_link_layer.get_active():
+                    self._zmq_pub.send(bytes([0] + enc_pkt))
+                else:
+                    self._zmq_pub.send(bytes([0] + pkt))
+
+                self.write_log(tc_name + " transmitted to " + self._satellite.get_name() + " from " + callsign + " via " + self.entry_tcp_address.get_text() + ":" + self.entry_tcp_port.get_text())
 
     def on_button_preferences_clicked(self, button):
         response = self.dialog_preferences.run()
@@ -1889,6 +1898,7 @@ class SpaceLabTransmitter:
                 self.radiobutton_preferences_conn_zmq.set_active(True)
             else:
                 self.radiobutton_preferences_conn_tcp.set_active(True)
+            self.switch_preferences_conn_inc_link_layer.set_active(config["output_include_link_layer"])
             self.logfile_chooser_button.set_filename(config["logfile_path"])
             self.combobox_sdr.set_active(config["sdr_dev"])
             self.entry_carrier_frequency.set_text(config["sdr_freq"])
@@ -1917,6 +1927,7 @@ class SpaceLabTransmitter:
         self.entry_doppler_port.set_text(str(_DEFAULT_DOPPLER_PORT))
 
         self.radiobutton_preferences_conn_tcp.set_active(True)
+        self.switch_preferences_conn_inc_link_layer.set_active(False)
 
         self.logfile_chooser_button.set_filename(_DEFAULT_LOGFILE_PATH)
 
@@ -1948,6 +1959,7 @@ class SpaceLabTransmitter:
                        "doppler_address": self.entry_doppler_address.get_text(),
                        "doppler_port": self.entry_doppler_port.get_text(),
                        "output_zmq_socket": self.radiobutton_preferences_conn_zmq.get_active(),
+                       "output_include_link_layer": self.switch_preferences_conn_inc_link_layer.get_active(),
                        "logfile_path": self.logfile_chooser_button.get_filename(),
                        "sdr_dev": self.combobox_sdr.get_active(),
                        "sdr_freq": self.entry_carrier_frequency.get_text(),

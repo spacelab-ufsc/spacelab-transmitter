@@ -2141,6 +2141,7 @@ Carlos Augusto Porto Freitas &lt;carlos.portof@hotmail.com&gt;</property>
                     <property name="visible">True</property>
                     <property name="can-focus">True</property>
                     <property name="receives-default">False</property>
+                    <property name="halign">start</property>
                     <property name="active">True</property>
                     <property name="draw-indicator">True</property>
                     <property name="group">radiobutton_preferences_conn_zmq</property>
@@ -2156,6 +2157,7 @@ Carlos Augusto Porto Freitas &lt;carlos.portof@hotmail.com&gt;</property>
                     <property name="visible">True</property>
                     <property name="can-focus">True</property>
                     <property name="receives-default">False</property>
+                    <property name="halign">start</property>
                     <property name="active">True</property>
                     <property name="draw-indicator">True</property>
                   </object>
@@ -2165,19 +2167,38 @@ Carlos Augusto Porto Freitas &lt;carlos.portof@hotmail.com&gt;</property>
                   </packing>
                 </child>
                 <child>
-                  <placeholder/>
+                  <object class="GtkSeparator">
+                    <property name="visible">True</property>
+                    <property name="can-focus">False</property>
+                  </object>
+                  <packing>
+                    <property name="left-attach">0</property>
+                    <property name="top-attach">3</property>
+                    <property name="width">3</property>
+                  </packing>
                 </child>
                 <child>
-                  <placeholder/>
+                  <object class="GtkLabel">
+                    <property name="visible">True</property>
+                    <property name="can-focus">False</property>
+                    <property name="label" translatable="yes">Include link layer:</property>
+                  </object>
+                  <packing>
+                    <property name="left-attach">1</property>
+                    <property name="top-attach">4</property>
+                  </packing>
                 </child>
                 <child>
-                  <placeholder/>
-                </child>
-                <child>
-                  <placeholder/>
-                </child>
-                <child>
-                  <placeholder/>
+                  <object class="GtkSwitch" id="switch_preferences_conn_inc_link_layer">
+                    <property name="visible">True</property>
+                    <property name="can-focus">True</property>
+                    <property name="halign">center</property>
+                    <property name="hexpand">True</property>
+                  </object>
+                  <packing>
+                    <property name="left-attach">2</property>
+                    <property name="top-attach">4</property>
+                  </packing>
                 </child>
                 <child>
                   <placeholder/>
