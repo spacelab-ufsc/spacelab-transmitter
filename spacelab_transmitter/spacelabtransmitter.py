@@ -413,7 +413,10 @@ class SpaceLabTransmitter:
         self.button_upload_data.connect("clicked", self.on_button_upload_data_clicked)
         self.dialog_upload_data = self.builder.get_object("dialog_upload_data")
         self.filechooser_upload_data = self.builder.get_object("filechooser_upload_data")
+        self.filechooser_upload_data.connect("selection-changed", self.on_filechooser_upload_data_selection_changed)
         self.entry_upload_data_file_id = self.builder.get_object("entry_upload_data_file_id")
+        self.entry_upload_data_pkt_start = self.builder.get_object("entry_upload_data_pkt_start")
+        self.entry_upload_data_pkt_end = self.builder.get_object("entry_upload_data_pkt_end")
         self.button_upload_data_data_action = self.builder.get_object("button_upload_data_data_action")
         self.button_upload_data_data_action.connect("clicked", self.on_button_upload_data_data_action_clicked)
         self.button_upload_data_commit_action = self.builder.get_object("button_upload_data_commit_action")
@@ -1587,6 +1590,13 @@ class SpaceLabTransmitter:
 
         if response == Gtk.ResponseType.DELETE_EVENT:
             self.dialog_upload_data.hide()
+    def on_filechooser_upload_data_selection_changed(self, filechooser):
+        slicer = FileSlicer(self.filechooser_upload_data.get_filename(), 200)
+
+        slicer.slice_file()
+
+        self.entry_upload_data_pkt_start.set_text("0")
+        self.entry_upload_data_pkt_end.set_text(str(slicer.get_total_chunks() - 1))
 
     def on_button_upload_data_data_action_clicked(self, button):
         try:
@@ -1598,25 +1608,24 @@ class SpaceLabTransmitter:
 
             response_key = dialog_pw.run()
             if response_key == Gtk.ResponseType.OK:
-                print("Total slices:", slicer.get_total_chunks())
                 for i in range(slicer.get_total_chunks()):
                     pl = list()
                     pkt = list()
                     if self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_SLP:
                         raise RuntimeError("The \"Upload Data\" telecommand is not implemented for the SLP protocol!")
                     elif self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_CSP:
-                        pl.append(int(self.entry_upload_data_file_id.get_text()))        # File ID
+                        pl.append(int(self.entry_upload_data_file_id.get_text()))   # File ID
                         pl += list(struct.pack('<I', i))                            # Packet ID
                         pl += list(struct.pack('<I', slicer.get_total_chunks()))    # Total number of packets
                         pl.append(0)                                                # Action type = 0
                         pl.append(len(slicer.get_chunk(i)))                         # Number of bytes in data field
                         pl += slicer.get_chunk(i)                                   # Data
-                        print(pl)
                         csp = CSP(int(self.entry_preferences_protocols_csp_my_adr.get_text()))
                         csp.set_hmac_flag_in_header(self.checkbutton_preferences_protocols_hmac_in_header.get_active())
                         pkt = csp.encode(CSP_PRIO_NORM, int(self.entry_preferences_protocols_csp_dst_adr.get_text()), CSP_PORT_UPLOAD_DATA, CSP_PORT_UPLOAD_DATA, False, True, False, False, False, pl, dialog_pw.get_key())
 
-                    self._transmit_tc(pkt, "Upload Data")
+                    if ((i >= int(self.entry_upload_data_pkt_start.get_text())) and (i <= int(self.entry_upload_data_pkt_end.get_text()))):
+                        self._transmit_tc(pkt, "Upload Data")
 
             dialog_pw.destroy()
         except ValueError as err:
@@ -1627,6 +1636,10 @@ class SpaceLabTransmitter:
 
     def on_button_upload_data_commit_action_clicked(self, button):
         try:
+            slicer = FileSlicer(self.filechooser_upload_data.get_filename(), 200)
+
+            slicer.slice_file()
+
             dialog_pw = DialogPassword(self.window)
 
             response_key = dialog_pw.run()
@@ -1634,7 +1647,7 @@ class SpaceLabTransmitter:
                 md5_hash = hashlib.md5()
                 with open(self.filechooser_upload_data.get_filename(), "rb") as f:
                     # Read and update hash in chunks of 4K (4096 bytes)
-                    for byte_block in iter(lambda: f.read(4096), b""):
+                    for byte_block in iter(lambda: f.read(8192), b""):
                         md5_hash.update(byte_block)
                 pl = list()
                 pkt = list()
@@ -1643,10 +1656,11 @@ class SpaceLabTransmitter:
                 elif self._satellite.get_active_link().get_network_protocol() == _PROTOCOL_CSP:
                     pl.append(int(self.entry_upload_data_file_id.get_text()))   # File ID
                     pl += [0, 0, 0, 0]                                          # Packet ID
-                    pl += [0, 0, 0, 0]                                          # Total number of packets
+                    pl += list(struct.pack('<I', slicer.get_total_chunks()))
                     pl.append(1)                                                # Action type = 1
                     pl.append(40)                                               # Number of bytes in data field
                     pl += [ord(x) for x in md5_hash.hexdigest()]                # MD5 hash
+                    pl += list(struct.pack('<Q', slicer.get_total_bytes()))
                     csp = CSP(int(self.entry_preferences_protocols_csp_my_adr.get_text()))
                     csp.set_hmac_flag_in_header(self.checkbutton_preferences_protocols_hmac_in_header.get_active())
                     pkt = csp.encode(CSP_PRIO_NORM, int(self.entry_preferences_protocols_csp_dst_adr.get_text()), CSP_PORT_UPLOAD_DATA, CSP_PORT_UPLOAD_DATA, False, True, False, False, False, pl, dialog_pw.get_key())
