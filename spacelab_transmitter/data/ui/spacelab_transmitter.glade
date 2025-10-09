@@ -2093,7 +2093,7 @@ Carlos Augusto Porto Freitas &lt;carlos.portof@hotmail.com&gt;</property>
               </packing>
             </child>
             <child>
-              <!-- n-columns=3 n-rows=5 -->
+              <!-- n-columns=3 n-rows=7 -->
               <object class="GtkGrid">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
@@ -2181,7 +2181,7 @@ Carlos Augusto Porto Freitas &lt;carlos.portof@hotmail.com&gt;</property>
                   <object class="GtkLabel">
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
-                    <property name="label" translatable="yes">Include link layer:</property>
+                    <property name="label" translatable="yes">Include Link Layer:</property>
                   </object>
                   <packing>
                     <property name="left-attach">1</property>
@@ -2199,6 +2199,46 @@ Carlos Augusto Porto Freitas &lt;carlos.portof@hotmail.com&gt;</property>
                     <property name="left-attach">2</property>
                     <property name="top-attach">4</property>
                   </packing>
+                </child>
+                <child>
+                  <object class="GtkSeparator">
+                    <property name="visible">True</property>
+                    <property name="can-focus">False</property>
+                  </object>
+                  <packing>
+                    <property name="left-attach">0</property>
+                    <property name="top-attach">5</property>
+                    <property name="width">3</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkLabel">
+                    <property name="visible">True</property>
+                    <property name="can-focus">False</property>
+                    <property name="halign">start</property>
+                    <property name="label" translatable="yes">ZMQ Proxy Byte:</property>
+                  </object>
+                  <packing>
+                    <property name="left-attach">1</property>
+                    <property name="top-attach">6</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkEntry" id="entry_preferences_conn_zmq_byte">
+                    <property name="visible">True</property>
+                    <property name="can-focus">True</property>
+                    <property name="max-length">3</property>
+                    <property name="width-chars">3</property>
+                    <property name="text" translatable="yes">13</property>
+                    <property name="input-purpose">number</property>
+                  </object>
+                  <packing>
+                    <property name="left-attach">2</property>
+                    <property name="top-attach">6</property>
+                  </packing>
+                </child>
+                <child>
+                  <placeholder/>
                 </child>
                 <child>
                   <placeholder/>
