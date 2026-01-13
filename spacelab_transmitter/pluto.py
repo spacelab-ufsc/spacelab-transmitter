@@ -39,7 +39,7 @@ class Pluto:
         """
         self._sample_rate = sample_rate
         self._pluto = adi.Pluto("ip:192.168.2.1")
-        self._pluto.tx_hardwaregain_chan0 = int(gain)
+        self.set_tx_gain(gain)
         self._pluto.sample_rate = int(sample_rate)
         self._pluto.tx_rf_bandwidth = int(sample_rate)
 
@@ -47,10 +47,10 @@ class Pluto:
         """
         Function to transmit IQ samples through the SDR device.
 
-        :param: samples: A NumPy array with the IQ data (complex).
-        :param: dur: is the time duration of the transmission (in seconds).
-        :param: rate: is the samples rate of the input samples.
-        :param: freq: is the frequency in Hz.
+        :param samples: A NumPy array with the IQ data (complex).
+        :param dur: is the time duration of the transmission (in seconds).
+        :param rate: is the samples rate of the input samples.
+        :param freq: is the frequency in Hz.
 
         :return: None.
         """
@@ -66,3 +66,77 @@ class Pluto:
         time.sleep(dur)
 
         return True
+
+    def receive(self, freq, bw, num_samps, gain=50.0):
+        """
+        Function to receive IQ samples from the SDR device.
+
+        :param freq: is the frequency in Hz.
+        :param gain: is the RX gain in dB (between 0 and 74.5 dB).
+        :param bw: is the RX filter bandwith in Hz.
+        :param num_samps: is the number of samples to receive.
+
+        :return: The received IQ samples.
+        """
+        self._pluto.rx_hardwaregain_chan0   = gain
+        self._pluto.rx_lo                   = int(freq)
+        self._pluto.rx_rf_bandwidth         = bw
+        self._pluto.rx_buffer_size          = num_samps
+
+        return self._pluto.rx()
+
+    def set_tx_gain(self, gain):
+        """
+        Sets the TX gain.
+
+        :param gain: is the desired TX gain.
+        :type: int
+
+        :return: None
+        """
+        self._pluto.tx_hardwaregain_chan0 = int(gain)
+
+    def get_tx_gain(self):
+        """
+        Gets the TX gain.
+
+        :return: The current TX gain.
+        :rtype: int
+        """
+        return self._pluto.tx_hardwaregain_chan0
+
+    def set_rx_gain_mode(self, mode):
+        """
+        Sets the RX gain mode.
+
+        :param mode: is the RX gain mode (manual, slow or fast).
+        :type: string
+
+        :return: None.
+        """
+        if mode == 'manual':
+            self._pluto.gain_control_mode_chan0 = 'manual'
+        elif mode == 'slow':
+            self._pluto.gain_control_mode_chan0 = 'slow_attack'
+        elif mode == 'fast':
+            self._pluto.gain_control_mode_chan0 = 'fast_attack'
+        else:
+            raise RuntimeError("Invalid RX gain mode!")
+
+    def get_rx_gain_mode(self):
+        """
+        Gets the RX gain monde.
+
+        :return: the current RX gain mode.
+        :rtype: string
+        """
+        mode = self._pluto.gain_control_mode_chan0
+
+        if mode == 'manual':
+            return 'manual'
+        elif mode == 'slow_attack':
+            return 'slow'
+        elif mode == 'fast_attack':
+            return 'fast'
+        else:
+            raise RuntimeError("Invalid RX gain mode!")
