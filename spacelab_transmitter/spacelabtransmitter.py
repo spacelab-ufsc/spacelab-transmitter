@@ -42,7 +42,6 @@ from spacelab_transmitter.file_slicer import FileSlicer
 
 from spacelab_transmitter.tc_dialogs import DialogDataRequest, DialogDeactivatePayload, DialogEnterHibernation, DialogActivatePayload, DialogGetPayloadData, DialogSetParameter, DialogDeactivateModule, DialogActivateModule, DialogGetParameter, DialogBroadcastMessage, DialogTransmitPacket, DialogEraseMemory, DialogUpdateTLE, DialogCSPPeek, DialogCSPPoke, DialogCSPIFStat, DialogCSPRouteSet, DialogScheduleTC, DialogGetTable, DialogUploadData, DialogPassword
 
-from spacelab_transmitter.gmsk import GMSK
 from spacelab_transmitter.usrp import USRP
 from spacelab_transmitter.pluto import Pluto
 from spacelab_transmitter.csp import CSP, CSP_PRIO_NORM
@@ -54,6 +53,7 @@ from spacelab_transmitter.dopplershift import DopplerShift
 from spacelab_transmitter.log import Log
 
 from pyngham import PyNGHam
+from pymodulation import GMSK
 
 # Constants
 _UI_FILE_LOCAL                  = os.path.abspath(os.path.dirname(__file__)) + '/data/ui/spacelab_transmitter.glade'

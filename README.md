@@ -53,18 +53,19 @@ This program will support the satellites below:
 * [UHD](https://github.com/EttusResearch/uhd)
 * [PyADI-IIO](https://github.com/analogdevicesinc/pyadi-iio)
 * [ZeroMQ](https://zeromq.org/)
+* [PyModulation](https://pypi.org/project/pymodulation/)
 
 ### Installation on Ubuntu
 
 ```sudo apt install python3 python3-gi python3-numpy python3-scipy python3-ephem python3-pyzmq python3-uhd```
 
-```pip install pyngham pyadi-iio```
+```pip install pyngham pyadi-iio pymodulation```
 
 ### Installation on Fedora
 
 ```sudo dnf install python3 python3-gobject python3-numpy python3-scipy python3-ephem python3-pyzmq uhd uhd-devel```
 
-```pip install pyngham pyadi-iio```
+```pip install pyngham pyadi-iio pymodulation```
 
 ## Installing
 

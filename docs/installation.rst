@@ -11,6 +11,7 @@ Before using the SpaceLab Transmitter, ensure that you have the necessary depend
 * `PyEphem <https://pypi.org/project/ephem/>`_
 * `UHD <https://github.com/EttusResearch/uhd>`_
 * `PyADI-IIO <https://github.com/analogdevicesinc/pyadi-iio>`_
+* `PyModulation <https://pypi.org/project/pymodulation/>`_
 
 Installing Adalm Pluto SDR driver and API
 =========================================

@@ -27,8 +27,8 @@ import time
 sys.path.append("../")
 
 from pyngham import PyNGHam
+from pymodulation import GMSK
 
-from spacelab_transmitter.gmsk import GMSK
 from spacelab_transmitter.pluto import Pluto
 
 # Signal Config.
