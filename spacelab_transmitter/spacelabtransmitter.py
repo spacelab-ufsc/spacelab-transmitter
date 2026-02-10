@@ -1597,6 +1597,7 @@ class SpaceLabTransmitter:
 
         if response == Gtk.ResponseType.DELETE_EVENT:
             self.dialog_upload_data.hide()
+
     def on_filechooser_upload_data_selection_changed(self, filechooser):
         slicer = FileSlicer(self.filechooser_upload_data.get_filename(), 200)
 
